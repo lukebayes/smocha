@@ -1,0 +1,28 @@
+{
+  "name": "smocha",
+  "version": "0.0.1",
+  "description": "Smokin' fast test runner that can execute Mocha test sources",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "npm test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "github.com/lukebayes/smocha"
+  },
+  "keywords": [
+    "JavaScript",
+    "unittest",
+    "component-test",
+    "integration-test",
+    "framework"
+  ],
+  "author": "Luke Bayes",
+  "license": "MIT",
+  "devDependencies": {
+    "mocha": "^2.4.5"
+  }
+}
