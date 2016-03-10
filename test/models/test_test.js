@@ -4,16 +4,26 @@ var Test = require('../../').Test,
 describe('Test', () => {
   var instance;
 
-  it('is instantiable', () => {
+  beforeEach(() => {
     instance = new Test('abcd');
-    assert(instance);
-    assert.equal(instance.name, 'abcd');
   });
 
-  it('is composable', () => {
-    var child = new Test();
-    instance.addChild(child);
-    assert.equal(instance.children.length, 1);
+  it('is instantiable', () => {
+    assert(instance);
+    assert.equal(instance.name, 'abcd');
+    assert(typeof instance.handler === 'function');
+  });
+
+  it('accepts handler', () => {
+    var handler = function() {};
+    instance = new Test('efgh', handler);
+    assert.equal(instance.handler, handler);
+  });
+
+  it('accepts name with no handler', () => {
+    instance = new Test('ijkl');
+    assert.equal(instance.name, 'ijkl');
+    assert.equal(instance.handler, Test.DEFAULT_HANDLER);
   });
 });
 

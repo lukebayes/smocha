@@ -23,6 +23,7 @@
   "author": "Luke Bayes",
   "license": "MIT",
   "devDependencies": {
-    "mocha": "^2.4.5"
+    "mocha": "^2.4.5",
+    "sinon": "^1.17.3"
   }
 }
