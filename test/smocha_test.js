@@ -1,7 +1,7 @@
 var Smocha = require('../').Smocha,
     assert = require('assert');
 
-describe('smocha', () => {
+describe('smocha 1', () => {
   var instance;
 
   beforeEach(() => {
