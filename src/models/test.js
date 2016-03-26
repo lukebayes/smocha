@@ -4,8 +4,12 @@ var Composable = require('./composable'),
 var DEFAULT_NAME = 'Default Name',
     DEFAULT_HANDLER = function() {};
 
+var lastId = 0;
+
 var Test = function(nameOrHandler, opt_handler) {
   var name;
+
+  this.id = 'test-' + (lastId++);
 
   if (opt_handler) {
     name = nameOrHandler;
@@ -23,17 +27,26 @@ var Test = function(nameOrHandler, opt_handler) {
 
 util.inherits(Test, Composable);
 
-Test.prototype.beforeRun = function() {
-  // run ancestral beforeEach blocks
+Test.prototype.getBeforeEachHooks = function() {
+  return this.parent && this.parent.getBeforeEachHooks() || [];
+};
+
+Test.prototype.getAfterEachHooks = function() {
+  return this.parent && this.parent.getAfterEachHooks() || [];
+};
+
+Test.prototype.runHooks = function(hooks) {
+  hooks.forEach(function(hook) {
+    hook.call(this);
+  });
 };
 
 Test.prototype.run = function() {
-  // run handler
-  this.handler.call({});
-};
+  var hooks = this.getBeforeEachHooks()
+    .concat([this.handler])
+    .concat(this.getAfterEachHooks());
 
-Test.prototype.afterRun = function() {
-  // run ancestral afterEach blocks
+  this.runHooks(hooks);
 };
 
 Test.DEFAULT_NAME = DEFAULT_NAME;

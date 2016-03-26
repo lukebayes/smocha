@@ -2,77 +2,101 @@ var Test = require('./test'),
     util = require('util');
 
 var nullFunction = function() {};
+var lastId = 0;
 
-var Suite = function(name, handler) {
-  Test.call(this, name, handler);
+var Suite = function(nameOrHandler, opt_handler) {
+  Test.call(this, nameOrHandler, opt_handler);
 
   this.beforeHooks = [];
   this.beforeEachHooks = [];
-  this.tests = [];
+  this.suiteStack = [];
   this.afterEachHooks = [];
   this.afterHooks = [];
   this.isBuilt = false;
+
+  this.id = 'suite-' + (lastId++);
 
   this._preHooks = null;
   this._postHooks = null;
 };
 
-Suite.prototype.beforeRun = function() {
-  // Run before blocks
-};
-
-Suite.prototype.build = function() {
-  this.children.forEach(function(child) {
-    child.build();
-  });
-
-  this.handler.call(null);
-  this.isBuilt = true;
-};
+util.inherits(Suite, Test);
 
 Suite.prototype.run = function() {
-  if (!this.isBuilt) {
-    this.build();
-  }
+  // Run each before hook before running suite.
+  this.beforeHooks.forEach(function(hook) {
+    hook.call(this);
+  }, this);
 
-  this.tests.forEach(test => test.run());
+  this.children.forEach(function(testOrSuite) {
+    testOrSuite.run();
+  }, this);
+
+  this.afterHooks.forEach(function(hook) {
+    hook.call(this);
+  }, this);
 };
 
-Suite.prototype.afterRun = function() {
-  // Run after blocks
+Suite.prototype.getBeforeEachHooks = function() {
+  var hooks = Test.prototype.getBeforeEachHooks.call(this)
+    .concat(this.beforeEachHooks);
+
+  return hooks;
+};
+
+Suite.prototype.getAfterEachHooks = function() {
+  var hooks = Test.prototype.getAfterEachHooks.call(this)
+    .concat(this.afterEachHooks);
+
+  return hooks;
+};
+
+Suite.prototype._getCurrentSuite = function() {
+  return this.suiteStack[this.suiteStack.length - 1] || this;
 };
 
 Suite.prototype.onSuite = function(nameOrHandler, opt_handler) {
-  this.addChild(new Suite(nameOrHandler, opt_handler));
+  var child = new Suite(nameOrHandler, opt_handler);
+  var parent = this._getCurrentSuite();
+
+  // Build the stack of suites and run the declaration handler.
+  this.suiteStack.push(child);
+  parent.addChild(child);
+  child.handler.call(child);
+  this.suiteStack.pop();
+
   return this;
 };
 
 Suite.prototype.onBefore = function(handler) {
-  this.beforeHooks.push(handler);
-  return this;
+  var suite = this._getCurrentSuite();
+  suite.beforeHooks.push(handler);
+  return suite;
 };
 
 Suite.prototype.onBeforeEach = function(handler) {
-  this.beforeEachHooks.push(handler);
-  return this;
+  var suite = this._getCurrentSuite();
+  suite.beforeEachHooks.push(handler);
+  return suite;
 }
 
 Suite.prototype.onTest = function(nameOrHandler, opt_handler) {
-  this.tests.push(new Test(nameOrHandler, opt_handler));
-  return this;
+  var suite = this._getCurrentSuite();
+  suite.addChild(new Test(nameOrHandler, opt_handler));
+  return suite;
 };
 
 Suite.prototype.onAfterEach = function(handler) {
-  this.afterEachHooks.push(handler);
-  return this;
+  var suite = this._getCurrentSuite();
+  suite.afterEachHooks.push(handler);
+  return suite;
 };
 
 Suite.prototype.onAfter = function(handler) {
-  this.afterHooks.push(handler);
-  return this;
+  var suite = this._getCurrentSuite();
+  suite.afterHooks.push(handler);
+  return suite;
 };
-
-util.inherits(Suite, Test);
 
 module.exports = Suite;
 

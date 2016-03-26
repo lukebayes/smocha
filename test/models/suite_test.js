@@ -13,76 +13,97 @@ describe('Suite', () => {
     five = sinon.spy();
     six = sinon.spy();
     seven = sinon.spy();
-    instance = new Suite('abcd');
+    eight = sinon.spy();
+    nine = sinon.spy();
+    ten = sinon.spy();
+    eleven = sinon.spy();
+    twelve = sinon.spy();
+    instance = new Suite('root');
   });
 
   it('is instantiable', () => {
     assert(instance);
-    assert.equal(instance.name, 'abcd');
+    assert.equal(instance.name, 'root');
     assert.equal(typeof instance.run, 'function');
   });
 
-  describe('composition', () => {
-    it('composes two tests', () => {
-      instance.onSuite(function() {
+  describe('composition and hook ordering', () => {
+    it('composes two suites', () => {
+      instance.onSuite('outer', function() {
         instance.onBefore(one);
+
+        // This hook should run before every single subsequent test
         instance.onBeforeEach(two);
-        instance.onBeforeEach(three);
-        instance.onTest('efgh', four);
-        instance.onTest('ijkl', four);
-        instance.onAfterEach(five);
-        instance.onAfterEach(six);
-        instance.onAfter(seven);
+
+        // These tests should run before the inner suite tests
+        instance.onTest('abcd', function() {
+          assert.equal(one.callCount, 1, 'outer before called once');
+          assert.equal(two.callCount, 1, 'outer beforeEach called once');
+          assert.equal(five.callCount, 0, 'inner before called once');
+        });
+
+        instance.onTest('efgh', function() {
+          assert.equal(one.callCount, 1, 'outer before called once');
+          assert.equal(two.callCount, 2, 'outer beforeEach called twice');
+          assert.equal(five.callCount, 0, 'inner before called once');
+        });
+
+        // Each of the inner suite tests should also run the outer beforeEach blocks
+        instance.onSuite('inner', function() {
+          instance.onBefore(five);
+          instance.onBeforeEach(six);
+
+          instance.onTest('ijkl', function() {
+            assert.equal(one.callCount, 1, 'outer before called once');
+            assert.equal(two.callCount, 3, 'outer beforeEach called three times by now');
+            assert.equal(five.callCount, 1, 'inner before called once');
+            assert.equal(six.callCount, 1, 'inner beforeEach called once');
+            assert.equal(nine.callCount, 0, 'inner afterEach not yet called');
+          });
+
+          instance.onTest('mnop', function() {
+            assert.equal(one.callCount, 1, 'outer before called once');
+            assert.equal(two.callCount, 4, 'outer beforeEach called four times by now');
+            assert.equal(five.callCount, 1, 'inner before called once');
+            assert.equal(six.callCount, 2, 'inner beforeEach called twice');
+            assert.equal(nine.callCount, 1, 'inner afterEach called once for previous test');
+          });
+
+          // This should run after each inner test is run
+          instance.onAfterEach(nine);
+
+          // This should run exactly once after inner tests are run
+          instance.onAfter(ten);
+        });
+
+        // These tests should run after the inner suite & tests
+        instance.onTest('qrst', function() {
+          assert.equal(one.callCount, 1, 'outer before called once');
+          assert.equal(two.callCount, 5, 'outer beforeEach called four times by now');
+
+          assert.equal(five.callCount, 1, 'inner before called once');
+          assert.equal(six.callCount, 2, 'inner beforeEach called for each test');
+          assert.equal(nine.callCount, 2, 'inner afterEach called for each test');
+          assert.equal(ten.callCount, 1, 'inner after called once');
+        });
+
+        instance.onTest('uvxw', function() {
+          assert.equal(one.callCount, 1, 'outer before called once');
+          assert.equal(two.callCount, 6, 'outer beforeEach called four times by now');
+        });
+
+        // This should run after every single test method.
+        instance.onAfterEach(eleven);
+
+        // This should run exactly once after all tests are run
+        instance.onAfter(twelve);
       });
 
+      assert.equal(one.callCount, 0, 'No test or before handlers called until run');
+
       instance.run();
-      assert.equal(four.callCount, 2);
-    });
-  });
-
-  describe('hooks', () => {
-    it('onSuite', () => {
-      var result = instance.onSuite('abcd', one);
-      assert.equal(instance, result);
-      assert.equal(instance.children.length, 1);
-      assert.equal(instance.children[0].name, 'abcd');
-      assert.equal(instance.children[0].handler, one);
-    });
-
-    it('onTest', () => {
-      var result = instance.onTest('abcd', one);
-      assert.equal(instance, result);
-      assert.equal(instance.tests.length, 1);
-      assert.equal(instance.tests[0].name, 'abcd');
-      assert.equal(instance.tests[0].handler, one);
-    });
-
-    it('onBefore', () => {
-      var result = instance.onBefore(one);
-      assert.equal(instance, result);
-      assert.equal(instance.beforeHooks.length, 1);
-      assert.equal(instance.beforeHooks[0], one);
-    });
-
-    it('onBeforeEach', () => {
-      var result = instance.onBeforeEach(one);
-      assert.equal(instance, result);
-      assert.equal(instance.beforeEachHooks.length, 1);
-      assert.equal(instance.beforeEachHooks[0], one);
-    });
-
-    it('onAfter', () => {
-      var result = instance.onAfter(one);
-      assert.equal(instance, result);
-      assert.equal(instance.afterHooks.length, 1);
-      assert.equal(instance.afterHooks[0], one);
-    });
-
-    it('onAfterEach', () => {
-      var result = instance.onAfterEach(one);
-      assert.equal(instance, result);
-      assert.equal(instance.afterEachHooks.length, 1);
-      assert.equal(instance.afterEachHooks[0], one);
+      assert.equal(five.callCount, 1, 'outer before called once');
+      assert.equal(twelve.callCount, 1, 'outer after called once');
     });
   });
 });
