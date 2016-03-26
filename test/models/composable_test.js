@@ -30,7 +30,7 @@ describe('Composable', () => {
   describe('getParent', () => {
 
     it('returns undefined if root', () => {
-      assert(instance.getParent() === undefined);
+      assert(instance.parent === undefined);
     });
 
     it('returns parents at each level', () => {
@@ -42,9 +42,9 @@ describe('Composable', () => {
       one.addChild(two);
       two.addChild(three);
 
-      assert.equal(three.getParent(), two);
-      assert.equal(two.getParent(), one);
-      assert.equal(one.getParent(), instance);
+      assert.equal(three.parent, two);
+      assert.equal(two.parent, one);
+      assert.equal(one.parent, instance);
     });
   });
 });
