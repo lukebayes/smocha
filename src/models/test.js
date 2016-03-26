@@ -3,7 +3,8 @@ var Composable = require('./composable'),
 
 var DEFAULT_NAME = 'Default Name',
     DEFAULT_HANDLER = function() {},
-    DEFAULT_TIMEOUT = 2000;
+    DEFAULT_TIMEOUT = 2000,
+    DEFAULT_RESULT = {};
 
 var lastId = 0;
 
@@ -50,9 +51,38 @@ Test.prototype.runHooks = function(hooks) {
   });
 };
 
+Test.prototype.fullName = function() {
+  var parts = [];
+
+  var nameRoot = this.parent && this.parent.fullName() || null;
+
+  if (nameRoot) {
+    parts.push(nameRoot);
+  }
+
+  if (this.name) {
+    parts.push(this.name);
+  }
+
+  return parts.join(' ');
+};
+
+Test.prototype._getRunHandler = function() {
+  return [function() {
+    try {
+      this.result = {
+        name: this.fullName()
+      };
+      this.handler.call(this.context);
+    } catch (err) {
+      this.result.error = err;
+    }
+  }.bind(this)];
+};
+
 Test.prototype.getHooks = function() {
   return this.getBeforeEachHooks()
-    .concat([this.handler])
+    .concat(this._getRunHandler())
     .concat(this.getAfterEachHooks())
     // Ensure each hook will be executed with the test context.
     .map(function(hook) {
@@ -62,11 +92,12 @@ Test.prototype.getHooks = function() {
 
 Test.prototype.run = function() {
   this.runHooks(this.getHooks());
+
+  return this.result;
 };
 
 Test.DEFAULT_NAME = DEFAULT_NAME;
 Test.DEFAULT_HANDLER = DEFAULT_HANDLER;
 
 module.exports = Test;
-
 
