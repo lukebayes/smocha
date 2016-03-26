@@ -22,19 +22,22 @@ var Suite = function(nameOrHandler, opt_handler) {
 
 util.inherits(Suite, Test);
 
-Suite.prototype.run = function() {
-  // Run each before hook before running suite.
-  this.beforeHooks.forEach(function(hook) {
-    hook.call(this);
-  }, this);
+Suite.prototype.getHooks = function() {
+  var hooks = this.beforeHooks.slice();
 
   this.children.forEach(function(testOrSuite) {
-    testOrSuite.run();
-  }, this);
+    hooks = hooks.concat(testOrSuite.getHooks());
+  });
 
-  this.afterHooks.forEach(function(hook) {
-    hook.call(this);
-  }, this);
+  hooks = hooks.concat(this.afterHooks);
+
+  return hooks;
+};
+
+Suite.prototype.run = function() {
+  this.getHooks().forEach(function(hook) {
+    hook();
+  });
 };
 
 Suite.prototype.getBeforeEachHooks = function() {

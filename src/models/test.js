@@ -2,7 +2,8 @@ var Composable = require('./composable'),
     util = require('util');
 
 var DEFAULT_NAME = 'Default Name',
-    DEFAULT_HANDLER = function() {};
+    DEFAULT_HANDLER = function() {},
+    DEFAULT_TIMEOUT = 2000;
 
 var lastId = 0;
 
@@ -10,6 +11,10 @@ var Test = function(nameOrHandler, opt_handler) {
   var name;
 
   this.id = 'test-' + (lastId++);
+  this.timeout = DEFAULT_TIMEOUT;
+  this.context = {
+    timeout: this._timeout.bind(this)
+  };
 
   if (opt_handler) {
     name = nameOrHandler;
@@ -27,6 +32,10 @@ var Test = function(nameOrHandler, opt_handler) {
 
 util.inherits(Test, Composable);
 
+Test.prototype._timeout = function(value) {
+  this.timeout = value;
+};
+
 Test.prototype.getBeforeEachHooks = function() {
   return this.parent && this.parent.getBeforeEachHooks() || [];
 };
@@ -41,12 +50,18 @@ Test.prototype.runHooks = function(hooks) {
   });
 };
 
-Test.prototype.run = function() {
-  var hooks = this.getBeforeEachHooks()
+Test.prototype.getHooks = function() {
+  return this.getBeforeEachHooks()
     .concat([this.handler])
-    .concat(this.getAfterEachHooks());
+    .concat(this.getAfterEachHooks())
+    // Ensure each hook will be executed with the test context.
+    .map(function(hook) {
+      return hook.bind(this.context);
+    }, this);
+};
 
-  this.runHooks(hooks);
+Test.prototype.run = function() {
+  this.runHooks(this.getHooks());
 };
 
 Test.DEFAULT_NAME = DEFAULT_NAME;
