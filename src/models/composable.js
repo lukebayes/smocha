@@ -10,9 +10,5 @@ Composable.prototype.addChild = function(child) {
   return child;
 };
 
-Composable.prototype.getParent = function() {
-  return this.parent;
-};
-
 module.exports = Composable;
 
