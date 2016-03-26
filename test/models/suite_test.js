@@ -39,13 +39,15 @@ describe('Suite', () => {
         instance.onTest('abcd', function() {
           assert.equal(one.callCount, 1, 'outer before called once');
           assert.equal(two.callCount, 1, 'outer beforeEach called once');
-          assert.equal(five.callCount, 0, 'inner before called once');
+          assert.equal(five.callCount, 0, 'inner before not yet called');
+          assert.equal(six.callCount, 0, 'inner beforeEach not yet called');
         });
 
         instance.onTest('efgh', function() {
           assert.equal(one.callCount, 1, 'outer before called once');
           assert.equal(two.callCount, 2, 'outer beforeEach called twice');
-          assert.equal(five.callCount, 0, 'inner before called once');
+          assert.equal(five.callCount, 0, 'inner before not yet called');
+          assert.equal(six.callCount, 0, 'inner beforeEach not yet called');
         });
 
         // Each of the inner suite tests should also run the outer beforeEach blocks
