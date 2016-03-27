@@ -1,4 +1,3 @@
-
 /**
  * The Runner is also an EventEmitter that will provide a stream of
  * notifications as tests are executed. Reporters, printers or other clients
