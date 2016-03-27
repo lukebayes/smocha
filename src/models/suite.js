@@ -36,6 +36,10 @@ var Suite = function(nameOrHandler, opt_handler) {
 
 util.inherits(Suite, Test);
 
+/**
+ * Get a flat array of all wrapped hooks for all tests defined within this
+ * Suite.
+ */
 Suite.prototype.getHooks = function() {
   var hooks = this.beforeHooks.slice();
 
@@ -48,6 +52,9 @@ Suite.prototype.getHooks = function() {
   return hooks;
 };
 
+/**
+ * Run this Suite and all nested hooks and tests.
+ */
 Suite.prototype.run = function() {
   this.getHooks().forEach(function(hook) {
     hook();

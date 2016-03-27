@@ -6,6 +6,7 @@ module.exports = {
   ProcessPool: require('./src/models/process_pool'),
   Smocha: require('./src/smocha'),
   Suite: require('./src/models/suite'),
-  Test: require('./src/models/test')
+  Test: require('./src/models/test'),
+  TestRunner: require('./src/test_runner')
 };
 
