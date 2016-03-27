@@ -1,5 +1,6 @@
 
 module.exports = {
+  ArrayIterator: require('./src/array_iterator'),
   Composable: require('./src/models/composable'),
   File: require('./src/models/file'),
   ProcessPool: require('./src/models/process_pool'),
