@@ -1,44 +1,52 @@
 'use strict';
 const Promise = require('promise');
 const Test = require('../../').Test;
+const TestRunner = require('../../').TestRunner;
 const assert = require('assert');
 const sinon = require('sinon');
 
 const Status = Test.Status;
 
 describe('Test', () => {
-  let instance;
+  let test;
 
-  beforeEach(() => {
-    instance = new Test('abcd');
-  });
+  describe('configuration', () => {
+    beforeEach(() => {
+      test = new Test('abcd');
+    });
 
-  it('is instantiable', () => {
-    assert(instance);
-    assert.equal(instance.name, 'abcd');
-    assert(typeof instance.handler === 'function');
-  });
+    it('is instantiable', () => {
+      assert(test);
+      assert.equal(test.name, 'abcd');
+      assert(typeof test.handler === 'function');
+    });
 
-  it('accepts handler', () => {
-    const handler = function() {};
-    instance = new Test('efgh', handler);
-    assert.equal(instance.handler, handler);
-  });
+    it('accepts handler', () => {
+      const handler = function() {};
+      test = new Test('efgh', handler);
+      assert.equal(test.handler, handler);
+    });
 
-  it('accepts name with no handler', () => {
-    instance = new Test('ijkl');
-    assert.equal(instance.name, 'ijkl');
-    assert.equal(instance.handler, Test.DEFAULT_HANDLER);
+    it('accepts name with no handler', () => {
+      test = new Test('ijkl');
+      assert.equal(test.name, 'ijkl');
+      assert.equal(test.handler, Test.DEFAULT_HANDLER);
+    });
   });
 
   describe('run', () => {
+    beforeEach(() => {
+      test = new Test('abcd');
+    });
+
     it('handles exceptions', () => {
-      instance = new Test(function() {
+      test = new Test(function() {
         throw new Error('fake-error');
       });
 
-      const data = instance.run();
-      assert.equal(data.failure.message, 'fake-error');
+      TestRunner.create(test).run();
+      assert(test.data.failure, 'Expected error object');
+      assert.equal(test.data.failure.message, 'fake-error');
     });
 
     describe('with beforeEach', () => {
@@ -69,12 +77,12 @@ describe('Test', () => {
           }
         };
 
-        instance = new Test('abcd', testHook);
-        instance.parent = parent;
+        test = new Test('abcd', testHook);
+        test.parent = parent;
       });
 
       it('executes parent hook methods', () => {
-        instance.run();
+        TestRunner.create(test).run();
         assert.equal(beforeOne.callCount, 1);
         assert.equal(beforeTwo.callCount, 1);
         assert.equal(afterOne.callCount, 1);
@@ -82,11 +90,11 @@ describe('Test', () => {
       });
 
       it('executes parent hook methods even when failing', () => {
-        instance.handler = function() {
+        test.handler = function() {
           throw new Error('fake-error');
         };
-        instance.run();
-        assert.equal(instance.data.failure.message, 'fake-error');
+        TestRunner.create(test).run();
+        assert.equal(test.data.failure.message, 'fake-error');
         assert.equal(beforeOne.callCount, 1);
         assert.equal(beforeTwo.callCount, 1);
         assert.equal(afterOne.callCount, 1);
@@ -111,6 +119,10 @@ describe('Test', () => {
   });
 
   describe('async', () => {
+    beforeEach(() => {
+      test = new Test('abcd');
+    });
+
     describe('promise', () => {
       it.skip('returns a promise', function() {
         // Create an initial, async succeeding promise.
@@ -121,20 +133,20 @@ describe('Test', () => {
         });
 
         // Create a test method that returns this promise.
-        instance = new Test(function() {
+        test = new Test(function() {
           return promise;
         });
 
         // Wrap the test promise with an assert to return to this test.
         const outer = promise.then(function() {
-          assert.equal(instance.data.status, Status.SUCCEEDED);
+          assert.equal(test.data.status, Status.SUCCEEDED);
         });
 
         // Run the async test.
-        instance.run();
+        TestRunner.create(test).run();
 
         // Ensure we're operating asynchronously.
-        assert.equal(instance.data.status, Status.INITIALIZED);
+        assert.equal(test.data.status, Status.INITIALIZED);
 
         // Defer this test until all asynchronous work settles.
         return outer;
@@ -143,26 +155,25 @@ describe('Test', () => {
   });
 
   describe('context', () => {
-    it('executes handler on test context', () => {
-      instance = new Test('abcd', function() {
+    it('executes handler against test context', () => {
+      test = new Test('abcd', function() {
         this.foo = 'efgh';
       });
+      test.context.foo = 'abcd';
+      assert.equal(test.context.foo, 'abcd');
 
-      instance.context.foo = 'abcd';
-      assert.equal(instance.context.foo, 'abcd');
-
-      instance.run();
-      assert.equal(instance.context.foo, 'efgh');
+      TestRunner.create(test).run();
+      assert.equal(test.context.foo, 'efgh');
     });
 
     it('provides timeout method', () => {
-      instance = new Test(function() {
+      test = new Test(function() {
         this.timeout(2300);
       });
 
-      assert.equal(instance.timeoutMs, 2000);
-      instance.run();
-      assert.equal(instance.timeoutMs, 2300);
+      assert.equal(test.timeoutMs, 2000);
+      TestRunner.create(test).run();
+      assert.equal(test.timeoutMs, 2300);
     });
   });
 });
