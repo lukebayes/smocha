@@ -67,6 +67,9 @@ Test.prototype.fullName = function() {
   return parts.join(' ');
 };
 
+Test.prototype._wrapHook = function() {
+};
+
 Test.prototype._getRunHandler = function() {
   return [function() {
     try {
