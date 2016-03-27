@@ -126,6 +126,29 @@ describe('Test', () => {
       test = new Test('abcd');
     });
 
+    describe('done', () => {
+      it('fails on sync exception', (done) => {
+        test = new Test(function(innerDone) {
+          throw new Error('fake-error');
+        });
+
+        TestRunner.create(test).run(function(err) {
+          assert.equal(err.message, 'fake-error');
+          done();
+        });
+      });
+
+      it('calls done handler', (done) => {
+        test = new Test(function(innerDone) {
+          setTimeout(function() {
+            innerDone();
+          });
+        });
+
+        TestRunner.create(test).run(done);
+      });
+    });
+
     describe('promise', () => {
       it('returns a promise', function() {
         // Create an initial, async succeeding promise.

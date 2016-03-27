@@ -2,8 +2,11 @@ var Iterator = require('../array_iterator');
 var Composable = require('./composable');
 var util = require('util');
 
-var DEFAULT_NAME = 'Default Name';
+// TODO(lbayes): Is this the thinnest, simplest promise library?
+var Promise = require('promise');
+
 var DEFAULT_HANDLER = function() {};
+var DEFAULT_NAME = 'Default Name';
 var DEFAULT_TIMEOUT = 2000;
 var SKIP_IF_FAILED = true;
 
@@ -25,10 +28,6 @@ var TestData = function() {
   this.fullName = null;
   this.status = Status.INITIALIZED;
   this.failure = null;
-  this.durationNs = null;
-
-  // Timings for each hook (pre and post)
-  this.durationsNs = [];
 };
 
 /**
@@ -96,6 +95,29 @@ Test.prototype.getAfterEachHooks = function() {
 };
 
 /**
+ * Some async hooks are written to expect a `done` method. Promisify these hooks
+ * for consistent execution.
+ */
+Test.prototype.wrapCallbackHook = function(hook) {
+  var self = this;
+
+  return function() {
+    return new Promise(function(fulfill, reject) {
+      var done = function(err) {
+        if (err) {
+          reject(err);
+          return;
+        }
+
+        fulfill();
+      };
+
+      hook.call(self.context, done)
+    });
+  };
+};
+
+/**
  * A test hook can be a before, beforeEach, afterEach, after or it block.
  *
  * We have 3 kinds of test hook implementations:
@@ -126,13 +148,11 @@ Test.prototype.wrapHook = function(hook, skipIfFailed) {
   return function(runner) {
     try {
       if (hook.length === 1) {
-        // We have a callback-style async hook.
-        // TODO(lbayes): Wrap the callback-style hook with a promisified
-        // wrapper.
-        throw new Error('Not yet implemented');
+        // We have a callback-style async hook, promisify it.
+        hook = self.wrapCallbackHook(hook);
       }
 
-      if (skipIfFailed && self.data.failure) {
+      if (skipIfFailed && data.failure) {
         // We have encountered an existing failure, and this hook has been
         // identified as one that should NOT be executed if there was a previous
         // failure (before, beforeEach and it). Other subsequently-configured
@@ -145,8 +165,8 @@ Test.prototype.wrapHook = function(hook, skipIfFailed) {
       var promise = hook.call(self.context);
 
       if (promise) {
-        // We have a Promise hook
-        // TODO(lbayes): Set a timer for possible timeout.
+        // We have a Promise hook, notify the runner.
+        // TODO(lbayes): Set a timer to support too-long runtimes.
         runner.onHookPaused(data);
 
         // Manage responses from a promisified hook.
@@ -202,8 +222,11 @@ Test.prototype.testStartedHook = function(runner) {
 };
 
 Test.prototype.testCompletedHook = function(runner) {
-  if (!this.data.failure) {
+  if (this.data.failure) {
+    runner.onTestFailed(this.data);
+  } else {
     this.data.status = Status.SUCCEEDED;
+    runner.onTestSucceeded(this.data);
   }
 
   runner.onHookStarted(this.data);
@@ -212,6 +235,8 @@ Test.prototype.testCompletedHook = function(runner) {
 };
 
 Test.prototype.getHooks = function() {
+  // TODO(lbayes): Insert hooks that check and clear the global environment.
+
   // Wrap the before hooks with general wrapper.
   var hooks = this.wrapHooks(this.getBeforeEachHooks(), SKIP_IF_FAILED);
   // Wrap the test method with a special wrapper.
@@ -228,7 +253,6 @@ Test.prototype.getHooks = function() {
   return hooks;
 };
 
-Test.DEFAULT_NAME = DEFAULT_NAME;
 Test.DEFAULT_HANDLER = DEFAULT_HANDLER;
 
 module.exports = Test;
