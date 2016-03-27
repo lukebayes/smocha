@@ -1,3 +1,4 @@
+var Iterator = require('../array_iterator');
 var Composable = require('./composable');
 var util = require('util');
 
@@ -10,11 +11,15 @@ var lastId = 0;
 var Status = {
   FAILED: 'failed',
   INITIALIZED: 'initialized',
+  PAUSED: 'paused',
   SKIPPED: 'skipped',
   STARTED: 'started',
   SUCCEEDED: 'succeeded'
 };
 
+/**
+ * Serializable payload that will be provided to reporters.
+ */
 var TestData = function() {
   this.fullName = null;
   this.status = Status.INITIALIZED;
@@ -26,13 +31,16 @@ var TestData = function() {
   this.durationsNs = [];
 };
 
+/**
+ * Fundamental building block tests.
+ */
 var Test = function(nameOrHandler, opt_handler) {
   var name;
 
   this.id = 'test-' + (lastId++);
-  this.timeout = DEFAULT_TIMEOUT;
+  this.timeoutMs = DEFAULT_TIMEOUT;
   this.context = {
-    timeout: this._timeout.bind(this)
+    timeout: this.setTimeout.bind(this)
   };
 
   this.result = new TestData();
@@ -55,24 +63,6 @@ util.inherits(Test, Composable);
 
 Test.Status = Status;
 
-Test.prototype._timeout = function(value) {
-  this.timeout = value;
-};
-
-Test.prototype.getBeforeEachHooks = function() {
-  return this.parent && this.parent.getBeforeEachHooks() || [];
-};
-
-Test.prototype.getAfterEachHooks = function() {
-  return this.parent && this.parent.getAfterEachHooks() || [];
-};
-
-Test.prototype.runHooks = function(hooks) {
-  hooks.forEach(function(hook) {
-    hook.call(this);
-  });
-};
-
 Test.prototype.fullName = function() {
   var parts = [];
 
@@ -89,12 +79,30 @@ Test.prototype.fullName = function() {
   return parts.join(' ');
 };
 
+Test.prototype.setTimeout = function(value) {
+  this.timeoutMs = value;
+};
+
+Test.prototype.getBeforeEachHooks = function() {
+  return this.parent && this.parent.getBeforeEachHooks() || [];
+};
+
+Test.prototype.getAfterEachHooks = function() {
+  return this.parent && this.parent.getAfterEachHooks() || [];
+};
+
+Test.prototype.runHooks = function(itr) {
+  while (itr.hasNext()) {
+    itr.next().call(this);
+  }
+};
+
 Test.prototype._wrapHook = function(hook) {
   var self = this;
 
   return function() {
     try {
-      hook.call(self.context);
+      var promise = hook.call(self.context);
     } catch (err) {
       self.result.status = Status.FAILED;
       self.result.failure = err;
@@ -113,7 +121,7 @@ Test.prototype.getHooks = function() {
 };
 
 Test.prototype.run = function() {
-  this.runHooks(this.getHooks());
+  this.runHooks(new Iterator(this.getHooks()));
 
   return this.result;
 };

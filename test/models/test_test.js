@@ -159,9 +159,9 @@ describe('Test', () => {
         this.timeout(2300);
       });
 
-      assert.equal(instance.timeout, 2000);
+      assert.equal(instance.timeoutMs, 2000);
       instance.run();
-      assert.equal(instance.timeout, 2300);
+      assert.equal(instance.timeoutMs, 2300);
     });
   });
 });
