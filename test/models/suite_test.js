@@ -1,9 +1,12 @@
-var Suite = require('../../').Suite,
-    assert = require('assert'),
-    sinon = require('sinon');
+'use strict';
+const Suite = require('../../').Suite;
+const TestRunner = require('../../').TestRunner;
+const assert = require('assert');
+const sinon = require('sinon');
 
 describe('Suite', () => {
-  var instance, one, two, three, four, five, six, seven;
+  let instance, one, two, three, four, five, six, seven, eight, nine, ten,
+      eleven, twelve;
 
   beforeEach(() => {
     one = sinon.spy();
@@ -24,7 +27,6 @@ describe('Suite', () => {
   it('is instantiable', () => {
     assert(instance);
     assert.equal(instance.name, 'root');
-    assert.equal(typeof instance.run, 'function');
   });
 
   describe('composition and hook ordering', () => {
@@ -103,7 +105,7 @@ describe('Suite', () => {
 
       assert.equal(one.callCount, 0, 'No test or before handlers called until run');
 
-      instance.run();
+      TestRunner.create(instance).run();
       assert.equal(five.callCount, 1, 'outer before called once');
       assert.equal(twelve.callCount, 1, 'outer after called once');
     });

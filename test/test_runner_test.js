@@ -9,6 +9,5 @@ describe('TestRunner', () => {
     instance = TestRunner.create();
     assert(instance);
   });
-
 });
 
