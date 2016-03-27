@@ -149,26 +149,35 @@ Test.prototype.wrapHook = function(hook, skipIfFailed) {
         // TODO(lbayes): Set a timer for possible timeout.
         runner.onHookPaused(data);
 
+        // Manage responses from a promisified hook.
         promise
           .then(function() {
+            // Execution has succeeded.
             runner.onHookSucceeded(data);
+            runner.onHookCompleted(data);
           })
           .catch(function(err) {
+            // Execution has been rejected.
+            data.status = Status.FAILED;
             data.failure = err;
             runner.onHookFailed(data);
-          })
-          .finally(function() {
             runner.onHookCompleted(data);
           });
       } else {
+        // We're running synchronously and have succeeded. Proceed immediately.
         runner.onHookSucceeded(data);
         runner.onHookCompleted(data);
       }
     } catch (err) {
+      // We have encountered a synchronous failure, disregard async execution
+      // status, propagate failure and proceed immediately.
       data.status = Status.FAILED;
       data.failure = err;
       runner.onHookFailed(data);
       runner.onHookCompleted(data);
+
+      // TODO(lbayes): Ensure async responses do not make their way to the
+      // runner, which has already moved on.
     }
   };
 };
@@ -193,6 +202,10 @@ Test.prototype.testStartedHook = function(runner) {
 };
 
 Test.prototype.testCompletedHook = function(runner) {
+  if (!this.data.failure) {
+    this.data.status = Status.SUCCEEDED;
+  }
+
   runner.onHookStarted(this.data);
   runner.onTestCompleted(this.data);
   runner.onHookCompleted(this.data);
