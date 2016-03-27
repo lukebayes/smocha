@@ -1,12 +1,30 @@
-var Composable = require('./composable'),
-    util = require('util');
+var Composable = require('./composable');
+var util = require('util');
 
-var DEFAULT_NAME = 'Default Name',
-    DEFAULT_HANDLER = function() {},
-    DEFAULT_TIMEOUT = 2000,
-    DEFAULT_RESULT = {};
+var DEFAULT_NAME = 'Default Name';
+var DEFAULT_HANDLER = function() {};
+var DEFAULT_TIMEOUT = 2000;
 
 var lastId = 0;
+
+var Status = {
+  FAILED: 'failed',
+  INITIALIZED: 'initialized',
+  SKIPPED: 'skipped',
+  STARTED: 'started',
+  SUCCEEDED: 'succeeded'
+};
+
+var TestData = function() {
+  this.fullName = null;
+  this.status = Status.INITIALIZED;
+  this.failure = null;
+
+  this.durationNs = null;
+
+  // Timings for each hook (pre and post)
+  this.durationsNs = [];
+};
 
 var Test = function(nameOrHandler, opt_handler) {
   var name;
@@ -16,6 +34,8 @@ var Test = function(nameOrHandler, opt_handler) {
   this.context = {
     timeout: this._timeout.bind(this)
   };
+
+  this.result = new TestData();
 
   if (opt_handler) {
     name = nameOrHandler;
@@ -32,6 +52,8 @@ var Test = function(nameOrHandler, opt_handler) {
 };
 
 util.inherits(Test, Composable);
+
+Test.Status = Status;
 
 Test.prototype._timeout = function(value) {
   this.timeout = value;
@@ -67,25 +89,22 @@ Test.prototype.fullName = function() {
   return parts.join(' ');
 };
 
-Test.prototype._wrapHook = function() {
-};
+Test.prototype._wrapHook = function(hook) {
+  var self = this;
 
-Test.prototype._getRunHandler = function() {
-  return [function() {
+  return function() {
     try {
-      this.result = {
-        name: this.fullName()
-      };
-      this.handler.call(this.context);
+      hook.call(self.context);
     } catch (err) {
-      this.result.error = err;
+      self.result.status = Status.FAILED;
+      self.result.failure = err;
     }
-  }.bind(this)];
+  };
 };
 
 Test.prototype.getHooks = function() {
   return this.getBeforeEachHooks()
-    .concat(this._getRunHandler())
+    .concat(this._wrapHook(this.handler))
     .concat(this.getAfterEachHooks())
     // Ensure each hook will be executed with the test context.
     .map(function(hook) {

@@ -1,6 +1,9 @@
-var Test = require('../../').Test,
-    assert = require('assert'),
-    sinon = require('sinon');
+var Promise = require('promise');
+var Test = require('../../').Test;
+var assert = require('assert');
+var sinon = require('sinon');
+
+var Status = Test.Status;
 
 describe('Test', () => {
   var instance;
@@ -34,7 +37,7 @@ describe('Test', () => {
       });
 
       var result = instance.run();
-      assert.equal(result.error.message, 'fake-error');
+      assert.equal(result.failure.message, 'fake-error');
     });
 
     describe('with beforeEach', () => {
@@ -82,7 +85,7 @@ describe('Test', () => {
           throw new Error('fake-error');
         };
         instance.run();
-        assert.equal(instance.result.error.message, 'fake-error');
+        assert.equal(instance.result.failure.message, 'fake-error');
         assert.equal(beforeOne.callCount, 1);
         assert.equal(beforeTwo.callCount, 1);
         assert.equal(afterOne.callCount, 1);
@@ -102,6 +105,38 @@ describe('Test', () => {
 
         assert.equal(afterOne.callCount, 1);
         assert.equal(afterTwo.callCount, 1);
+      });
+    });
+  });
+
+  describe('async', () => {
+    describe('promise', () => {
+      it.skip('returns a promise', function() {
+        // Create an initial, async succeeding promise.
+        var promise = new Promise(function(fulfill, reject) {
+          setTimeout(function() {
+            fulfill();
+          });
+        });
+
+        // Create a test method that returns this promise.
+        instance = new Test(function() {
+          return promise;
+        });
+
+        // Wrap the test promise with an assert to return to this test.
+        var outer = promise.then(function() {
+          assert.equal(instance.result.status, Status.SUCCEEDED);
+        });
+
+        // Run the async test.
+        instance.run();
+
+        // Ensure we're operating asynchronously.
+        assert.equal(instance.result.status, Status.INITIALIZED);
+
+        // Defer this test until all asynchronous work settles.
+        return outer;
       });
     });
   });
