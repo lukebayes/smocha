@@ -104,13 +104,16 @@ describe('Test', () => {
       // Before we go much further, we need to create external iterators
       // for test execution and ensure we're supporting async tests,
       // promisified tests and regular test failures.
-      it.skip('stops execution if beforeEach fails', () => {
+      it('stops execution if beforeEach fails', () => {
         beforeEachHooks.unshift(function() {
           throw new Error('before-err');
         });
 
+        TestRunner.create(test).run();
+
         assert.equal(beforeOne.callCount, 0);
         assert.equal(beforeTwo.callCount, 0);
+        assert.equal(testHook.callCount, 0);
 
         assert.equal(afterOne.callCount, 1);
         assert.equal(afterTwo.callCount, 1);
