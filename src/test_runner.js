@@ -1,11 +1,17 @@
 var EventEmitter = require('events').EventEmitter;
 var Events = require('./models/events');
 var Iterator = require('./array_iterator');
+var TestStatus = require('./models/test').Status;
 var util = require('util');
 
 var TestRunnerData = function() {
   this.hooks = [];
   this.tests = [];
+
+  this.status = TestStatus.INITIALIZED;
+  // TODO(lbayes): Update TestRunnerData.failure to the first found failure if
+  // a failure was encountered.
+  this.failure = null;
 };
 
 /**
@@ -95,6 +101,10 @@ TestRunner.prototype.onHookSucceeded = function(hookData) {
 };
 
 TestRunner.prototype.onHookFailed = function(hookData) {
+  if (!this.data.failure) {
+    this.data.failure = hookData.failure;
+    this.data.status = TestStatus.FAILED;
+  }
   this.emit(Events.HOOK_FAILED, hookData);
 };
 
@@ -109,6 +119,8 @@ TestRunner.prototype.onHookCompleted = function(hookData) {
 };
 
 TestRunner.prototype.run = function(opt_completeHandler) {
+  this._completeHandler = opt_completeHandler;
+
   this.onRunnerStarted();
 
   this._iterator = new Iterator(this._test.getHooks());
@@ -130,6 +142,8 @@ TestRunner.prototype._runNext = function() {
     hook(this);
   } else {
     this.emit(Events.RUNNER_COMPLETED, this.data);
+    // Call the complete handler if one was provided to the `.run()` call.
+    this._completeHandler && this._completeHandler(this.data.failure, this.data);
   }
 };
 
