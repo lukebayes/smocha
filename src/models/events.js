@@ -6,9 +6,24 @@
  */
 module.exports = {
   /**
+   * A test file has been discovered.
+   */
+  FILE_DISCOVERED: 'fileDiscovered',
+
+  /**
+   * A Suite has been discovered,
+   */
+  SUITE_DISCOVERED: 'suiteDiscovered',
+
+  /**
+   * A Test method has been discovered.
+   */
+  TEST_DISCOVERED: 'testDiscovered',
+
+  /**
    * Overall TestRunner has started execution.
    */
-  STARTED: 'started',
+  RUNNER_STARTED: 'runnerStarted',
 
   /**
    * Suite execution has begun.
@@ -23,7 +38,7 @@ module.exports = {
   /**
    * A before, beforeEach, after or afterEach hook has begun.
    */
-  HOOK_ENDED: 'hookEnded',
+  HOOK_COMPLETED: 'hookCompleted',
 
   /**
    * Execution has paused due to an asynchronous response from a hook or test.
@@ -41,9 +56,9 @@ module.exports = {
   TEST_STARTED: 'testStarted',
 
   /**
-   * A test method has finished execution and passed.
+   * A test method has finished execution and succeeded.
    */
-  TEST_PASSED: 'testPassed',
+  TEST_SUCCEEDED: 'testSucceeded',
 
   /**
    * A test method has finished execution and failed.
@@ -53,16 +68,16 @@ module.exports = {
   /**
    * A test method has completed execution.
    */
-  TEST_ENDED: 'testEnded',
+  TEST_COMPLETED: 'testCompleted',
 
   /**
    * A Suite has completed execution.
    */
-  SUITE_ENDED: 'suiteEnded',
+  SUITE_COMPLETED: 'suiteCompleted',
 
   /**
    * Overall TestRunner has completed execution.
    */
-  ENDED: 'ended'
+  RUNNER_COMPLETED: 'runnerCompleted'
 };
 

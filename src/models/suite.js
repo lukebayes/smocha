@@ -22,18 +22,34 @@ var Suite = function(nameOrHandler, opt_handler) {
 
 util.inherits(Suite, Test);
 
+Suite.prototype.suiteStartHook = function(runner) {
+  runner.onHookStarted(this.data);
+  runner.onSuiteStarted(this.data);
+  runner.onHookCompleted(this.data);
+};
+
+Suite.prototype.suiteCompleteHook = function(runner) {
+  runner.onHookStarted(this.data);
+  runner.onSuiteCompleted(this.data);
+  runner.onHookCompleted(this.data);
+};
+
 /**
  * Get a flat array of all wrapped hooks for all tests defined within this
  * Suite.
  */
 Suite.prototype.getHooks = function() {
-  var hooks = this.beforeHooks.slice();
+  var hooks = this.wrapHooks(this.beforeHooks);
 
   this.children.forEach(function(testOrSuite) {
+    // NOTE(lbayes): These hooks will be wrapped by the child Test or Suite.
     hooks = hooks.concat(testOrSuite.getHooks());
   });
 
-  hooks = hooks.concat(this.afterHooks);
+  hooks = hooks.concat(this.wrapHooks(this.afterHooks));
+
+  hooks.unshift(this.suiteStartHook.bind(this));
+  hooks.push(this.suiteCompleteHook.bind(this));
 
   return hooks;
 };
