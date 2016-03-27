@@ -127,7 +127,7 @@ describe('Test', () => {
     });
 
     describe('promise', () => {
-      it.skip('returns a promise', function() {
+      it('returns a promise', function() {
         // Create an initial, async succeeding promise.
         const promise = new Promise(function(fulfill, reject) {
           setTimeout(function() {
@@ -140,9 +140,9 @@ describe('Test', () => {
           return promise;
         });
 
-        // Wrap the test promise with an assert to return to this test.
-        const outer = promise.then(function() {
-          assert.equal(test.data.status, Status.SUCCEEDED);
+        const early = promise.then(function() {
+          // Ensure the data is in pending state until after all hooks.
+          assert.equal(test.data.status, Status.PENDING);
         });
 
         // Run the async test.
@@ -150,6 +150,12 @@ describe('Test', () => {
 
         // Ensure we're operating asynchronously.
         assert.equal(test.data.status, Status.INITIALIZED);
+
+
+        const outer = promise.then(function() {
+          // Ensure the status moves to succeeded state.
+          assert.equal(test.data.status, Status.SUCCEEDED);
+        });
 
         // Defer this test until all asynchronous work settles.
         return outer;
