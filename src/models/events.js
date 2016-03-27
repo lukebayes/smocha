@@ -36,6 +36,21 @@ module.exports = {
   HOOK_STARTED: 'hookStarted',
 
   /**
+   * A before, beforeEach, after or afterEach hook has paused.
+   */
+  HOOK_PAUSED: 'hookPaused',
+
+  /**
+   * A before, beforeEach, after or afterEach hook has succeeded.
+   */
+  HOOK_SUCCEEDED: 'hookSucceeded',
+
+  /**
+   * A before, beforeEach, after or afterEach hook has failed.
+   */
+  HOOK_FAILED: 'hookFailed',
+
+  /**
    * A before, beforeEach, after or afterEach hook has begun.
    */
   HOOK_COMPLETED: 'hookCompleted',

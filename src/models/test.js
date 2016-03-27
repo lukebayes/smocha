@@ -78,6 +78,10 @@ Test.prototype.fullName = function() {
   return parts.join(' ');
 };
 
+Test.prototype.isPending = function() {
+  return this.data.status === Status.PAUSED;
+};
+
 Test.prototype.setTimeout = function(value) {
   this.timeoutMs = value;
 };
@@ -90,7 +94,6 @@ Test.prototype.getAfterEachHooks = function() {
   return this.parent && this.parent.getAfterEachHooks() || [];
 };
 
-
 /**
  * A test hook can be a before, beforeEach, afterEach, after or it block.
  *
@@ -101,15 +104,19 @@ Test.prototype.getAfterEachHooks = function() {
  * 3) Async Promise
  *
  * Synchronous hooks are often lightweight, simple functions and should be
- * executed quicklky.
+ * executed quickly.
  *
- * Async Callback hooks require a `done()` function as the only argument.
+ * Async Callback hooks expect a `done()` function as the only argument. This
+ * function will be called whenever the hook is complete. If the hook calls the
+ * function with a non-null argument, this is treated as an error and the
+ * provided argument is expected to be an Error object.
  *
- * Async Promise hooks return a promise when called.
+ * Async Promise hooks return a promise when called and should fulfill or
+ * reject the promise to indicate success or failure. Rejections should include
+ * a helpful Error to make debugging easier.
  *
  * We also need the Runner to emit events to notify Reporters during test
  * progress.
- *
  */
 Test.prototype.wrapHook = function(hook) {
   var self = this;
@@ -119,21 +126,37 @@ Test.prototype.wrapHook = function(hook) {
     try {
       if (hook.length === 1) {
         // We have a callback-style async hook.
+        // TODO(lbayes): Wrap the callback-style hook with a promisified
+        // wrapper.
         throw new Error('Not yet implemented');
       }
 
       var promise = hook.call(self.context);
 
       if (promise) {
+        // We have a Promise hook
+        // TODO(lbayes): Set a timer for possible timeout.
         runner.onHookPaused(data);
+
+        promise
+          .then(function() {
+            runner.onHookSucceeded(data);
+          })
+          .catch(function(err) {
+            data.failure = err;
+            runner.onHookFailed(data);
+          })
+          .finally(function() {
+            runner.onHookCompleted(data);
+          });
       } else {
+        runner.onHookSucceeded(data);
         runner.onHookCompleted(data);
       }
     } catch (err) {
       data.status = Status.FAILED;
       data.failure = err;
       runner.onHookFailed(data);
-    } finally {
       runner.onHookCompleted(data);
     }
   };
