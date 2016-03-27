@@ -46,6 +46,11 @@ module.exports = {
   HOOK_SUCCEEDED: 'hookSucceeded',
 
   /**
+   * A before, beforeEach, after or afterEach hook has skipped.
+   */
+  HOOK_SKIPPED: 'hookSkipped',
+
+  /**
    * A before, beforeEach, after or afterEach hook has failed.
    */
   HOOK_FAILED: 'hookFailed',

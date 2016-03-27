@@ -22,13 +22,13 @@ var Suite = function(nameOrHandler, opt_handler) {
 
 util.inherits(Suite, Test);
 
-Suite.prototype.suiteStartHook = function(runner) {
+Suite.prototype.suiteStartedHook = function(runner) {
   runner.onHookStarted(this.data);
   runner.onSuiteStarted(this.data);
   runner.onHookCompleted(this.data);
 };
 
-Suite.prototype.suiteCompleteHook = function(runner) {
+Suite.prototype.suiteCompletedHook = function(runner) {
   runner.onHookStarted(this.data);
   runner.onSuiteCompleted(this.data);
   runner.onHookCompleted(this.data);
@@ -48,8 +48,8 @@ Suite.prototype.getHooks = function() {
 
   hooks = hooks.concat(this.wrapHooks(this.afterHooks));
 
-  hooks.unshift(this.suiteStartHook.bind(this));
-  hooks.push(this.suiteCompleteHook.bind(this));
+  hooks.unshift(this.suiteStartedHook.bind(this));
+  hooks.push(this.suiteCompletedHook.bind(this));
 
   return hooks;
 };

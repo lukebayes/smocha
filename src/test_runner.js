@@ -98,6 +98,10 @@ TestRunner.prototype.onHookFailed = function(hookData) {
   this.emit(Events.HOOK_FAILED, hookData);
 };
 
+TestRunner.prototype.onHookSkipped = function(hookData) {
+  this.emit(Events.HOOK_SKIPPED, hookData);
+};
+
 TestRunner.prototype.onHookCompleted = function(hookData) {
   this.data.hooks.push(hookData);
   this.emit(Events.HOOK_COMPLETED, hookData);

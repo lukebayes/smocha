@@ -5,6 +5,7 @@ var util = require('util');
 var DEFAULT_NAME = 'Default Name';
 var DEFAULT_HANDLER = function() {};
 var DEFAULT_TIMEOUT = 2000;
+var SKIP_IF_FAILED = true;
 
 var lastId = 0;
 
@@ -118,7 +119,7 @@ Test.prototype.getAfterEachHooks = function() {
  * We also need the Runner to emit events to notify Reporters during test
  * progress.
  */
-Test.prototype.wrapHook = function(hook) {
+Test.prototype.wrapHook = function(hook, skipIfFailed) {
   var self = this;
   var data = this.data;
 
@@ -129,6 +130,16 @@ Test.prototype.wrapHook = function(hook) {
         // TODO(lbayes): Wrap the callback-style hook with a promisified
         // wrapper.
         throw new Error('Not yet implemented');
+      }
+
+      if (skipIfFailed && self.data.failure) {
+        // We have encountered an existing failure, and this hook has been
+        // identified as one that should NOT be executed if there was a previous
+        // failure (before, beforeEach and it). Other subsequently-configured
+        // hooks will likely be executed (after, afterEach).
+        runner.onHookSkipped(data);
+        runner.onHookCompleted(data);
+        return;
       }
 
       var promise = hook.call(self.context);
@@ -166,34 +177,40 @@ Test.prototype.wrapHook = function(hook) {
  * Wrap the provided Array of hook functions so that they properly manage
  * asynchronous execution and aggregated iteration.
  */
-Test.prototype.wrapHooks = function(hooks) {
+Test.prototype.wrapHooks = function(hooks, skipIfFailed) {
   return hooks.map(function(hook) {
-    return this.wrapHook(hook);
+    return this.wrapHook(hook, skipIfFailed);
   }, this);
 };
 
-Test.prototype.testStartHook = function(runner) {
+Test.prototype.testStartedHook = function(runner) {
+  // Update the data with name.
   this.data.fullName = this.fullName();
+
   runner.onHookStarted(this.data);
   runner.onTestStarted(this.data);
   runner.onHookCompleted(this.data);
 };
 
-Test.prototype.testCompleteHook = function(runner) {
+Test.prototype.testCompletedHook = function(runner) {
   runner.onHookStarted(this.data);
   runner.onTestCompleted(this.data);
   runner.onHookCompleted(this.data);
 };
 
 Test.prototype.getHooks = function() {
-  var hooks = this.getBeforeEachHooks()
-      .concat([this.handler])
-      .concat(this.getAfterEachHooks());
+  // Wrap the before hooks with general wrapper.
+  var hooks = this.wrapHooks(this.getBeforeEachHooks(), SKIP_IF_FAILED);
+  // Wrap the test method with a special wrapper.
+  hooks.push(this.wrapHook(this.handler, SKIP_IF_FAILED));
+  // Wrap the after hooks with general wrapper.
+  hooks = hooks.concat(this.wrapHooks(this.getAfterEachHooks()));
 
-  hooks = this.wrapHooks(hooks);
+  // Insert the test start hook.
+  hooks.unshift(this.testStartedHook.bind(this));
 
-  hooks.unshift(this.testStartHook.bind(this));
-  hooks.push(this.testCompleteHook.bind(this));
+  // Insert the test completed hook.
+  hooks.push(this.testCompletedHook.bind(this));
 
   return hooks;
 };
