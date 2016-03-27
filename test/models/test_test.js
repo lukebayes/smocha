@@ -1,12 +1,13 @@
-var Promise = require('promise');
-var Test = require('../../').Test;
-var assert = require('assert');
-var sinon = require('sinon');
+'use strict';
+const Promise = require('promise');
+const Test = require('../../').Test;
+const assert = require('assert');
+const sinon = require('sinon');
 
-var Status = Test.Status;
+const Status = Test.Status;
 
 describe('Test', () => {
-  var instance;
+  let instance;
 
   beforeEach(() => {
     instance = new Test('abcd');
@@ -19,7 +20,7 @@ describe('Test', () => {
   });
 
   it('accepts handler', () => {
-    var handler = function() {};
+    const handler = function() {};
     instance = new Test('efgh', handler);
     assert.equal(instance.handler, handler);
   });
@@ -36,12 +37,12 @@ describe('Test', () => {
         throw new Error('fake-error');
       });
 
-      var result = instance.run();
-      assert.equal(result.failure.message, 'fake-error');
+      const data = instance.run();
+      assert.equal(data.failure.message, 'fake-error');
     });
 
     describe('with beforeEach', () => {
-      var parent, beforeEachHooks, afterEachHooks, beforeOne, beforeTwo,
+      let parent, beforeEachHooks, afterEachHooks, beforeOne, beforeTwo,
         afterOne, afterTwo, testHook;
 
       beforeEach(() => {
@@ -85,7 +86,7 @@ describe('Test', () => {
           throw new Error('fake-error');
         };
         instance.run();
-        assert.equal(instance.result.failure.message, 'fake-error');
+        assert.equal(instance.data.failure.message, 'fake-error');
         assert.equal(beforeOne.callCount, 1);
         assert.equal(beforeTwo.callCount, 1);
         assert.equal(afterOne.callCount, 1);
@@ -113,7 +114,7 @@ describe('Test', () => {
     describe('promise', () => {
       it.skip('returns a promise', function() {
         // Create an initial, async succeeding promise.
-        var promise = new Promise(function(fulfill, reject) {
+        const promise = new Promise(function(fulfill, reject) {
           setTimeout(function() {
             fulfill();
           });
@@ -125,15 +126,15 @@ describe('Test', () => {
         });
 
         // Wrap the test promise with an assert to return to this test.
-        var outer = promise.then(function() {
-          assert.equal(instance.result.status, Status.SUCCEEDED);
+        const outer = promise.then(function() {
+          assert.equal(instance.data.status, Status.SUCCEEDED);
         });
 
         // Run the async test.
         instance.run();
 
         // Ensure we're operating asynchronously.
-        assert.equal(instance.result.status, Status.INITIALIZED);
+        assert.equal(instance.data.status, Status.INITIALIZED);
 
         // Defer this test until all asynchronous work settles.
         return outer;

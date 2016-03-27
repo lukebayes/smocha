@@ -24,7 +24,6 @@ var TestData = function() {
   this.fullName = null;
   this.status = Status.INITIALIZED;
   this.failure = null;
-
   this.durationNs = null;
 
   // Timings for each hook (pre and post)
@@ -43,7 +42,7 @@ var Test = function(nameOrHandler, opt_handler) {
     timeout: this.setTimeout.bind(this)
   };
 
-  this.result = new TestData();
+  this.data = new TestData();
 
   if (opt_handler) {
     name = nameOrHandler;
@@ -104,8 +103,8 @@ Test.prototype._wrapHook = function(hook) {
     try {
       var promise = hook.call(self.context);
     } catch (err) {
-      self.result.status = Status.FAILED;
-      self.result.failure = err;
+      self.data.status = Status.FAILED;
+      self.data.failure = err;
     }
   };
 };
@@ -123,7 +122,7 @@ Test.prototype.getHooks = function() {
 Test.prototype.run = function() {
   this.runHooks(new Iterator(this.getHooks()));
 
-  return this.result;
+  return this.data;
 };
 
 Test.DEFAULT_NAME = DEFAULT_NAME;
