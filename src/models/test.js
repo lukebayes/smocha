@@ -160,6 +160,7 @@ Test.prototype.wrapHook = function(hook, skipIfFailed) {
         return;
       }
 
+      // Call the hook so that `this` refers to the shared context.
       var promise = hook.call(self.context);
 
       if (promise) {
