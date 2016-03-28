@@ -25,13 +25,20 @@ var TestRunnerData = function() {
 var TestRunner = function(testOrSuite) {
   EventEmitter.call(this);
 
-  this._test = testOrSuite;
+  this._test = testOrSuite || null;
+  this._string = null;
+
   this._completeHandler = null;
   this._isStarted = false;
   this.data = new TestRunnerData();
 };
 
 util.inherits(TestRunner, EventEmitter);
+
+TestRunner.prototype.withPath = function(path) {
+  this._path = path;
+  return this;
+};
 
 TestRunner.prototype.onRunnerStarted = function() {
   if (this._isStarted) {
@@ -118,13 +125,35 @@ TestRunner.prototype.onHookCompleted = function(hookData) {
   this._runNext();
 };
 
+TestRunner.prototype._buildTest = function(callback) {
+  if (this._test) {
+    return callback(null, this._test);
+  }
+
+  if (this._path) {
+    console.log('YOOOOOOOOOO', this._path);
+  }
+
+  if (!this._test) {
+    throw new Error('Unable to run tests without test content');
+  }
+};
+
 TestRunner.prototype.run = function(opt_completeHandler) {
   this._completeHandler = opt_completeHandler;
 
   this.onRunnerStarted();
 
-  this._iterator = new Iterator(this._test.getHooks());
-  this._runNext();
+  this._buildTest(function(err, test) {
+    if (err) {
+      this._completeHandler(err);
+      return;
+    }
+    this._iterator = new Iterator(test.getHooks());
+    this._runNext();
+  }.bind(this));
+
+  // TODO(lbayes): Return a promise too?
 };
 
 /**

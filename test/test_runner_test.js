@@ -2,6 +2,7 @@
 const Events = require('../').Events;
 const TestRunner = require('../').TestRunner;
 const assert = require('assert');
+const fs = require('fs');
 const sinon = require('sinon');
 
 describe('TestRunner', () => {
@@ -59,6 +60,19 @@ describe('TestRunner', () => {
 
     assert.equal(hookCompleted.getCall(0).args[0], 'efgh');
     assert.equal(hookCompleted.getCall(1).args[0], 'mnop');
+  });
+
+  describe('file input', () => {
+    let fixturePath;
+
+    beforeEach(() => {
+      fixturePath = __dirname + '/fixtures/passing_fixture.js';
+    });
+
+    it('accepts file', done => {
+      const runner = TestRunner.create().withPath(fixturePath);
+      runner.run(done);
+    });
   });
 });
 
