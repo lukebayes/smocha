@@ -1,5 +1,5 @@
-var Iterator = require('../array_iterator');
 var Composable = require('./composable');
+var Iterator = require('../array_iterator');
 var util = require('util');
 
 // TODO(lbayes): Is this the thinnest, simplest promise library?
@@ -59,8 +59,6 @@ var Test = function(nameOrHandler, opt_handler) {
 };
 
 util.inherits(Test, Composable);
-
-Test.Status = Status;
 
 Test.prototype.fullName = function() {
   var parts = [];
@@ -252,6 +250,8 @@ Test.prototype.getHooks = function() {
 
   return hooks;
 };
+
+Test.Status = Status;
 
 Test.DEFAULT_HANDLER = DEFAULT_HANDLER;
 

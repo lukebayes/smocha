@@ -13,7 +13,6 @@ var Suite = function(nameOrHandler, opt_handler) {
   this.afterEachHooks = [];
   this.afterHooks = [];
   this.isBuilt = false;
-
   this.id = 'suite-' + (lastId++);
 
   this._preHooks = null;
@@ -95,7 +94,7 @@ Suite.prototype.onBeforeEach = function(handler) {
   var suite = this._getCurrentSuite();
   suite.beforeEachHooks.push(handler);
   return suite;
-}
+};
 
 Suite.prototype.onTest = function(nameOrHandler, opt_handler) {
   var suite = this._getCurrentSuite();
