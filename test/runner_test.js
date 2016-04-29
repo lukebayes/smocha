@@ -1,10 +1,10 @@
 'use strict';
 const Events = require('../').Events;
-const TestRunner = require('../').TestRunner;
+const Runner = require('../').Runner;
 const assert = require('assert');
 const sinon = require('sinon');
 
-describe('TestRunner', () => {
+describe('Runner', () => {
   var instance, fakeTest, fakeHooks;
 
   beforeEach(() => {
@@ -14,7 +14,7 @@ describe('TestRunner', () => {
       getHooks: function()  { return fakeHooks; }
     };
 
-    instance = TestRunner.create(fakeTest);
+    instance = Runner.create(fakeTest);
   });
 
   it('only runs once', () => {
@@ -22,7 +22,7 @@ describe('TestRunner', () => {
 
     assert.throws(err => {
       instance.run();
-    }, /TestRunner can only be run once/);
+    }, /Runner can only be run once/);
   });
 
   it('calls each hook with self', () => {
