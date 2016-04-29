@@ -21,7 +21,7 @@ module.exports = {
   TEST_DISCOVERED: 'testDiscovered',
 
   /**
-   * Overall TestRunner has started execution.
+   * Overall Runner has started execution.
    */
   RUNNER_STARTED: 'runnerStarted',
 
@@ -96,7 +96,7 @@ module.exports = {
   SUITE_COMPLETED: 'suiteCompleted',
 
   /**
-   * Overall TestRunner has completed execution.
+   * Overall Runner has completed execution.
    */
   RUNNER_COMPLETED: 'runnerCompleted'
 };

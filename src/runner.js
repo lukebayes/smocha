@@ -4,12 +4,12 @@ var Iterator = require('./array_iterator');
 var TestStatus = require('./models/test').Status;
 var util = require('util');
 
-var TestRunnerData = function() {
+var RunnerData = function() {
   this.hooks = [];
   this.tests = [];
 
   this.status = TestStatus.INITIALIZED;
-  // TODO(lbayes): Update TestRunnerData.failure to the first found failure if
+  // TODO(lbayes): Update RunnerData.failure to the first found failure if
   // a failure was encountered.
   this.failure = null;
 };
@@ -20,22 +20,22 @@ var TestRunnerData = function() {
  * have been called.
  *
  * @see src/models/events.js For more details about the event stream that the
- *   TestRunner can emit.
+ *   Runner can emit.
  */
-var TestRunner = function(testOrSuite) {
+var Runner = function(testOrSuite) {
   EventEmitter.call(this);
 
   this._test = testOrSuite;
   this._completeHandler = null;
   this._isStarted = false;
-  this.data = new TestRunnerData();
+  this.data = new RunnerData();
 };
 
-util.inherits(TestRunner, EventEmitter);
+util.inherits(Runner, EventEmitter);
 
-TestRunner.prototype.onRunnerStarted = function() {
+Runner.prototype.onRunnerStarted = function() {
   if (this._isStarted) {
-    throw new Error('TestRunner can only be run once');
+    throw new Error('Runner can only be run once');
   }
   this._isStarted = true;
   this.emit(Events.RUNNER_STARTED);
@@ -45,7 +45,7 @@ TestRunner.prototype.onRunnerStarted = function() {
  * All Suites insert a hook at the beginning to notify the runner when they have
  * started.
  */
-TestRunner.prototype.onSuiteStarted = function(suiteData) {
+Runner.prototype.onSuiteStarted = function(suiteData) {
   this.emit(Events.SUITE_STARTED, suiteData);
 };
 
@@ -53,7 +53,7 @@ TestRunner.prototype.onSuiteStarted = function(suiteData) {
  * All Suites insert a hook at the end to notify the runner when they are
  * complete.
  */
-TestRunner.prototype.onSuiteCompleted = function(suiteData) {
+Runner.prototype.onSuiteCompleted = function(suiteData) {
   this.emit(Events.SUITE_COMPLETED, suiteData);
 };
 
@@ -61,16 +61,16 @@ TestRunner.prototype.onSuiteCompleted = function(suiteData) {
  * All Tests insert a hook at the beginning to notify the runner when they have
  * started.
  */
-TestRunner.prototype.onTestStarted = function(testData) {
+Runner.prototype.onTestStarted = function(testData) {
   this.emit(Events.TEST_STARTED, testData);
 };
 
 
-TestRunner.prototype.onTestFailed = function(testData) {
+Runner.prototype.onTestFailed = function(testData) {
   this.emit(Events.TEST_FAILED, testData);
 };
 
-TestRunner.prototype.onTestSucceeded = function(testData) {
+Runner.prototype.onTestSucceeded = function(testData) {
   this.emit(Events.TEST_SUCCEEDED, testData);
 };
 
@@ -78,7 +78,7 @@ TestRunner.prototype.onTestSucceeded = function(testData) {
  * All Tests insert a hook at the end to notify the runner when they are
  * complete.
  */
-TestRunner.prototype.onTestCompleted = function(testData) {
+Runner.prototype.onTestCompleted = function(testData) {
   this.data.tests.push(testData);
   this.emit(Events.TEST_COMPLETED, testData);
 };
@@ -88,19 +88,19 @@ TestRunner.prototype.onTestCompleted = function(testData) {
  * method on the provided runner. This is how we balance the needs of fast
  * synchronous hooks and more complex asynchronous hooks.
  */
-TestRunner.prototype.onHookStarted = function(hookData) {
+Runner.prototype.onHookStarted = function(hookData) {
   this.emit(Events.HOOK_STARTED, hookData);
 };
 
-TestRunner.prototype.onHookPaused = function(hookData) {
+Runner.prototype.onHookPaused = function(hookData) {
   this.emit(Events.HOOK_PAUSED, hookData);
 };
 
-TestRunner.prototype.onHookSucceeded = function(hookData) {
+Runner.prototype.onHookSucceeded = function(hookData) {
   this.emit(Events.HOOK_SUCCEEDED, hookData);
 };
 
-TestRunner.prototype.onHookFailed = function(hookData) {
+Runner.prototype.onHookFailed = function(hookData) {
   if (!this.data.failure) {
     this.data.failure = hookData.failure;
     this.data.status = TestStatus.FAILED;
@@ -108,17 +108,17 @@ TestRunner.prototype.onHookFailed = function(hookData) {
   this.emit(Events.HOOK_FAILED, hookData);
 };
 
-TestRunner.prototype.onHookSkipped = function(hookData) {
+Runner.prototype.onHookSkipped = function(hookData) {
   this.emit(Events.HOOK_SKIPPED, hookData);
 };
 
-TestRunner.prototype.onHookCompleted = function(hookData) {
+Runner.prototype.onHookCompleted = function(hookData) {
   this.data.hooks.push(hookData);
   this.emit(Events.HOOK_COMPLETED, hookData);
   this._runNext();
 };
 
-TestRunner.prototype.run = function(opt_completeHandler) {
+Runner.prototype.run = function(opt_completeHandler) {
   this._completeHandler = opt_completeHandler;
 
   this.onRunnerStarted();
@@ -135,7 +135,7 @@ TestRunner.prototype.run = function(opt_completeHandler) {
  * If there are no more hooks, mark this Runner as completed and notify
  * listeners.
  */
-TestRunner.prototype._runNext = function() {
+Runner.prototype._runNext = function() {
   var itr = this._iterator;
   if (itr.hasNext()) {
     var hook = itr.next();
@@ -150,9 +150,8 @@ TestRunner.prototype._runNext = function() {
 /**
  * Create a new runner with the provided Test or Suite reference.
  */
-TestRunner.create = function(testOrSuite) {
-  return new TestRunner(testOrSuite);
+Runner.create = function(testOrSuite) {
+  return new Runner(testOrSuite);
 };
 
-module.exports = TestRunner;
-
+module.exports = Runner;
