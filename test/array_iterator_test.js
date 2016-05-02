@@ -1,22 +1,22 @@
-var ArrayIterator = require('../').ArrayIterator;
-var assert = require('assert');
+'use strict';
+const ArrayIterator = require('../').ArrayIterator;
+const assert = require('assert');
 
-describe('ArrayIterator', function() {
-
-  it('loop over one child', function() {
-    var itr = new ArrayIterator(['a']);
+describe('ArrayIterator', () => {
+  it('loop over one child', () => {
+    const itr = new ArrayIterator(['a']);
 
     assert(itr.hasNext());
     assert.equal('a', itr.next());
 
     assert(!itr.hasNext());
-    assert.throws(function() {
+    assert.throws(() => {
       itr.next();
     }, /no more items/);
   });
 
-  it('loop over three children', function() {
-    var itr = new ArrayIterator(['a', 'b', 'c']);
+  it('loop over three children', () => {
+    const itr = new ArrayIterator(['a', 'b', 'c']);
     assert(itr.hasNext());
     assert.equal('a', itr.next());
     assert(itr.hasNext());
@@ -25,13 +25,13 @@ describe('ArrayIterator', function() {
     assert.equal('c', itr.next());
 
     assert(!itr.hasNext());
-    assert.throws(function() {
+    assert.throws(() => {
       itr.next();
     }, /no more items/);
   });
 
-  it('return next item from peek', function() {
-    var itr = new ArrayIterator(['a', 'b']);
+  it('return next item from peek', () => {
+    const itr = new ArrayIterator(['a', 'b']);
     assert.equal('a', itr.peek());
     itr.next();
     assert.equal('b', itr.peek());
@@ -39,7 +39,7 @@ describe('ArrayIterator', function() {
 
     assert(!itr.hasNext());
 
-    assert.throws(function() {
+    assert.throws(() => {
       itr.peek();
     }, /no more items/);
   });
