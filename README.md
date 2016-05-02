@@ -35,3 +35,11 @@ Our team has over 5,500 unit/component tests that currently take about 2.5
 minutes on a 2014 IMac (Intel Core i7-4771 CPU @ 3.50GHz). After spreading these
 tests across the available cores, test run times dropped to about 22 seconds.
 
+
+## Contributing
+
+1) Get Node v5.10+ into your system path.
+2) `npm install`
+3) Run tests with `mocha test/**/*_test.js --reporter dot`
+4) Run linter with, `eslint .`
+
