@@ -38,8 +38,7 @@ tests across the available cores, test run times dropped to about 22 seconds.
 
 ## Contributing
 
-1) Get Node v5.10+ into your system path.
-2) `npm install`
-3) Run tests with `mocha test/**/*_test.js --reporter dot`
-4) Run linter with, `eslint .`
+- Get Node v5.10+ into your system path.
+- `npm install`
+- Run tests with `npm test`
 
