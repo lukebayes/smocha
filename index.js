@@ -1,4 +1,3 @@
-
 module.exports = {
   ArrayIterator: require('./src/array_iterator'),
   Composable: require('./src/models/composable'),
