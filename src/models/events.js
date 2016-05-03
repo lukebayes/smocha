@@ -6,6 +6,15 @@
  */
 module.exports = {
   /**
+   * Test file evaluation has completed.
+   */
+  FILE_EVAL_COMPLETED: 'fileEvalCompleted',
+
+  /**
+   * Test file evaluation has begun.
+   */
+  FILE_EVAL_STARTED: 'fileEvalStarted',
+  /**
    * A test file has been discovered.
    */
   FILE_DISCOVERED: 'fileDiscovered',

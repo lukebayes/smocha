@@ -145,6 +145,10 @@ Test.prototype.wrapHook = function(hook, skipIfFailed) {
   var self = this;
   var data = this.data;
 
+  /**
+   * This is the wrapped hoook function. Each wrapped hook must be called with
+   * a Runner instance.
+   */
   return function(runner) {
     try {
       if (hook.length === 1) {
