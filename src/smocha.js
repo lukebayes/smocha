@@ -1,5 +1,6 @@
-require('/home/lukebayes/Projects/krypton/experimental/test/bootstrap.js');
-require('/home/lukebayes/Projects/krypton/experimental/modules/browser/kr-react/bootstrap.js');
+const KRYPTON = process.env.KRYPTON;
+require(KRYPTON+'/test/bootstrap.js');
+require(KRYPTON+'/modules/browser/kr-react/bootstrap.js');
 
 var FileRunner = require('./file_runner');
 var files = require('./files');
@@ -27,7 +28,7 @@ module.exports = Smocha;
 
 
 if (require.main === module) {
-  files.scan('modules/common/kr-utils/test/*_test.js', function(err, result) {
+  files.scan(KRYPTON+'/modules/common/kr-utils/test/*_test.js', function(err, result) {
     var instance = new Smocha({files: result.paths});
     instance.run();
   });
