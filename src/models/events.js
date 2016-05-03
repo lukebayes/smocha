@@ -14,6 +14,7 @@ module.exports = {
    * Test file evaluation has begun.
    */
   FILE_EVAL_STARTED: 'fileEvalStarted',
+
   /**
    * A test file has been discovered.
    */

@@ -28,7 +28,7 @@ class RunnerData {
  * @see src/models/events.js For more details about the event stream that the
  *   Runner can emit.
  */
-class FileRunner extends EventEmitter {
+class Runner extends EventEmitter {
   constructor() {
     super();
 
@@ -37,12 +37,17 @@ class FileRunner extends EventEmitter {
     this.data = new RunnerData();
   }
 
+  /**
+   * The runner has begun running.
+   */
   onRunnerStarted() {
-    if (this._isStarted) {
-      throw new Error('FileRunner can only be run once');
+    // NOTE(lbayes): Subclasses (like FileRunner) may call this before calling
+    // runTest, so we need to support calling this method more than once and
+    // ensure we do not emit the event more than once.
+    if (!this._isStarted) {
+      this._isStarted = true;
+      this.emit(Events.RUNNER_STARTED);
     }
-    this._isStarted = true;
-    this.emit(Events.RUNNER_STARTED);
   }
 
   /**
@@ -119,19 +124,18 @@ class FileRunner extends EventEmitter {
   onHookCompleted(hookData) {
     this.data.hooks.push(hookData);
     this.emit(Events.HOOK_COMPLETED, hookData);
-    this._runNext();
+    this._runNextHook();
   }
 
+  /**
+   * Run all hooks for the provided Test (or Suite which subclasses Test).
+   */
   runTest(test, opt_completeHandler) {
     this._completeHandler = opt_completeHandler;
+    this.onRunnerStarted();
 
     this._iterator = new Iterator(test.getHooks());
-    this._runNext();
-  }
-
-  // Placeholder
-  runSuite(suite, opt_completeHandler) {
-    runTest(suite, opt_completeHandler);
+    this._runNextHook();
   }
 
   /**
@@ -142,7 +146,7 @@ class FileRunner extends EventEmitter {
    * If there are no more hooks, mark this Runner as completed and notify
    * listeners.
    */
-  _runNext() {
+  _runNextHook() {
     var itr = this._iterator;
     if (itr.hasNext()) {
       var hook = itr.next();
@@ -155,5 +159,5 @@ class FileRunner extends EventEmitter {
   }
 }
 
-module.exports = FileRunner;
+module.exports = Runner;
 
