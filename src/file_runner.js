@@ -1,8 +1,8 @@
 'use strict';
+var Events = require('./models/events');
 var Runner = require('./runner');
 var Suite = require('./models/suite');
 var defaultUi = require('./default_ui');
-
 
 class FileRunner extends Runner {
 
