@@ -1,6 +1,6 @@
 'use strict';
-const FileRunner = require('../../').FileRunner;
 const Promise = require('promise');
+const Runner = require('../../').Runner;
 const Test = require('../../').Test;
 const assert = require('assert');
 const sinon = require('sinon');
@@ -8,7 +8,11 @@ const sinon = require('sinon');
 const Status = Test.Status;
 
 describe('Test', () => {
-  let test;
+  let test, runner;
+
+  beforeEach(() => {
+    runner = new Runner();
+  });
 
   describe('configuration', () => {
     beforeEach(() => {
@@ -44,7 +48,8 @@ describe('Test', () => {
         throw new Error('fake-error');
       });
 
-      FileRunner.create(test).run();
+      runner.runTest(test);
+
       assert(test.data.failure, 'Expected error object');
       assert.equal(test.data.failure.message, 'fake-error');
     });
@@ -82,7 +87,8 @@ describe('Test', () => {
       });
 
       it('executes parent hook methods', () => {
-        FileRunner.create(test).run();
+        runner.runTest(test);
+
         assert.equal(beforeOne.callCount, 1);
         assert.equal(beforeTwo.callCount, 1);
         assert.equal(afterOne.callCount, 1);
@@ -93,7 +99,8 @@ describe('Test', () => {
         test.handler = function() {
           throw new Error('fake-error');
         };
-        FileRunner.create(test).run();
+        runner.runTest(test);
+
         assert.equal(test.data.failure.message, 'fake-error');
         assert.equal(beforeOne.callCount, 1);
         assert.equal(beforeTwo.callCount, 1);
@@ -109,7 +116,7 @@ describe('Test', () => {
           throw new Error('before-err');
         });
 
-        FileRunner.create(test).run();
+        runner.runTest(test);
 
         assert.equal(beforeOne.callCount, 0);
         assert.equal(beforeTwo.callCount, 0);
@@ -132,7 +139,7 @@ describe('Test', () => {
           throw new Error('fake-error');
         });
 
-        FileRunner.create(test).run(function(err) {
+        runner.runTest(test, function(err) {
           assert.equal(err.message, 'fake-error');
           done();
         });
@@ -145,7 +152,7 @@ describe('Test', () => {
           });
         });
 
-        FileRunner.create(test).run(done);
+        runner.runTest(test, done);
       });
     });
 
@@ -169,7 +176,7 @@ describe('Test', () => {
         });
 
         // Run the async test.
-        FileRunner.create(test).run();
+        runner.runTest(test);
 
         // Ensure we're operating asynchronously.
         assert.equal(test.data.status, Status.INITIALIZED);
@@ -194,7 +201,7 @@ describe('Test', () => {
       test.context.foo = 'abcd';
       assert.equal(test.context.foo, 'abcd');
 
-      FileRunner.create(test).run();
+      runner.runTest(test);
       assert.equal(test.context.foo, 'efgh');
     });
 
@@ -204,7 +211,7 @@ describe('Test', () => {
       });
 
       assert.equal(test.timeoutMs, 2000);
-      FileRunner.create(test).run();
+      runner.runTest(test);
       assert.equal(test.timeoutMs, 2300);
     });
   });

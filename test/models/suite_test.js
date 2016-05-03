@@ -1,5 +1,5 @@
 'use strict';
-const FileRunner = require('../../').FileRunner;
+const Runner = require('../../').Runner;
 const Suite = require('../../').Suite;
 const assert = require('assert');
 const sinon = require('sinon');
@@ -105,7 +105,8 @@ describe('Suite', () => {
 
       assert.equal(one.callCount, 0, 'No test or before handlers called until run');
 
-      FileRunner.create(instance).run();
+      var runner = new Runner();
+      runner.runTest(instance);
 
       assert.equal(five.callCount, 1, 'outer before called once');
       assert.equal(twelve.callCount, 1, 'outer after called once');
