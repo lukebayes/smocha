@@ -23,7 +23,8 @@
   "author": "Luke Bayes",
   "license": "MIT",
   "dependencies": {
-    "chokidar": "1.4.3"
+    "chokidar": "1.4.3",
+    "diff": "^2.2.2"
   },
   "devDependencies": {
     "@lukebayes/each-file": "^1.0.0",
