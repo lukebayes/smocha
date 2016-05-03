@@ -1,10 +1,10 @@
 'use strict';
 const Events = require('../').Events;
-const Runner = require('../').Runner;
+const FileRunner = require('../').FileRunner;
 const assert = require('assert');
 const sinon = require('sinon');
 
-describe('Runner', () => {
+describe('FileRunner', () => {
   var instance, fakeTest, fakeHooks;
 
   beforeEach(() => {
@@ -14,7 +14,7 @@ describe('Runner', () => {
       getHooks: function()  { return fakeHooks; }
     };
 
-    instance = Runner.create(fakeTest);
+    instance = FileRunner.create(fakeTest);
   });
 
   it('only runs once', () => {
