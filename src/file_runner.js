@@ -22,7 +22,7 @@ var RunnerData = function() {
  * @see src/models/events.js For more details about the event stream that the
  *   Runner can emit.
  */
-var Runner = function(testOrSuite) {
+var FileRunner = function(testOrSuite) {
   EventEmitter.call(this);
 
   this._test = testOrSuite;
@@ -31,11 +31,11 @@ var Runner = function(testOrSuite) {
   this.data = new RunnerData();
 };
 
-util.inherits(Runner, EventEmitter);
+util.inherits(FileRunner, EventEmitter);
 
-Runner.prototype.onRunnerStarted = function() {
+FileRunner.prototype.onRunnerStarted = function() {
   if (this._isStarted) {
-    throw new Error('Runner can only be run once');
+    throw new Error('FileRunner can only be run once');
   }
   this._isStarted = true;
   this.emit(Events.RUNNER_STARTED);
@@ -45,7 +45,7 @@ Runner.prototype.onRunnerStarted = function() {
  * All Suites insert a hook at the beginning to notify the runner when they have
  * started.
  */
-Runner.prototype.onSuiteStarted = function(suiteData) {
+FileRunner.prototype.onSuiteStarted = function(suiteData) {
   this.emit(Events.SUITE_STARTED, suiteData);
 };
 
@@ -53,7 +53,7 @@ Runner.prototype.onSuiteStarted = function(suiteData) {
  * All Suites insert a hook at the end to notify the runner when they are
  * complete.
  */
-Runner.prototype.onSuiteCompleted = function(suiteData) {
+FileRunner.prototype.onSuiteCompleted = function(suiteData) {
   this.emit(Events.SUITE_COMPLETED, suiteData);
 };
 
@@ -61,16 +61,16 @@ Runner.prototype.onSuiteCompleted = function(suiteData) {
  * All Tests insert a hook at the beginning to notify the runner when they have
  * started.
  */
-Runner.prototype.onTestStarted = function(testData) {
+FileRunner.prototype.onTestStarted = function(testData) {
   this.emit(Events.TEST_STARTED, testData);
 };
 
 
-Runner.prototype.onTestFailed = function(testData) {
+FileRunner.prototype.onTestFailed = function(testData) {
   this.emit(Events.TEST_FAILED, testData);
 };
 
-Runner.prototype.onTestSucceeded = function(testData) {
+FileRunner.prototype.onTestSucceeded = function(testData) {
   this.emit(Events.TEST_SUCCEEDED, testData);
 };
 
@@ -78,7 +78,7 @@ Runner.prototype.onTestSucceeded = function(testData) {
  * All Tests insert a hook at the end to notify the runner when they are
  * complete.
  */
-Runner.prototype.onTestCompleted = function(testData) {
+FileRunner.prototype.onTestCompleted = function(testData) {
   this.data.tests.push(testData);
   this.emit(Events.TEST_COMPLETED, testData);
 };
@@ -88,19 +88,19 @@ Runner.prototype.onTestCompleted = function(testData) {
  * method on the provided runner. This is how we balance the needs of fast
  * synchronous hooks and more complex asynchronous hooks.
  */
-Runner.prototype.onHookStarted = function(hookData) {
+FileRunner.prototype.onHookStarted = function(hookData) {
   this.emit(Events.HOOK_STARTED, hookData);
 };
 
-Runner.prototype.onHookPaused = function(hookData) {
+FileRunner.prototype.onHookPaused = function(hookData) {
   this.emit(Events.HOOK_PAUSED, hookData);
 };
 
-Runner.prototype.onHookSucceeded = function(hookData) {
+FileRunner.prototype.onHookSucceeded = function(hookData) {
   this.emit(Events.HOOK_SUCCEEDED, hookData);
 };
 
-Runner.prototype.onHookFailed = function(hookData) {
+FileRunner.prototype.onHookFailed = function(hookData) {
   if (!this.data.failure) {
     this.data.failure = hookData.failure;
     this.data.status = TestStatus.FAILED;
@@ -108,17 +108,17 @@ Runner.prototype.onHookFailed = function(hookData) {
   this.emit(Events.HOOK_FAILED, hookData);
 };
 
-Runner.prototype.onHookSkipped = function(hookData) {
+FileRunner.prototype.onHookSkipped = function(hookData) {
   this.emit(Events.HOOK_SKIPPED, hookData);
 };
 
-Runner.prototype.onHookCompleted = function(hookData) {
+FileRunner.prototype.onHookCompleted = function(hookData) {
   this.data.hooks.push(hookData);
   this.emit(Events.HOOK_COMPLETED, hookData);
   this._runNext();
 };
 
-Runner.prototype.run = function(opt_completeHandler) {
+FileRunner.prototype.run = function(opt_completeHandler) {
   this._completeHandler = opt_completeHandler;
 
   this.onRunnerStarted();
@@ -135,7 +135,7 @@ Runner.prototype.run = function(opt_completeHandler) {
  * If there are no more hooks, mark this Runner as completed and notify
  * listeners.
  */
-Runner.prototype._runNext = function() {
+FileRunner.prototype._runNext = function() {
   var itr = this._iterator;
   if (itr.hasNext()) {
     var hook = itr.next();
@@ -150,8 +150,8 @@ Runner.prototype._runNext = function() {
 /**
  * Create a new runner with the provided Test or Suite reference.
  */
-Runner.create = function(testOrSuite) {
-  return new Runner(testOrSuite);
+FileRunner.create = function(testOrSuite) {
+  return new FileRunner(testOrSuite);
 };
 
-module.exports = Runner;
+module.exports = FileRunner;
