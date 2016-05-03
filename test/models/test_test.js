@@ -1,7 +1,7 @@
 'use strict';
+const FileRunner = require('../../').FileRunner;
 const Promise = require('promise');
 const Test = require('../../').Test;
-const Runner = require('../../').Runner;
 const assert = require('assert');
 const sinon = require('sinon');
 
@@ -44,7 +44,7 @@ describe('Test', () => {
         throw new Error('fake-error');
       });
 
-      Runner.create(test).run();
+      FileRunner.create(test).run();
       assert(test.data.failure, 'Expected error object');
       assert.equal(test.data.failure.message, 'fake-error');
     });
@@ -82,7 +82,7 @@ describe('Test', () => {
       });
 
       it('executes parent hook methods', () => {
-        Runner.create(test).run();
+        FileRunner.create(test).run();
         assert.equal(beforeOne.callCount, 1);
         assert.equal(beforeTwo.callCount, 1);
         assert.equal(afterOne.callCount, 1);
@@ -93,7 +93,7 @@ describe('Test', () => {
         test.handler = function() {
           throw new Error('fake-error');
         };
-        Runner.create(test).run();
+        FileRunner.create(test).run();
         assert.equal(test.data.failure.message, 'fake-error');
         assert.equal(beforeOne.callCount, 1);
         assert.equal(beforeTwo.callCount, 1);
@@ -109,7 +109,7 @@ describe('Test', () => {
           throw new Error('before-err');
         });
 
-        Runner.create(test).run();
+        FileRunner.create(test).run();
 
         assert.equal(beforeOne.callCount, 0);
         assert.equal(beforeTwo.callCount, 0);
@@ -132,7 +132,7 @@ describe('Test', () => {
           throw new Error('fake-error');
         });
 
-        Runner.create(test).run(function(err) {
+        FileRunner.create(test).run(function(err) {
           assert.equal(err.message, 'fake-error');
           done();
         });
@@ -145,7 +145,7 @@ describe('Test', () => {
           });
         });
 
-        Runner.create(test).run(done);
+        FileRunner.create(test).run(done);
       });
     });
 
@@ -169,7 +169,7 @@ describe('Test', () => {
         });
 
         // Run the async test.
-        Runner.create(test).run();
+        FileRunner.create(test).run();
 
         // Ensure we're operating asynchronously.
         assert.equal(test.data.status, Status.INITIALIZED);
@@ -194,7 +194,7 @@ describe('Test', () => {
       test.context.foo = 'abcd';
       assert.equal(test.context.foo, 'abcd');
 
-      Runner.create(test).run();
+      FileRunner.create(test).run();
       assert.equal(test.context.foo, 'efgh');
     });
 
@@ -204,7 +204,7 @@ describe('Test', () => {
       });
 
       assert.equal(test.timeoutMs, 2000);
-      Runner.create(test).run();
+      FileRunner.create(test).run();
       assert.equal(test.timeoutMs, 2300);
     });
   });
