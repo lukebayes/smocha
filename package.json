@@ -1,13 +1,15 @@
 {
   "name": "smocha",
-  "version": "0.0.1",
-  "description": "Smokin' fast test runner that can execute Mocha test sources",
+  "version": "1.0.0",
+  "description": "Smokin' fast test runner that can execute Mocha tests",
   "main": "index.js",
   "directories": {
+    "bin": "bin",
+    "src": "src",
     "test": "test"
   },
   "scripts": {
-    "test": "./node_modules/.bin/_mocha test/*_test.js test/**/*_test.js --reporter dot"
+    "test": "bin/smocha test/"
   },
   "repository": {
     "type": "git",
@@ -17,19 +19,13 @@
     "JavaScript",
     "unittest",
     "component-test",
-    "integration-test",
-    "framework"
+    "integration-test"
   ],
   "author": "Luke Bayes",
   "license": "MIT",
-  "dependencies": {
-    "chokidar": "1.4.3",
-    "diff": "^2.2.2"
-  },
+  "dependencies": {},
   "devDependencies": {
     "@lukebayes/each-file": "^1.0.0",
-    "mocha": "^2.4.5",
-    "promise": "^7.1.1",
-    "sinon": "^1.17.3"
+    "chai": "^4.1.1"
   }
 }

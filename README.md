@@ -1,6 +1,6 @@
 
 # Smocha
-Smokin' fast (and Safe) drop-in replacement for Mocha tests.
+Smokin' fast drop-in replacement for Mocha tests.
 
 Tests should be fast.
 Tests should be isolated.
@@ -12,8 +12,7 @@ a given developer, whether these cores are local or remote should not require
 any changes to the test code itself.
 
 Nodejs presents a collection of primitives that make it possible for us to write
-extremely fast, concurrent programs that can scale with machine capabilities and
-avoid many of the limitations that other languages suffer from.
+extremely fast, concurrent programs that can scale with compute capability.
 
 For example, we can scan the file system for test files, and immediately begin
 execution when the first file is encountered. We can fan out test execution
@@ -24,21 +23,25 @@ execution that is reset between each test method.
 A variety of test types can be described using the same DSL provided by Mocha,
 we should be able to simply declare different runners for different test tasks.
 
-Smocha will soon support the following types of tests:
+Smocha supports the following types of tests:
 
 * Unit/Component
 * Performance
 * Fuzzing
 * Integration
 
-Our team has over 5,500 unit/component tests that currently take about 2.5
-minutes on a 2014 IMac (Intel Core i7-4771 CPU @ 3.50GHz). After spreading these
-tests across the available cores, test run times dropped to about 22 seconds.
+One of the teams that I have worked on, had over 5,500 unit & component tests
+that took take about 2.5 minutes on a 2014 IMac
+(Intel Core i7-4771 CPU @ 3.50GHz) to run.
 
+After spreading these tests across the available cores, test run times dropped
+to typically take 22 seconds.
 
 ## Contributing
 
-- Get Node v5.10+ into your system path.
+- Clone the git repository and cd into it
+- `make dev-install`
+- `source setup-env.sh`
 - `npm install`
-- Run tests with `npm test`
+- Run tests by running `smocha` in the main directory (it was added to your path by setup-env.sh).
 
