@@ -43,5 +43,5 @@ to typically take 22 seconds.
 - `make dev-install`
 - `source setup-env.sh`
 - `npm install`
-- Run tests by running `smocha` in the main directory (it was added to your path by setup-env.sh).
+- Run tests by running `make test` in the main directory (it was added to your path by setup-env.sh).
 
