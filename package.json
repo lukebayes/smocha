@@ -23,7 +23,9 @@
   ],
   "author": "Luke Bayes",
   "license": "MIT",
-  "dependencies": {},
+  "dependencies": {
+    "vm2": "^3.4.6"
+  },
   "devDependencies": {
     "@lukebayes/each-file": "^1.0.0",
     "chai": "^4.1.1",
