@@ -10,18 +10,14 @@ class NodeLoader {
   constructor(file, runner) {
     this.file = file;
     this.runner = runner;
-    this.hooks = [];
   }
 
   load() {
-    console.log('Nodeloader loading file', this.file);
     return new Promise((resolve, reject) => {
       fs.readFile(this.file, (err, data) => {
         if (err) {
-          console.error("FAIL:", err);
           reject(err);
         } else {
-          console.error("SUCCESS:", data.toString());
           resolve(new TestFile(this.file, data.toString()));
         }
       });
@@ -35,33 +31,6 @@ class TestFile {
     this.content = content;
   }
 }
-
-class Composite {
-  constructor() {
-    this.children = [];
-  }
-
-  forEach(handler) {
-    return this.children.forEach(handler);
-  }
-}
-
-class Suite extends Composite {
-  constructor(label, handler, onAsync) {
-    this.label = label;
-    this.handler = handler;
-    this.onAsync = onAsync;
-  }
-}
-
-class Hook extends Composite {
-  constructor(label, handler, onAsync) {
-    this.label = label;
-    this.handler = handler;
-    this.onAsync = onAsync;
-  }
-}
-
 
 class BaseReporter {
   constructor(writer) {
@@ -99,44 +68,87 @@ class BaseReporter {
   }
 }
 
+class Composite {
+  constructor() {
+    this.children = [];
+  }
+
+  forEach(handler) {
+    return this.children.forEach(handler);
+  }
+}
+
+class Hook extends Composite {
+  constructor(label, handler, onAsync) {
+    super();
+    this.label = label;
+    this.handler = handler;
+    this.onAsync = onAsync;
+  }
+}
+
+class Suite extends Hook {
+  constructor(label, handler) {
+    super(label, handler);
+    this.befores = [];
+    this.afters = [];
+    this.beforeEaches = [];
+    this.afterEaches = [];
+    this.tests = [];
+  }
+}
+
+const nullFunction = function() {};
+
 class BddInterface {
-  constructor(hooks) {
-    this._hooks = hooks;
+  constructor() {
+    this.suites = [new Suite()];
   }
 
-  describe(name, body) {
-    console.log('DESCRIBE:', name);
-    console.log('body:', body);
+  get _currentSuite() {
+    return this.suites[this.suites.length - 1];
   }
 
-  it(name, body, handler) {
+  describe(label, body) {
+    this._currentSuite.children.push(new Suite(label, body));
+    body();
+    if (this.suites.length > 1) {
+      this.suites.pop();
+    }
   }
 
-  beforeEach(name, body, handler) {
+  it(label, body, onAsync) {
+    this._currentSuite.tests.push(new Hook(label, body, onAsync));
   }
 
-  afterEach(name, body, handler) {
+  beforeEach(label, body, onAsync) {
+    this._currentSuite.beforeEaches.push(new Hook(label, body, onAsync));
   }
 
-  before(name, body, handler) {
+  afterEach(label, body, onAsync) {
+    this._currentSuite.afterEaches.push(new Hook(label, body, onAsync));
   }
 
-  after(name, body, handler) {
+  before(label, body, onAsync) {
+    this._currentSuite.befores.push(new Hook(label, body, onAsync));
   }
 
-  getHooks() {
-    console.log('returning hooks:', this._hooks);
-    return this._hooks;
+  after(label, body, onAsync) {
+    this._currentSuite.afters.push(new Hook(label, body, onAsync));
+  }
+
+  toHooks() {
+    return [];
   }
 
   toSandbox() {
     return {
-      after: this.after,
-      afterEach: this.afterEach,
-      before: this.before,
-      beforeEach: this.beforeEach,
-      describe: this.describe,
-      it: this.it,
+      after: this.after.bind(this),
+      afterEach: this.afterEach.bind(this),
+      before: this.before.bind(this),
+      beforeEach: this.beforeEach.bind(this),
+      describe: this.describe.bind(this),
+      it: this.it.bind(this),
     }
   }
 }
@@ -154,7 +166,6 @@ class TestRunner {
   }
 
   load() {
-    console.log('loading: ', this.files);
     const loaders = this._createLoaders();
     return this._loadLoaders(loaders)
       .then((testFiles) => {
@@ -169,28 +180,34 @@ class TestRunner {
   }
 
   _processTestFiles(testFiles) {
-    return Promise.all(testFiles.map((file) => {
+    return testFiles.map((file) => {
       return this._processTestFile(file);
-    }));
+    });
   }
 
-  _processTestFile(testFile) {
-    console.log('processing:', testFile);
-    console.log('aye');
+  _getInterface() {
+    return new BddInterface();
+  }
 
-    const testInterface = new BddInterface();
-
+  _runFile(testFile, testInterface) {
+    // TODO(lbayes): Select the appropriate runtime environment
+    // depending on whether we're in a browser, on a device or
+    // running in Nodejs.
     const vm = new NodeVM({
       timeout: 1000,
       require: {
         external: true
       },
-      sandbox: testInterface.toSandbox(),
+      sandbox: testInterface.toSandbox()
     });
 
     vm.run(testFile.content, testFile.filename);
+  }
 
-    return testInterface.getHooks();
+  _processTestFile(testFile) {
+    const testInterface = this._getInterface();
+    this._runFile(testFile, testInterface);
+    return testInterface.toHooks();
     console.log('FINISHED');
   }
 
