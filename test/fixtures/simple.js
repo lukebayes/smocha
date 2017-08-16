@@ -21,7 +21,7 @@ describe('Simple', () => {
   });
 
   it('receives __filename', () => {
-    assert.equal(__filename, 'sdf');
+    assert.match(__filename, /simple.js/);
   });
 
   it('passes', () => {

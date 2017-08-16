@@ -71,6 +71,12 @@ class BaseReporter {
 class Composite {
   constructor() {
     this.children = [];
+    this.parent = null;
+  }
+
+  addChild(child) {
+    child.parent = this;
+    this.children.push(child);
   }
 
   forEach(handler) {
@@ -85,6 +91,15 @@ class Hook extends Composite {
     this.handler = handler;
     this.onAsync = onAsync;
   }
+
+  execute() {
+    this.handler();
+  }
+
+  getLabel() {
+    const base = this.parent ? this.parent.getLabel : '';
+    return `${base} ${this.label}`;
+  }
 }
 
 class Suite extends Hook {
@@ -96,49 +111,82 @@ class Suite extends Hook {
     this.afterEaches = [];
     this.tests = [];
   }
+
+  execute() {
+    this.toHooks().forEach((hook) => {
+      hook.execute();
+    });
+  }
+
+  toHooks() {
+    // Capture the suite-level before blocks
+    let hooks = this.befores.slice();
+
+    // Create a hook set for beforeEaches, its and afterEaches
+    this.tests.forEach((test) => {
+      hooks = hooks.concat(this.beforeEaches);
+      hooks.push(test);
+      hooks = hooks.concat(this.afterEaches);
+    });
+
+    // Nest the children as hooks
+    this.forEach((child) => {
+      hooks.concat(child.toHooks());
+    });
+
+    // Get the suite-level afters.
+    return hooks.concat(this.afters);
+    return hooks;
+  }
 }
 
 const nullFunction = function() {};
 
 class BddInterface {
   constructor() {
-    this.suites = [new Suite()];
-  }
-
-  get _currentSuite() {
-    return this.suites[this.suites.length - 1];
+    this._currentSuite = null;
   }
 
   describe(label, body) {
-    this._currentSuite.children.push(new Suite(label, body));
-    body();
-    if (this.suites.length > 1) {
-      this.suites.pop();
+    const parent = this._currentSuite;
+    const child = new Suite(label, body);
+
+    if (parent) {
+      parent.addChild(child);
     }
+
+    this._currentSuite = child;
+
+    body();
+
+    if (parent) {
+      this._currentSuite = parent;
+    }
+
   }
 
   it(label, body, onAsync) {
     this._currentSuite.tests.push(new Hook(label, body, onAsync));
   }
 
-  beforeEach(label, body, onAsync) {
-    this._currentSuite.beforeEaches.push(new Hook(label, body, onAsync));
+  beforeEach(body, onAsync) {
+    this._currentSuite.beforeEaches.push(new Hook('beforeEach', body, onAsync));
   }
 
-  afterEach(label, body, onAsync) {
-    this._currentSuite.afterEaches.push(new Hook(label, body, onAsync));
+  afterEach(body, onAsync) {
+    this._currentSuite.afterEaches.push(new Hook('afterEach', body, onAsync));
   }
 
-  before(label, body, onAsync) {
-    this._currentSuite.befores.push(new Hook(label, body, onAsync));
+  before(body, onAsync) {
+    this._currentSuite.befores.push(new Hook('before', body, onAsync));
   }
 
-  after(label, body, onAsync) {
-    this._currentSuite.afters.push(new Hook(label, body, onAsync));
+  after(body, onAsync) {
+    this._currentSuite.afters.push(new Hook('after', body, onAsync));
   }
 
-  toHooks() {
-    return [];
+  execute() {
+    this._currentSuite.execute();
   }
 
   toSandbox() {
@@ -158,7 +206,7 @@ const mod = require('module');
 const path = require('path');
 
 
-class TestRunner {
+class TestLoader {
   constructor(files, opt_options) {
     this.files = Array.isArray(files) ? files : [files];
     this.options = opt_options || {};
@@ -207,8 +255,7 @@ class TestRunner {
   _processTestFile(testFile) {
     const testInterface = this._getInterface();
     this._runFile(testFile, testInterface);
-    return testInterface.toHooks();
-    console.log('FINISHED');
+    return testInterface;
   }
 
   _createLoaders() {
@@ -218,5 +265,21 @@ class TestRunner {
   }
 }
 
-module.exports = TestRunner;
+class TestRunner {
+  constructor(loaders) {
+    this._loaders = loaders;
+  }
+
+  run() {
+    // TODO(lbayes): Introduce support for async hooks!
+    this._loaders.forEach((loader) => {
+      loader.execute();
+    });
+  }
+}
+
+module.exports = {
+  TestLoader,
+  TestRunner
+}
 
