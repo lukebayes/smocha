@@ -10,11 +10,10 @@ const Composite = require('./composite');
  * handler is called.
  */
 class Hook extends Composite {
-  constructor(label, handler, onAsync) {
+  constructor(label, handler) {
     super();
     this._label = label;
     this.handler = this._wrapHandler(handler);
-    this.onAsync = onAsync;
   }
 
   _wrapHandler(handler) {
