@@ -71,7 +71,7 @@ describe('Hook', () => {
       return new Hook('abcd', handler).execute()
         .catch((err) => {
           assert.equal(err, 'fake error');
-        })
+        });
     });
   });
 });
