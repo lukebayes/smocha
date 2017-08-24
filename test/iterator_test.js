@@ -40,4 +40,17 @@ describe('Iterator', () => {
     instance.next();
     assert.isFalse(instance.hasNext());
   });
+
+  it('supports undefined entries', () => {
+    const instance = new Iterator([undefined]);
+    assert(instance.hasNext());
+  });
+
+  it('resets iteration', () => {
+    const instance = new Iterator(['a', 'b', 'c']);
+    instance.next();
+    instance.next();
+    instance.reset();
+    assert.equal(instance.next(), 'a');
+  });
 });

@@ -11,8 +11,7 @@ class Iterator {
   }
 
   hasNext() {
-    const entry = this._iterable[this._index + 1];
-    return typeof entry !== 'undefined';
+    return this._iterable.length - 1 >= this._index + 1;
   }
 
   next() {
@@ -21,6 +20,10 @@ class Iterator {
 
   peek() {
     return this._iterable[this._index + 1];
+  }
+
+  reset() {
+    this._index = -1;
   }
 }
 
