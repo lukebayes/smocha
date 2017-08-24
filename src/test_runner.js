@@ -1,45 +1,7 @@
 const BaseReporter = require('./base_reporter');
+const Composite = require('./composite');
+const NodeLoader = require('./node_loader');
 const TestFile = require('./test_file');
-const fs = require('fs');
-
-/**
- * Loads the file and returns an executor that is bound to the provided
- * definitions.
- */
-class NodeLoader {
-  constructor(file, runner) {
-    this.file = file;
-    this.runner = runner;
-  }
-
-  load() {
-    return new Promise((resolve, reject) => {
-      fs.readFile(this.file, (err, data) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(new TestFile(this.file, data.toString()));
-        }
-      });
-    });
-  }
-}
-
-class Composite {
-  constructor() {
-    this.children = [];
-    this.parent = null;
-  }
-
-  addChild(child) {
-    child.parent = this;
-    this.children.push(child);
-  }
-
-  forEach(handler) {
-    return this.children.forEach(handler);
-  }
-}
 
 class Hook extends Composite {
   constructor(label, handler, onAsync) {
