@@ -9,10 +9,13 @@ describe('Hook', () => {
   });
 
   it('accepts label and handler', () => {
-    const handler = sinon.spy();
-    const instance = new Hook('abcd', handler);
+    const instance = new Hook('abcd');
     assert.equal(instance.getLabel(), 'abcd');
-    assert.equal(instance.handler, handler);
+  });
+
+  it('uses a null function if no handler is provided', () => {
+    const instance = new Hook();
+    assert.isUndefined(instance.execute());
   });
 
   it('executes provided handler', () => {

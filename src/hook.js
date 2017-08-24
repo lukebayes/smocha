@@ -1,5 +1,8 @@
 const Composite = require('./composite');
 
+// Shared stub function implementation, for hooks that have no handler.
+function nullFunction() {};
+
 /**
  * Hooks are the base wrapper around all test declarations including before,
  * after, beforeEach, afterEach, it and describe.
@@ -13,7 +16,7 @@ class Hook extends Composite {
   constructor(label, handler) {
     super();
     this._label = label;
-    this.handler = this._wrapHandler(handler);
+    this._handler = this._wrapHandler(handler);
   }
 
   _wrapHandler(handler) {
@@ -35,11 +38,11 @@ class Hook extends Composite {
 
     // This handler is either undefined or has zero arguments, therefore it is
     // either synchronous or it will return a promise when called.
-    return handler;
+    return handler || nullFunction;
   }
 
   execute() {
-    return this.handler();
+    return this._handler();
   }
 
   getLabel() {
