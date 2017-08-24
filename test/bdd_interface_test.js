@@ -11,5 +11,8 @@ describe('BddInterface', () => {
   it('is instantiable', () => {
     assert(instance);
   });
+
+  it('provides a describe implementation', () => {
+  });
 });
 
