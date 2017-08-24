@@ -10,8 +10,8 @@ class Composite {
     this.children.push(child);
   }
 
-  forEach(handler) {
-    return this.children.forEach(handler);
+  forEach(handler, index, array) {
+    return this.children.forEach(handler, index, array);
   }
 }
 

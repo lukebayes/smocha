@@ -53,8 +53,10 @@ describe('Composite', () => {
 
   it('iterates over children', () => {
     let looped = false;
-    root.forEach((child) => {
+    root.forEach((child, index, array) => {
       assert.equal(child, one);
+      assert.equal(index, 0);
+      assert.deepEqual(array, [one]);
       looped = true;
     });
     assert(looped);
