@@ -1,5 +1,4 @@
-
-
+const TestFile = require('./test_file');
 const fs = require('fs');
 
 /**
@@ -22,13 +21,6 @@ class NodeLoader {
         }
       });
     });
-  }
-}
-
-class TestFile {
-  constructor(filename, content) {
-    this.filename = filename;
-    this.content = content;
   }
 }
 
