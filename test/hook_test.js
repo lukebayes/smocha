@@ -41,6 +41,48 @@ describe('Hook', () => {
     assert.equal(three.getLabel(), 'abcd efgh ijkl mnop');
   });
 
+  describe('timeout', () => {
+    let instance;
+
+    beforeEach(() => {
+      instance = new Hook('abcd');
+    });
+
+    it('gets default timeout', () => {
+      assert.equal(instance.timeout(), 2000);
+    });
+
+    it('sets timeout', () => {
+      instance.timeout(3000);
+      assert.equal(instance.timeout(), 3000);
+    });
+
+    it('does not accept 0 timeout', () => {
+      instance.timeout(0);
+      assert.equal(instance.timeout(), 2000);
+    });
+
+    it('gets timeout from parent', () => {
+      const root = new Hook('abcd');
+      const child = new Hook('efgh');
+      root.addChild(child);
+
+      root.timeout(50);
+      assert.equal(child.timeout(), 50);
+      assert.equal(root.timeout(), 50);
+    });
+
+    it('overrides timeout in child', () => {
+      const root = new Hook('abcd');
+      const child = new Hook('efgh');
+      root.addChild(child);
+
+      child.timeout(100);
+      assert.equal(child.timeout(), 100);
+      assert.equal(root.timeout(), 2000);
+    });
+  });
+
   describe('promise', () => {
     it('returns handler promise, if provided', () => {
       function handler() {

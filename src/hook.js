@@ -1,5 +1,10 @@
 const Composite = require('./composite');
 
+/**
+ * Default async hook timeout in milliseconds.
+ */
+const DEFAULT_TIMEOUT = 2000;
+
 // Shared stub function implementation, for hooks that have no handler.
 function nullFunction() {};
 
@@ -17,6 +22,7 @@ class Hook extends Composite {
     super();
     this._label = label;
     this._handler = this._prepareHandler(handler);
+    this._timeout = null;
   }
 
   /**
@@ -27,7 +33,8 @@ class Hook extends Composite {
    * should either be a promise or undefined.
    */
   _prepareHandler(handler) {
-    // this looks like a declaration that expects an async callback.
+    // TODO(lbayes): Timeouts
+    // This looks like a declaration that expects an async callback.
     if (handler && handler.length > 0) {
       function asyncHandler() {
         return new Promise((resolve, reject) => {
@@ -37,6 +44,9 @@ class Hook extends Composite {
             }
             resolve();
           }
+          // TODO(lbayes): Call the handler with a context, so that
+          // implementations can call this.timeout(2000), and possibly other
+          // methods.
           handler(callbackToPromise);
         });
       }
@@ -46,6 +56,18 @@ class Hook extends Composite {
     // This handler is either undefined or has zero arguments, therefore it is
     // either synchronous or it will return a promise when called.
     return handler || nullFunction;
+  }
+
+  timeout(opt_value) {
+    if (opt_value) {
+      this._timeout = opt_value;
+    }
+
+    if (this._timeout !== null) {
+      return this._timeout;
+    }
+
+    return this.parent && this.parent.timeout() || DEFAULT_TIMEOUT;
   }
 
   /**
@@ -63,6 +85,8 @@ class Hook extends Composite {
     return `${base}${this._label}`;
   }
 }
+
+Hook.DEFAULT_TIMEOUT = DEFAULT_TIMEOUT;
 
 module.exports = Hook;
 

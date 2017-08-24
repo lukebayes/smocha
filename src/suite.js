@@ -18,11 +18,15 @@ class Suite extends Hook {
    * complete before proceeding to the next one.
    */
   execute() {
-    this.toHooks().forEach((hook) => {
-      hook.execute();
-    });
+    const hooks = this.toHooks();
   }
 
+  /**
+   * Flatten the entire tree of tests and suites and insert all before/after
+   * hooks around each test or suite as the case may be.
+   *
+   * Return the array of hooks to be called serially.
+   */
   toHooks() {
     // Capture the suite-level before blocks
     let hooks = this.befores.slice();
