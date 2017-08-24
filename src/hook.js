@@ -18,8 +18,8 @@ class Hook extends Composite {
   }
 
   _wrapHandler(handler) {
+    // this looks like a declaration that expects an async callback.
     if (handler && handler.length > 0) {
-      // this looks like a declaration that expects an async callback.
       function asyncHandler() {
         return new Promise((resolve, reject) => {
           function callbackToPromise(err) {
@@ -33,6 +33,9 @@ class Hook extends Composite {
       }
       return asyncHandler;
     }
+
+    // This handler is either undefined or has zero arguments, therefore it is
+    // either synchronous or it will return a promise when called.
     return handler;
   }
 

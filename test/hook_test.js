@@ -38,15 +38,14 @@ describe('Hook', () => {
     assert.equal(three.getLabel(), 'abcd efgh ijkl mnop');
   });
 
-  describe('promisify', () => {
+  describe('promise', () => {
     it('returns handler promise, if provided', () => {
       function handler() {
         return new Promise((resolve, reject) => {
           resolve();
         });
       }
-      const instance = new Hook('abcd', handler);
-      const result = instance.execute();
+      const result = new Hook('abcd', handler).execute();
       assert(result);
       assert(result.then);
       return result;
@@ -55,14 +54,24 @@ describe('Hook', () => {
 
   describe('async', () => {
     it('handles async handler', () => {
-      const onAsync = sinon.spy();
       function handler(callback) {
         callback();
       }
-      const instance = new Hook('abcd', handler);
-      const result = instance.execute();
+      const result = new Hook('abcd', handler).execute();
       assert(result);
+      // Wraps callback handler in a returned promise
+      assert(result.then);
       return result;
+    });
+
+    it('forwards async failure to promise rejection', () => {
+      function handler(callback) {
+        callback('fake error');
+      }
+      return new Hook('abcd', handler).execute()
+        .catch((err) => {
+          assert.equal(err, 'fake error');
+        })
     });
   });
 });
