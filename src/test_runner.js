@@ -1,25 +1,8 @@
 const BaseReporter = require('./base_reporter');
 const Composite = require('./composite');
+const Hook = require('./hook');
 const NodeLoader = require('./node_loader');
 const TestFile = require('./test_file');
-
-class Hook extends Composite {
-  constructor(label, handler, onAsync) {
-    super();
-    this.label = label;
-    this.handler = handler;
-    this.onAsync = onAsync;
-  }
-
-  execute() {
-    this.handler();
-  }
-
-  getLabel() {
-    const base = this.parent ? this.parent.getLabel : '';
-    return `${base} ${this.label}`;
-  }
-}
 
 class Suite extends Hook {
   constructor(label, handler) {
