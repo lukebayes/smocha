@@ -1,6 +1,16 @@
 const Hook = require('./hook');
 const Suite = require('./suite');
 
+/**
+ * Bdd implementation of methods that are made available user-defined tests.
+ *
+ * This instance has a life cycle in that it is instantiated, then a sandbox
+ * is requested (this an object containing bound method signatures) and then
+ * tests are loaded against this instance and those sandboxed interface methods
+ * are called by test definitions. After all tests have been processed, the
+ * caller will ask for the root suite and can execute or analyze the assembled
+ * tests as needed.
+ */
 class BddInterface {
   constructor() {
     this._currentSuite = null;
@@ -45,7 +55,12 @@ class BddInterface {
   }
 
   execute() {
+    throw new Error('no longer implemented');
     this._currentSuite.execute();
+  }
+
+  getRoot() {
+    return this._currentSuite;
   }
 
   toSandbox() {
@@ -56,7 +71,7 @@ class BddInterface {
       beforeEach: this.beforeEach.bind(this),
       describe: this.describe.bind(this),
       it: this.it.bind(this),
-    }
+    };
   }
 }
 

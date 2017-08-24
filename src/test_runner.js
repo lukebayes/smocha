@@ -8,9 +8,10 @@ class TestRunner {
   }
 
   run() {
+    // TODO(lbayes): This method needs to be asynchronous
     return this._loaders.map((loader) => {
       return loader.execute();
-    })
+    });
   }
 }
 
