@@ -1,5 +1,6 @@
 const Composite = require('../').Composite;
 const assert = require('chai').assert;
+const sinon = require('sinon');
 
 describe('Composite', () => {
   let root;
@@ -59,5 +60,12 @@ describe('Composite', () => {
       looped = true;
     });
     assert(looped);
+  });
+
+  it('bubbles events', () => {
+    const handler = sinon.spy();
+    root.on('abcd', handler);
+    five.bubble('abcd');
+    assert.equal(handler.callCount, 1);
   });
 });

@@ -3,22 +3,25 @@ const assert = require('chai').assert;
 const sinon = require('sinon');
 
 describe('Emitter', () => {
+  let instance;
+  let handler;
+
+  beforeEach(() => {
+    instance = new Emitter([]);
+    handler = sinon.spy();
+  });
+
   it('is instantiable', () => {
-    const instance = new Emitter([]);
     assert(instance);
   });
 
   it('dispatches to a subscriber', () => {
-    const handler = sinon.spy();
-    const instance = new Emitter();
     instance.on('abcd', handler);
     instance.emit('abcd');
     assert.equal(handler.callCount, 1);
   });
 
   it('supports multiple subscribers', () => {
-    const instance = new Emitter();
-    const handler = sinon.spy();
     instance.on('abcd', handler);
     instance.on('efgh', handler);
     instance.on('ijkl', handler);
@@ -31,8 +34,6 @@ describe('Emitter', () => {
   });
 
   it('returns unsubscribe function', () => {
-    const instance = new Emitter();
-    const handler = sinon.spy();
     const unsubscribe = instance.on('abcd', handler);
 
     unsubscribe();
@@ -41,12 +42,22 @@ describe('Emitter', () => {
   });
 
   it('removes listener by handler reference and event name', () => {
-    const instance = new Emitter();
-    const handler = sinon.spy();
     instance.on('abcd', handler);
 
     instance.remove('abcd', handler);
-    instance.emit('abcd');
+    const stopped = instance.emit('abcd');
     assert.equal(handler.callCount, 0);
+    assert.isFalse(stopped);
+  });
+
+  it('halts progress if a handler returns true', () => {
+    function stopper() { return true; };
+
+    instance.on('abcd', handler);
+    instance.on('abcd', stopper);
+    instance.on('abcd', handler);
+    const stopped = instance.emit('abcd');
+    assert.equal(handler.callCount, 1);
+    assert(stopped);
   });
 });

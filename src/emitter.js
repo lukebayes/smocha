@@ -13,9 +13,9 @@ class Emitter {
   }
 
   emit(eventName, payload) {
-    this._listeners.forEach((listener) => {
+    return this._listeners.some((listener) => {
       if (listener.eventName === eventName) {
-        listener.handler(payload);
+        return listener.handler(payload);
       }
     });
   }

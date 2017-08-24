@@ -1,11 +1,19 @@
-
+const Emitter = require('./emitter');
 /**
  * Provide some basic infrastructure for entity composition.
  */
-class Composite {
+class Composite extends Emitter {
   constructor() {
+    super();
     this.children = [];
     this.parent = null;
+  }
+
+  bubble(eventName, payload) {
+    this.emit(eventName, payload);
+    if (this.parent) {
+      this.parent.bubble(eventName, payload);
+    }
   }
 
   /**
