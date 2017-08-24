@@ -1,12 +1,12 @@
-const TestLoader = require('../').TestLoader;
+const FileLoader = require('../').FileLoader;
 const TestRunner = require('../').TestRunner;
 const assert = require('chai').assert;
 
-describe('TestLoader', () => {
+describe('FileLoader', () => {
   var instance;
 
   beforeEach(() => {
-    instance = new TestLoader('test/fixtures/simple.js');
+    instance = new FileLoader('test/fixtures/simple.js');
   });
 
   it('is instantiable', () => {

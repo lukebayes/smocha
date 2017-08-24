@@ -206,7 +206,13 @@ const mod = require('module');
 const path = require('path');
 
 
-class TestLoader {
+/**
+ * Test loader for tests declared in external files.
+ *
+ * Only works when executed from a node process that has access to the
+ * provided files.
+ */
+class FileLoader {
   constructor(files, opt_options) {
     this.files = Array.isArray(files) ? files : [files];
     this.options = opt_options || {};
@@ -279,7 +285,7 @@ class TestRunner {
 }
 
 module.exports = {
-  TestLoader,
+  FileLoader,
   TestRunner
 }
 
