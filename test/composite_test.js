@@ -50,15 +50,4 @@ describe('Composite', () => {
     assert.equal(one.children[1], four);
     assert.equal(one.children[2], five);
   });
-
-  it('iterates over children', () => {
-    let looped = false;
-    root.forEach((child, index, array) => {
-      assert.equal(child, one);
-      assert.equal(index, 0);
-      assert.deepEqual(array, [one]);
-      looped = true;
-    });
-    assert(looped);
-  });
 });

@@ -1,5 +1,8 @@
 const Hook = require('./hook');
 
+/**
+ * Fundamental container for test hooks.
+ */
 class Suite extends Hook {
   constructor(label, handler) {
     super(label, handler);
@@ -10,6 +13,10 @@ class Suite extends Hook {
     this.tests = [];
   }
 
+  /**
+   * Execute all hooks, in order and wait for any asynchronous hooks to
+   * complete before proceeding to the next one.
+   */
   execute() {
     this.toHooks().forEach((hook) => {
       hook.execute();
