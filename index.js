@@ -1,4 +1,5 @@
 const BaseReporter = require('./src/base_reporter');
+const BddInterface = require('./src/bdd_interface');
 const Composite = require('./src/composite');
 const Hook = require('./src/hook');
 const NodeLoader = require('./src/node_loader');
@@ -9,6 +10,7 @@ const TestRunner = require('./src/test_runner').TestRunner;
 
 module.exports = {
   BaseReporter,
+  BddInterface,
   Composite,
   Hook,
   FileLoader,
