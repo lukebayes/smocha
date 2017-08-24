@@ -1,31 +1,25 @@
-const FileLoader = require('../').FileLoader;
 const TestRunner = require('../').TestRunner;
 const assert = require('chai').assert;
+const sinon = require('sinon');
 
-describe('FileLoader', () => {
-  var instance;
+describe('TestRunner', () => {
+  let instance;
 
   beforeEach(() => {
-    instance = new FileLoader('test/fixtures/simple.js');
+    instance = new TestRunner();
   });
 
   it('is instantiable', () => {
     assert(instance);
   });
 
-  it('accepts a single file', () => {
-    assert.deepEqual(instance.files, ['test/fixtures/simple.js']);
-  });
+  it('calls execute on provided loaders', () => {
+    const exec = sinon.stub().returns('abcd');
+    const fakeLoaders = [{execute: exec}];
+    const results = new TestRunner(fakeLoaders).run();
 
-  it('loads a file', () => {
-    return instance.load();
-  });
-
-  it('builds hooks from simple file', () => {
-    instance.load()
-      .then((loaders) => {
-        return new TestRunner(loaders).run();
-      });
+    assert.equal(results.length, 1);
+    assert.equal(results[0], 'abcd');
   });
 });
 
