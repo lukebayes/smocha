@@ -1,6 +1,7 @@
 const BaseReporter = require('./src/base_reporter');
 const BddInterface = require('./src/bdd_interface');
 const Composite = require('./src/composite');
+const Emitter = require('./src/emitter');
 const FileLoader = require('./src/file_loader');
 const Hook = require('./src/hook');
 const Iterator = require('./src/iterator');
@@ -13,6 +14,7 @@ module.exports = {
   BaseReporter,
   BddInterface,
   Composite,
+  Emitter,
   FileLoader,
   Hook,
   Iterator,

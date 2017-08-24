@@ -24,7 +24,6 @@ describe('Composite', () => {
     one.addChild(five);
 
     two.addChild(three);
-
   });
 
   it('populates children collection', () => {

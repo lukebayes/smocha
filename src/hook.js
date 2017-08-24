@@ -58,6 +58,12 @@ class Hook extends Composite {
     return handler || nullFunction;
   }
 
+  /**
+   * Set or get the timeout value for the current hook.
+   *
+   * This method will delegate to the nearest parent configuration if a local
+   * value is not found.
+   */
   timeout(opt_value) {
     if (opt_value) {
       this._timeout = opt_value;
