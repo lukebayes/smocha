@@ -14,11 +14,8 @@ class Suite extends Hook {
     this.tests = [];
   }
 
-  /**
-   * Execute all hooks, in order and wait for any asynchronous hooks to
-   * complete before proceeding to the next one.
-   */
   execute() {
+    // noop
   }
 
   /**

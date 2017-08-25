@@ -66,6 +66,9 @@ class Hook extends Composite {
    *
    * This method will delegate to the nearest parent configuration if a local
    * value is not found.
+   *
+   * NOTE(lbayes): This method signature is only this way in order to support
+   * legacy mocha tests.
    */
   timeout(opt_value) {
     if (opt_value) {

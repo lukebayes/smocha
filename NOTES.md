@@ -36,6 +36,6 @@ Once we create the Composite Suite data structure, we're faced with some choices
 
 Before we begin execution, we need to know (1) if a filter is present, then we need to only execute those tests that match the filter and (2) if any Hooks include a .only annotation, we need to remove all TEST Hooks that do not.
 
-Both of these operations should be performed while evaluating test files and constructing the Suites. This is challenging because we might be evaluating Suites across any number of different processes or machines in parallel. While it would be reasonable for a parent process to simply forward an existing filter to be applied, in the .only case, sibling processes will need to pass messages in order to prevent test executions that shouldn't begin.
+In the case of filters, we know ahead of time and we can simply not add filtered tests to our data structure, but things get much more interesting with the .only annotation, especially when evaluating and running across multiple processes or machines.
 
-Perhaps we could implement this as an event that bubbles up the Suite Tree during evaluation?
+In this case, we need to perform a traversal of the tree after evaluation and before execution and if one or more describe.only or it.only blocks are found, we need to then filture out all other hb
