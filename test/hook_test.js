@@ -10,7 +10,7 @@ describe('Hook', () => {
 
   it('accepts label and handler', () => {
     const instance = new Hook('abcd');
-    assert.equal(instance.getLabel(), 'abcd');
+    assert.equal(instance.getFullLabel(), 'abcd');
   });
 
   it('uses a null function if no handler is provided', () => {
@@ -25,6 +25,27 @@ describe('Hook', () => {
     assert.equal(handler.callCount, 1);
   });
 
+  it('receives the hook as this', () => {
+    let receivedLabel;
+    function handler() {
+      receivedLabel = this.getFullLabel();
+    }
+    const instance = new Hook('abcd', handler);
+    instance.execute();
+    assert.equal(receivedLabel, 'abcd');
+  });
+
+  it('receives the hook as this when using callback', () => {
+    let receivedLabel;
+    function handler(callback) {
+      receivedLabel = this.getFullLabel();
+      callback();
+    }
+    const instance = new Hook('abcd', handler);
+    instance.execute();
+    assert.equal(receivedLabel, 'abcd');
+  });
+
   it('label includes parent if composed', () => {
     const root = new Hook('abcd');
     const one = new Hook('efgh');
@@ -35,10 +56,10 @@ describe('Hook', () => {
     one.addChild(two);
     two.addChild(three);
 
-    assert.equal(root.getLabel(), 'abcd');
-    assert.equal(one.getLabel(), 'abcd efgh');
-    assert.equal(two.getLabel(), 'abcd efgh ijkl');
-    assert.equal(three.getLabel(), 'abcd efgh ijkl mnop');
+    assert.equal(root.getFullLabel(), 'abcd');
+    assert.equal(one.getFullLabel(), 'abcd efgh');
+    assert.equal(two.getFullLabel(), 'abcd efgh ijkl');
+    assert.equal(three.getFullLabel(), 'abcd efgh ijkl mnop');
   });
 
   describe('timeout', () => {
@@ -118,5 +139,11 @@ describe('Hook', () => {
           assert.equal(err, 'fake error');
         });
     });
+  });
+
+  it('accepts optional type parameter', () => {
+    const handler = sinon.spy();
+    const instance = new Hook('abcd', handler, 'foo');
+    assert.equal(instance.type, 'foo');
   });
 });

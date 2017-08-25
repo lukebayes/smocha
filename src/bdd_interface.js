@@ -34,33 +34,32 @@ class BddInterface {
 
   }
 
-  it(label, body, onAsync) {
-    this._currentSuite.tests.push(new Hook(label, body, onAsync));
+  it(label, body) {
+    this._currentSuite.tests.push(new Hook(label, body));
   }
 
-  beforeEach(body, onAsync) {
-    this._currentSuite.beforeEaches.push(new Hook('beforeEach', body, onAsync));
+  beforeEach(body) {
+    this._currentSuite.beforeEaches.push(new Hook('beforeEach', body));
   }
 
-  afterEach(body, onAsync) {
-    this._currentSuite.afterEaches.push(new Hook('afterEach', body, onAsync));
+  afterEach(body) {
+    this._currentSuite.afterEaches.push(new Hook('afterEach', body));
   }
 
-  before(body, onAsync) {
-    this._currentSuite.befores.push(new Hook('before', body, onAsync));
+  before(body) {
+    this._currentSuite.befores.push(new Hook('before', body));
   }
 
-  after(body, onAsync) {
-    this._currentSuite.afters.push(new Hook('after', body, onAsync));
-  }
-
-  execute() {
-    throw new Error('no longer implemented');
-    this._currentSuite.execute();
+  after(body) {
+    this._currentSuite.afters.push(new Hook('after', body));
   }
 
   getRoot() {
-    return this._currentSuite;
+    let current = this._currentSuite;
+    while(current.parent) {
+      current = current.parent;
+    }
+    return current;
   }
 
   toSandbox() {

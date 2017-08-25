@@ -33,6 +33,14 @@ describe('Emitter', () => {
     assert.equal(handler.callCount, 3);
   });
 
+  it('calls all subscribers from the same event', () => {
+    instance.on('abcd', handler);
+    instance.on('abcd', handler);
+    instance.on('abcd', handler);
+    instance.emit('abcd');
+    assert.equal(handler.callCount, 3);
+  });
+
   it('returns unsubscribe function', () => {
     const unsubscribe = instance.on('abcd', handler);
 
@@ -59,5 +67,15 @@ describe('Emitter', () => {
     const stopped = instance.emit('abcd');
     assert.equal(handler.callCount, 1);
     assert(stopped);
+  });
+
+  it('forwards provided payload', () => {
+    let received;
+    function handler(payload) {
+      received = payload;
+    }
+    instance.on('abcd', handler);
+    instance.emit('abcd', 'efgh');
+    assert.equal(received, 'efgh');
   });
 });

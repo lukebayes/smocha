@@ -9,6 +9,8 @@ const NodeLoader = require('./src/node_loader');
 const Suite = require('./src/suite');
 const TestFile = require('./src/test_file');
 const TestRunner = require('./src/test_runner');
+const events = require('./src/events');
+const hooks = require('./src/hooks');
 
 module.exports = {
   BaseReporter,
@@ -21,6 +23,8 @@ module.exports = {
   NodeLoader,
   Suite,
   TestFile,
-  TestRunner
+  TestRunner,
+  events,
+  hooks,
 };
 

@@ -5,7 +5,7 @@ const Composite = require('./composite');
  */
 const DEFAULT_TIMEOUT = 2000;
 
-// Shared stub function implementation, for hooks that have no handler.
+// Shared stub function implementation, for hooks that have no handler.ca.
 function nullFunction() {};
 
 /**
@@ -18,10 +18,11 @@ function nullFunction() {};
  * when the handler is called.
  */
 class Hook extends Composite {
-  constructor(label, handler) {
+  constructor(label, handler, opt_type) {
     super();
     this._label = label;
     this._handler = this._prepareHandler(handler);
+    this.type = opt_type || 'hook';
     this._timeout = null;
   }
 
@@ -47,7 +48,7 @@ class Hook extends Composite {
           // TODO(lbayes): Call the handler with a context, so that
           // implementations can call this.timeout(2000), and possibly other
           // methods.
-          handler(callbackToPromise);
+          handler.call(this, callbackToPromise);
         });
       }
       return asyncHandler;
@@ -80,15 +81,22 @@ class Hook extends Composite {
    * Execute the provided handler.
    */
   execute() {
-    return this._handler();
+    return this._handler.call(this);
   }
 
   /**
    * Get the full label (including parent labels) for this Hook.
    */
-  getLabel() {
-    const base = this.parent ? this.parent.getLabel() + ' ' : '';
+  getFullLabel() {
+    const base = this.parent ? this.parent.getFullLabel() + ' ' : '';
     return `${base}${this._label}`;
+  }
+
+  /**
+   * Get the local label only.
+   */
+  getLabel() {
+    return this._label;
   }
 }
 

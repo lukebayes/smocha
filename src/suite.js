@@ -1,4 +1,5 @@
 const Hook = require('./hook');
+const hooks = require('./hooks');
 
 /**
  * Fundamental container for test hooks.
@@ -28,24 +29,25 @@ class Suite extends Hook {
    * Return the array of hooks to be called serially.
    */
   toHooks() {
+    let result = [];
     // Capture the suite-level before blocks
-    let hooks = this.befores.slice();
+    result = result.concat(this.befores.slice());
 
     // Create a hook set for beforeEaches, its and afterEaches
     this.tests.forEach((test) => {
-      hooks = hooks.concat(this.beforeEaches);
-      hooks.push(test);
-      hooks = hooks.concat(this.afterEaches);
+      result = result.concat(this.beforeEaches);
+      result.push(test);
+      result = result.concat(this.afterEaches);
     });
 
-    // Nest the children as hooks
+    // Nest the children as result
     this.forEach((child) => {
-      hooks.concat(child.toHooks());
+      result.concat(child.toHooks());
     });
 
     // Get the suite-level afters.
-    return hooks.concat(this.afters);
-    return hooks;
+    return result.concat(this.afters);
+    return result;
   }
 }
 
