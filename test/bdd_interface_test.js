@@ -1,5 +1,6 @@
 const BddInterface = require('../').BddInterface;
 const assert = require('chai').assert;
+const sinon = require('sinon');
 
 describe('BddInterface', () => {
   let instance;
@@ -8,11 +9,19 @@ describe('BddInterface', () => {
     instance = new BddInterface();
   });
 
-  it('is instantiable', () => {
-    assert(instance);
-  });
+  describe('it.only', () => {
+    it.skip('provides it.only', () => {
+      const handler = sinon.spy();
+      instance.describe('abcd');
 
-  it('provides a describe implementation', () => {
+      instance.it('mnop', handler);
+      instance.it.only('efgh', handler);
+      instance.it('ijkl', handler);
+
+      const rootSuite = instance.getRoot();
+
+      assert.equal(rootSuite.tests.length, 1);
+    });
   });
 });
 

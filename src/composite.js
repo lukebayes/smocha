@@ -25,6 +25,17 @@ class Composite extends Emitter {
   }
 
   /**
+   * Get the root node in the tree.
+   */
+  getRoot() {
+    let current = this;
+    while (current.parent) {
+      current = current.parent;
+    }
+    return current;
+  }
+
+  /**
    * Enumerate each child.
    */
   forEach(handler, index, array) {

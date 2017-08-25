@@ -18,11 +18,13 @@ function nullFunction() {};
  * when the handler is called.
  */
 class Hook extends Composite {
-  constructor(label, handler, opt_type) {
+  constructor(label, handler, opt_isOnly, opt_isPending) {
     super();
+    this.isPending = opt_isPending || false;
+    this.isOnly = opt_isOnly || false;
+
     this._label = label;
     this._handler = this._prepareHandler(handler);
-    this.type = opt_type || 'hook';
     this._timeout = null;
   }
 

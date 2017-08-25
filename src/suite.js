@@ -1,12 +1,12 @@
 const Hook = require('./hook');
-const hooks = require('./hooks');
 
 /**
  * Fundamental container for test hooks.
  */
 class Suite extends Hook {
-  constructor(label, handler) {
-    super(label, handler);
+  constructor(label, handler, opt_isOnly, opt_isPending) {
+    super(label, handler, opt_isOnly, opt_isPending);
+
     this.befores = [];
     this.afters = [];
     this.beforeEaches = [];
@@ -19,7 +19,6 @@ class Suite extends Hook {
    * complete before proceeding to the next one.
    */
   execute() {
-    const hooks = this.toHooks();
   }
 
   /**

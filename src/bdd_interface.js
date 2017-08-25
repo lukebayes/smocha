@@ -1,6 +1,9 @@
 const Hook = require('./hook');
 const Suite = require('./suite');
 
+const IS_ONLY = true;
+const IS_PENDING = true;
+
 /**
  * Bdd implementation of methods that are made available user-defined tests.
  *
@@ -14,28 +17,52 @@ const Suite = require('./suite');
 class BddInterface {
   constructor() {
     this._currentSuite = null;
+    this._configureAnnotations();
   }
 
-  describe(label, body) {
+  _configureAnnotations() {
+    this.describe.only = (label, body) => {
+      this.describe(label, body, IS_ONLY);
+    };
+
+    this.describe.skip = (label, body) => {
+      this.describe(label, body, null, IS_PENDING);
+    };
+
+    this.it.only = (label, body) => {
+      this.it(label, body, IS_ONLY);
+    };
+
+    this.it.skip = (label, body) => {
+      this.it(label, body, null, IS_PENDING);
+    };
+  }
+
+  describe(label, body, isOnly, isPending) {
     const parent = this._currentSuite;
-    const child = new Suite(label, body);
+    const child = new Suite(label, body, isOnly, isPending);
 
     if (parent) {
+      // NOTE(lbayes): The current child MUST be attached to the tree before
+      // the describe block is evaluated so that .only statements can message
+      // the entire tree.
       parent.addChild(child);
     }
 
     this._currentSuite = child;
 
-    body();
+    // Evaluate the current describe block to construct a tree of Hooks and Suites
+    if (body) {
+      body();
+    }
 
     if (parent) {
       this._currentSuite = parent;
     }
-
   }
 
-  it(label, body) {
-    this._currentSuite.tests.push(new Hook(label, body));
+  it(label, body, isOnly, isPending) {
+    this._currentSuite.tests.push(new Hook(label, body, isOnly, isPending));
   }
 
   beforeEach(body) {
@@ -55,11 +82,7 @@ class BddInterface {
   }
 
   getRoot() {
-    let current = this._currentSuite;
-    while(current.parent) {
-      current = current.parent;
-    }
-    return current;
+    return this._currentSuite.getRoot();
   }
 
   toSandbox() {
