@@ -1,3 +1,4 @@
+const Hook = require('../').Hook;
 const Suite = require('../').Suite;
 const assert = require('chai').assert;
 const sinon = require('sinon');
@@ -16,24 +17,24 @@ describe('Suite', () => {
     let testTwo;
 
     beforeEach(() => {
-      after = sinon.spy();
-      afterEachOne = sinon.spy();
-      afterEachTwo = sinon.spy();
-      before = sinon.spy();
-      beforeEachOne = sinon.spy();
-      beforeEachTwo = sinon.spy();
-      testOne = sinon.spy();
-      testTwo = sinon.spy();
+      after = new Hook('after');
+      afterEachOne = new Hook('afterEach');
+      afterEachTwo = new Hook('afterEach');
+      before = new Hook('before');
+      beforeEachOne = new Hook('beforeEach');
+      beforeEachTwo = new Hook('beforeEach');
+      testOne = new Hook('test one');
+      testTwo = new Hook('test two');
 
       instance = new Suite('abcd');
-      instance.befores.push(before);
-      instance.beforeEaches.push(beforeEachOne);
-      instance.beforeEaches.push(beforeEachTwo);
-      instance.afterEaches.push(afterEachOne);
-      instance.afterEaches.push(afterEachTwo);
-      instance.afters.push(after);
-      instance.tests.push(testOne);
-      instance.tests.push(testTwo);
+      instance.addBefore(before);
+      instance.addBeforeEach(beforeEachOne);
+      instance.addBeforeEach(beforeEachTwo);
+      instance.addAfterEach(afterEachOne);
+      instance.addAfterEach(afterEachTwo);
+      instance.addAfter(after);
+      instance.addTest(testOne);
+      instance.addTest(testTwo);
     });
 
     it('creates hooks', () => {

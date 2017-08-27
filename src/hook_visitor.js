@@ -8,28 +8,38 @@ class HookVisitor extends Emitter {
     this._options = opt_options || {};
   }
 
+  visit(hook) {
+    if (hook instanceof Suite) {
+      return this.visitSuite(hook);
+    } else {
+      throw new Error('Visitor entry point requires a Suite');
+    }
+  }
+
   visitSuite(hook) {
-    this.emit(events.SUITE, hook);
+    const result = this.emit(events.SUITE, hook);
+
+    return result;
   }
 
   visitTest(hook) {
-    this.emit(events.TEST, hook);
+    return this.emit(events.TEST, hook);
   }
 
   visitBefore(hook) {
-    this.emit(events.BEFORE, hook);
+    return this.emit(events.BEFORE, hook);
   }
 
   visitAfter(hook) {
-    this.emit(events.AFTER, hook);
+    return this.emit(events.AFTER, hook);
   }
 
   visitBeforeEach(hook) {
-    this.emit(events.BEFORE_EACH, hook);
+    return this.emit(events.BEFORE_EACH, hook);
   }
 
   visitAfterEach(hook) {
-    this.emit(events.AFTER_EACH, hook);
+    return this.emit(events.AFTER_EACH, hook);
   }
 }
 

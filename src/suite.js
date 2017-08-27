@@ -18,6 +18,30 @@ class Suite extends Hook {
     // noop
   }
 
+  addBefore(hook) {
+    this.befores.push(hook);
+  }
+
+  addBeforeEach(hook) {
+    this.beforeEaches.push(hook);
+  }
+
+  addAfter(hook) {
+    this.afters.push(hook);
+  }
+
+  addAfterEach(hook) {
+    this.afterEaches.push(hook);
+  }
+
+  addTest(hook) {
+    this.tests.push(hook);
+  }
+
+  getTests() {
+    return this.tests;
+  }
+
   getBefores() {
     return this.befores;
   }

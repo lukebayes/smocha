@@ -18,6 +18,7 @@ class BddInterface {
   constructor() {
     this._currentSuite = null;
     this._configureAnnotations();
+    this._onlys = [];
   }
 
   _configureAnnotations() {
@@ -31,11 +32,29 @@ class BddInterface {
 
     this.it.only = (label, body) => {
       this.it(label, body, IS_ONLY);
+      this._onOnly(label, body);
     };
 
     this.it.skip = (label, body) => {
       this.it(label, body, null, IS_PENDING);
     };
+  }
+
+  _clearNonOnlys() {
+    const onlyLabels = this._onlys.map((only) => {
+      return only.label;
+    });
+
+    this._currentSuite.getTests().forEach((testHook) => {
+      if (onlyLabels.indexOf(testHook.getLabel()) === -1) {
+        testHook.isDisabled = true;
+      }
+    });
+  }
+
+  _onOnly(label, body) {
+    this._onlys.push({label: label, body: body});
+
   }
 
   describe(label, body, isOnly, isPending) {
@@ -62,23 +81,23 @@ class BddInterface {
   }
 
   it(label, body, isOnly, isPending) {
-    this._currentSuite.tests.push(new Hook(label, body, isOnly, isPending));
+    this._currentSuite.addTest(new Hook(label, body, isOnly, isPending));
   }
 
   beforeEach(body) {
-    this._currentSuite.beforeEaches.push(new Hook('beforeEach', body));
+    this._currentSuite.addBeforeEach(new Hook('beforeEach', body));
   }
 
   afterEach(body) {
-    this._currentSuite.afterEaches.push(new Hook('afterEach', body));
+    this._currentSuite.addAfterEach(new Hook('afterEach', body));
   }
 
   before(body) {
-    this._currentSuite.befores.push(new Hook('before', body));
+    this._currentSuite.addBefore(new Hook('before', body));
   }
 
   after(body) {
-    this._currentSuite.afters.push(new Hook('after', body));
+    this._currentSuite.addAfter(new Hook('after', body));
   }
 
   getRoot() {
@@ -86,7 +105,7 @@ class BddInterface {
   }
 
   toSandbox() {
-    return {
+    const sandbox = {
       after: this.after.bind(this),
       afterEach: this.afterEach.bind(this),
       before: this.before.bind(this),
@@ -94,6 +113,12 @@ class BddInterface {
       describe: this.describe.bind(this),
       it: this.it.bind(this),
     };
+    sandbox.it.only = this.it.only.bind(this);
+    sandbox.describe.only = this.describe.only.bind(this);
+    sandbox.it.skip = this.it.skip.bind(this);
+    sandbox.describe.skip = this.describe.skip.bind(this);
+
+    return sandbox;
   }
 }
 

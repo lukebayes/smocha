@@ -14,9 +14,11 @@ describe('BddInterface', () => {
       const handler = sinon.spy();
       instance.describe('abcd');
 
-      instance.it('mnop', handler);
-      instance.it.only('efgh', handler);
-      instance.it('ijkl', handler);
+      const sandbox = instance.toSandbox();
+
+      sandbox.it('mnop', handler);
+      sandbox.it.only('efgh', handler);
+      sandbox.it('ijkl', handler);
 
       const rootSuite = instance.getRoot();
 

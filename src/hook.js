@@ -22,9 +22,10 @@ class Hook extends Composite {
     super();
     this.isPending = opt_isPending || false;
     this.isOnly = opt_isOnly || false;
+    this.isDisabled = false;
 
     this._label = label;
-    this._handler = this._prepareHandler(handler);
+    this._preparedHandler = this._prepareHandler(handler);
     this._timeout = null;
   }
 
@@ -86,7 +87,7 @@ class Hook extends Composite {
    * Execute the provided handler.
    */
   execute() {
-    return this._handler.call(this);
+    return this._preparedHandler.call(this);
   }
 
   /**

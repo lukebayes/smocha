@@ -10,13 +10,62 @@ describe('HookVisitor', () => {
   let handler;
   let hook;
 
-  describe('active delegate', () => {
+  beforeEach(() => {
+    instance = new HookVisitor();
+    handler = sinon.spy();
+    hook = new Hook();
+  });
+
+  describe('traversal', () => {
+    let after;
+    let afterEachOne;
+    let afterEachTwo;
+    let before;
+    let beforeEachOne;
+    let beforeEachTwo;
+    let childOne;
+    let childTwo;
+    let testOne;
+    let testTwo;
+
     beforeEach(() => {
-      instance = new HookVisitor();
-      handler = sinon.spy();
-      hook = new Hook();
+      after = new Hook('after');
+      afterEachOne = new Hook('afterEach');
+      afterEachTwo = new Hook('afterEach');
+      before = new Hook('before');
+      beforeEachOne = new Hook('beforeEach');
+      beforeEachTwo = new Hook('beforeEach');
+      testOne = new Hook('test one');
+      testTwo = new Hook('test two');
+
+      root = new Suite('root');
+
+      childOne = new Suite('child one');
+      childOne.addBefore(before);
+      childOne.addBeforeEach(beforeEachOne);
+      childOne.addBeforeEach(beforeEachTwo);
+      childOne.addAfterEach(afterEachOne);
+      childOne.addAfterEach(afterEachTwo);
+      childOne.addAfter(after);
+      childOne.addTest(testOne);
+      childOne.addTest(testTwo);
+      root.addChild(childOne);
+
+      childTwo = new Suite('child two');
+      childTwo.addBeforeEach(new Hook('beforeEach'));
+      childTwo.addTest(new Hook('test three'));
+      childOne.addChild(childTwo);
     });
 
+    it.skip('traverses provided suite', () => {
+      const beforeHandler = sinon.spy();
+      instance.on(events.BEFORE, beforeHandler);
+      instance.visit(root);
+      assert.equal(beforeHandler.callCount, 29);
+    });
+  });
+
+  describe('active delegate', () => {
     function assertHandlerCalledWith(handler, hook) {
       assert.equal(handler.callCount, 1);
       assert.equal(handler.getCall(0).args[0], hook);

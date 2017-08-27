@@ -84,4 +84,10 @@ describe('Emitter', () => {
     instance.emit('abcd', 'efgh');
     assert.equal(received, 'efgh');
   });
+
+  it('notifies if it has a listener', () => {
+    instance.on('abcd', sinon.spy());
+    assert.isFalse(instance.hasListenerFor('efgh'));
+    assert(instance.hasListenerFor('abcd'));
+  });
 });
