@@ -4,6 +4,7 @@ const Composite = require('./src/composite');
 const Emitter = require('./src/emitter');
 const FileLoader = require('./src/file_loader');
 const Hook = require('./src/hook');
+const HookVisitor = require('./src/hook_visitor');
 const Iterator = require('./src/iterator');
 const NodeLoader = require('./src/node_loader');
 const Suite = require('./src/suite');
@@ -18,6 +19,7 @@ module.exports = {
   Emitter,
   FileLoader,
   Hook,
+  HookVisitor,
   Iterator,
   NodeLoader,
   Suite,

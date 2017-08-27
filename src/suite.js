@@ -18,6 +18,14 @@ class Suite extends Hook {
     // noop
   }
 
+  getBefores() {
+    return this.befores;
+  }
+
+  getAfters() {
+    return this.afters;
+  }
+
   /**
    * Get a list of beforeEach hooks that has the deepest declaration first and
    * the nearest one last.
