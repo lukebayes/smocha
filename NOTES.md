@@ -48,7 +48,7 @@ Some considerations to mitigate this problem are as follows:
 
 3. Remove support for .only and instead only support Commandline flag to filter down to a single test (or file) when desired: This would be a significant incompatibility with Mocha's interface and would break my own years-long development workflow.
 
-4. Sort file processing by last edit timestamp: This would allow us to usually capture files that have been edited with the addition of a .only annotation and we could easily filter those tests that are declared in the same file and in subsequent files. One additional benefit here, is that test execution would become somewhat randomized and interacting tests could surface more readily. We might need to do some work to expose test ordering in order to make failures visible and reproducible.
+4. Sort file processing by last edit timestamp: This would allow us to usually capture files that have been edited with the addition of a .only annotation and we could easily filter those tests that are declared in the same file and in subsequent files. One additional benefit here, is that test execution would become somewhat randomized and interacting tests could surface more readily. We might need to do some work to expose test ordering in order to make failures visible and reproducible. We will still need to provide messaging across processes in order to prevent sibling processes from continuing into execution. There is also a likely risk that sibling processes might execute some of their tests before the one with a .only is evaluated. Perhaps this could be mitigated by also adding a flag for core count, or that disables parallel execution?
 
 ### Execution Planning: Failures
 
