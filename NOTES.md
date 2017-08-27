@@ -6,7 +6,7 @@
 
 We have a composite tree structure that is being created in the form of Suites and Hooks.
 
-A Hook is a relatively simple container for a label and a handler. Hooks provide an ```execute()``` method which wraps and call the provided handler, which may be implemented as a synchronous method, an async method that receives a node style callback, or it might return a Promise. The Hook implementation hides these details from callers. When ```execute()``` is called, if the underlying handler is synchronous, nothing is returned, otherwise a Promise is returned.0
+A Hook is a relatively simple container for a label and a handler. Hooks provide an ```execute()``` method which wraps and call the provided handler, which may be implemented as a synchronous method, an async method that receives a node style callback, or it might return a Promise. The Hook implementation hides these details from callers. When ```execute()``` is called, if the underlying handler is synchronous, nothing is returned, otherwise a Promise is returned.
 
 A Suite is a Hook that can compose any number of Suites and Hooks. The Suite implementation of ```execute()``` will cause all child Hooks to be executed.
 
@@ -32,10 +32,27 @@ Test execution may be limited or filtered in the following ways:
 
 Once we create the Composite Suite data structure, we're faced with some choices surrounding traversal and execution.
 
-### Execution Planning
+### Execution Planning: .only
 
-Before we begin execution, we need to know (1) if a filter is present, then we need to only execute those tests that match the filter and (2) if any Hooks include a .only annotation, we need to remove all TEST Hooks that do not.
+Before we begin execution, we need to know (1) if a filter is present, then we need to only execute those tests that match the filter and (2) if any Hooks (Suite or Test) include a .only annotation, we need to remove all TEST Hooks (and their associated before/afters) that do not. Additionally, if a suite has all of it's tests filtered out, that Suite's before/after hooks should not fire.
 
 In the case of filters, we know ahead of time and we can simply not add filtered tests to our data structure, but things get much more interesting with the .only annotation, especially when evaluating and running across multiple processes or machines.
 
-In this case, we need to perform a traversal of the tree after evaluation and before execution and if one or more describe.only or it.only blocks are found, we need to then filture out all other hb
+In this case, we need to perform a traversal of the tree after evaluation and before execution and if one or more describe.only or it.only blocks are found, we need to then filter out all other tests. This is problematic as I would like to begin test execution as each file is encountered on disk so that large projects can run as quickly as possible.
+
+Some considerations to mitigate this problem are as follows:
+
+1. Commandline flag to disable immediate test execution: This would allow an author to switch into .only mode and get the desired behavior. Unfortunately, switching into the commandline feels somewhat cumbersome when driving the rhythm that goes with a test watcher.
+
+2. Withold reporting until all test files have been evaluated: This approach would make the UI appear to do what is desired, but any runtime debug hooks would potentially fire for tests that are not apparently being run. This seems bad.
+
+3. Remove support for .only and instead only support Commandline flag to filter down to a single test (or file) when desired: This would be a significant incompatibility with Mocha's interface and would break my own years-long development workflow.
+
+4. Sort file processing by last edit timestamp: This would allow us to usually capture files that have been edited with the addition of a .only annotation and we could easily filter those tests that are declared in the same file and in subsequent files. One additional benefit here, is that test execution would become somewhat randomized and interacting tests could surface more readily. We might need to do some work to expose test ordering in order to make failures visible and reproducible.
+
+### Execution Planning: Failures
+
+When running in "watch" mode, anytime there are one or more test failures, the runner should automatically filter subsequent test runs to only include those failed tests, until they pass. Once all failures have passed, a second run should automatically trigger without the auto-filter applied.
+
+This functionality implies that filters should be pluralized, not singular.
+
