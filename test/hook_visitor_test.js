@@ -1,25 +1,40 @@
-const {Hook} = require('../');
-const {HookVisitor} = require('../');
-const {assert} = require('chai');
+const Hook = require('../').Hook;
+const HookVisitor = require('../').HookVisitor;
+const assert = require('chai').assert;
+const sinon = require('sinon');
 
 class FakeDelegate {
+  onTest(test) {
+  }
 }
 
 describe('HookVisitor', () => {
   let delegate;
   let instance;
 
-  beforeEach(() => {
-    delegate = new FakeDelegate();
-    instance = new HookVisitor(delegate);
+  describe('active delegate', () => {
+    beforeEach(() => {
+      delegate = new FakeDelegate();
+      instance = new HookVisitor(delegate);
+    });
+
+    it('handles onTest', () => {
+      const test = new Hook('abcd');
+      sinon.spy(delegate, 'onTest');
+      instance.visitTest(test);
+      assert.equal(delegate.onTest.callCount, 1);
+    });
   });
 
-  it('is instantiable', () => {
-    assert(instance);
-  });
+  describe('empty delegate', () => {
+    beforeEach(() => {
+      delegate = {};
+      instance = new HookVisitor(delegate);
+    });
 
-  it('visits a test', () => {
-    const test = new Hook('abcd');
-    instance.visitTest(test);
+    it('ignores onTest', () => {
+      const test = new Hook('abcd');
+      instance.visitTest(test);
+    });
   });
 });
