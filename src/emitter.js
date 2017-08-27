@@ -5,6 +5,10 @@ class Emitter {
   }
 
   on(eventName, handler) {
+    if (typeof eventName === 'undefined') {
+      throw new Error('Emitter.on called with empty event name');
+    }
+
     const index = this._listeners.push({eventName: eventName, handler: handler}) - 1;
 
     return () => {

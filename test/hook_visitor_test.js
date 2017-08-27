@@ -1,40 +1,62 @@
 const Hook = require('../').Hook;
 const HookVisitor = require('../').HookVisitor;
+const Suite = require('../').Suite;
 const assert = require('chai').assert;
+const events = require('../').events;
 const sinon = require('sinon');
 
-class FakeDelegate {
-  onTest(test) {
-  }
-}
-
 describe('HookVisitor', () => {
-  let delegate;
   let instance;
+  let handler;
+  let hook;
 
   describe('active delegate', () => {
     beforeEach(() => {
-      delegate = new FakeDelegate();
-      instance = new HookVisitor(delegate);
+      instance = new HookVisitor();
+      handler = sinon.spy();
+      hook = new Hook();
     });
 
-    it('handles onTest', () => {
-      const test = new Hook('abcd');
-      sinon.spy(delegate, 'onTest');
-      instance.visitTest(test);
-      assert.equal(delegate.onTest.callCount, 1);
-    });
-  });
+    function assertHandlerCalledWith(handler, hook) {
+      assert.equal(handler.callCount, 1);
+      assert.equal(handler.getCall(0).args[0], hook);
+    }
 
-  describe('empty delegate', () => {
-    beforeEach(() => {
-      delegate = {};
-      instance = new HookVisitor(delegate);
+    it('emits onTest', () => {
+      instance.on(events.TEST, handler);
+      instance.visitTest(hook);
+      assertHandlerCalledWith(handler, hook);
     });
 
-    it('ignores onTest', () => {
-      const test = new Hook('abcd');
-      instance.visitTest(test);
+    it('emits onBefore', () => {
+      instance.on(events.BEFORE, handler);
+      instance.visitBefore(hook);
+      assertHandlerCalledWith(handler, hook);
+    });
+
+    it('emits onBeforeEach', () => {
+      instance.on(events.BEFORE_EACH, handler);
+      instance.visitBeforeEach(hook);
+      assertHandlerCalledWith(handler, hook);
+    });
+
+    it('emits afterEach', () => {
+      instance.on(events.AFTER_EACH, handler);
+      instance.visitAfterEach(hook);
+      assertHandlerCalledWith(handler, hook);
+    });
+
+    it('emits after', () => {
+      instance.on(events.AFTER, handler);
+      instance.visitAfter(hook);
+      assertHandlerCalledWith(handler, hook);
+    });
+
+    it('emits suite', () => {
+      hook = new Suite();
+      instance.on(events.SUITE, handler);
+      instance.visitSuite(hook);
+      assertHandlerCalledWith(handler, hook);
     });
   });
 });

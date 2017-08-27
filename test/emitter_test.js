@@ -15,6 +15,12 @@ describe('Emitter', () => {
     assert(instance);
   });
 
+  it('throws on undefined subscription', () => {
+    assert.throws(() => {
+      instance.on(undefined, handler);
+    }, /called with empty event name/);
+  });
+
   it('dispatches to a subscriber', () => {
     instance.on('abcd', handler);
     instance.emit('abcd');

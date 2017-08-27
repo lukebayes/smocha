@@ -1,47 +1,35 @@
+const Emitter = require('./emitter');
 const Suite = require('./suite');
-const nullFunction = require('./null_function');
+const events = require('./events');
 
-class DelegateWrapper {
-  constructor(delegate) {
-    this._delegate = delegate;
-  }
-
-  onTest(hook) {
-    if (!this._onTest) {
-      console.log('assign onTest delegate');
-      this._onTest = this._delegate.onTest instanceof Function ? this._delegate.onTest.bind(this._delegate) : nullFunction;
-    }
-
-    return this._onTest(hook);
-  }
-}
-
-class HookVisitor {
-  constructor(delegate, opt_options) {
-    this._delegate = new DelegateWrapper(delegate);
+class HookVisitor extends Emitter {
+  constructor(opt_options) {
+    super();
     this._options = opt_options || {};
   }
 
   visitSuite(hook) {
-  }
-
-  visitHook(hook) {
+    this.emit(events.SUITE, hook);
   }
 
   visitTest(hook) {
-    this._delegate.onTest(hook);
+    this.emit(events.TEST, hook);
   }
 
   visitBefore(hook) {
+    this.emit(events.BEFORE, hook);
   }
 
   visitAfter(hook) {
+    this.emit(events.AFTER, hook);
   }
 
   visitBeforeEach(hook) {
+    this.emit(events.BEFORE_EACH, hook);
   }
 
   visitAfterEach(hook) {
+    this.emit(events.AFTER_EACH, hook);
   }
 }
 
