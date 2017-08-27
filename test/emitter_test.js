@@ -64,15 +64,18 @@ describe('Emitter', () => {
     assert.isFalse(stopped);
   });
 
-  it('halts progress if a handler returns true', () => {
-    function stopper() { return true; };
+  it('halts progress if a handler returns Emitter.CANCEL', () => {
+    function stopper() { return Emitter.CANCEL; };
+    function other() { return true; };
 
-    instance.on('abcd', handler);
-    instance.on('abcd', stopper);
-    instance.on('abcd', handler);
+    instance.on('abcd', handler); // Should be called.
+    instance.on('abcd', other); // Should be called.
+    instance.on('abcd', stopper); // Stops subsequent.
+    instance.on('abcd', handler); // Should NOT be called.
+
     const stopped = instance.emit('abcd');
     assert.equal(handler.callCount, 1);
-    assert(stopped);
+    assert.isTrue(stopped);
   });
 
   it('forwards provided payload', () => {

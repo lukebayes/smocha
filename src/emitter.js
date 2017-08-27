@@ -1,5 +1,10 @@
 
 /**
+ * Return this reference if you wish to cancel subsequent handlers.
+ */
+const CANCEL = {};
+
+/**
  * Thin, simple and fast implementation of the Observer pattern.
  *
  * This implementation differs from the native node and others in that the
@@ -32,7 +37,7 @@ class Emitter {
   emit(eventName, payload) {
     return this._listeners.some((listener) => {
       if (listener.eventName === eventName) {
-        return listener.handler(payload);
+        return listener.handler(payload) === CANCEL;
       }
     });
   }
@@ -65,5 +70,10 @@ class Emitter {
     });
   }
 }
+
+/**
+ * Handlers can return this constant to cancel subsequent events.
+ */
+Emitter.CANCEL = CANCEL;
 
 module.exports = Emitter;
