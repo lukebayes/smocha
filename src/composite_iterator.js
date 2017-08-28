@@ -38,7 +38,9 @@ class CompositeIterator {
   }
 
   peek() {
-    throw new Error('Not implemented');
+    if (this.hasNext()) {
+      return this._current().peek();
+    }
   }
 }
 

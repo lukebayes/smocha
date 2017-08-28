@@ -44,16 +44,22 @@ describe('CompositeIterator', () => {
     instance = new CompositeIterator(one);
     assert(instance);
     assert(instance.hasNext());
+    assert.equal(instance.peek(), one);
     assert.equal(instance.next(), one);
     assert(instance.hasNext());
+    assert.equal(instance.peek(), two);
     assert.equal(instance.next(), two);
     assert(instance.hasNext());
+    assert.equal(instance.peek(), four);
     assert.equal(instance.next(), four);
     assert(instance.hasNext());
-    assert.equal(instance.next().id, five.id);
+    assert.equal(instance.peek(), five);
+    assert.equal(instance.next(), five);
     assert(instance.hasNext());
+    assert.equal(instance.peek(), six);
     assert.equal(instance.next(), six);
     assert(instance.hasNext());
+    assert.equal(instance.peek(), three);
     assert.equal(instance.next(), three);
 
     assert.isFalse(instance.hasNext());
