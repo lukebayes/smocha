@@ -11,7 +11,13 @@ const DEFAULT_DIRECTORY = 'test';
  * Subsequent processes will read these files buffers and execute the tests.
  */
 function findFiles(opt_expressionStr, opt_directory) {
-  const expr = opt_expressionStr ? new RegExp(opt_expressionStr) : DEFAULT_EXPRESSION;
+  let expr;
+  if (opt_expressionStr) {
+    expr = opt_expressionStr instanceof RegExp ? opt_expressionStr : new RegExp(opt_expressionStr);
+  } else {
+    expr = DEFAULT_EXPRESSION;
+  }
+
   const dir = opt_directory || DEFAULT_DIRECTORY;
 
   return new Promise((resolve, reject) => {

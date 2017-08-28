@@ -3,12 +3,9 @@ const BddInterface = require('./src/bdd_interface');
 const Composite = require('./src/composite');
 const CompositeIterator = require('./src/composite_iterator');
 const Emitter = require('./src/emitter');
-const FileLoader = require('./src/file_loader');
 const Hook = require('./src/hook');
 const Iterator = require('./src/iterator');
-const NodeLoader = require('./src/node_loader');
 const Suite = require('./src/suite');
-const TestFile = require('./src/test_file');
 const TestRunner = require('./src/test_runner');
 const evaluateFile = require('./src/evaluate_file');
 const evaluateFiles = require('./src/evaluate_files');
@@ -23,12 +20,9 @@ module.exports = {
   Composite,
   CompositeIterator,
   Emitter,
-  FileLoader,
   Hook,
   Iterator,
-  NodeLoader,
   Suite,
-  TestFile,
   TestRunner,
   evaluateFile,
   evaluateFiles,
