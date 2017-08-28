@@ -1,4 +1,4 @@
-const readEachFileMatching = require('fileutils').readEachFileMatching;
+const eachFileMatching = require('fileutils').eachFileMatching;
 
 const DEFAULT_EXPRESSION = /.*_test.js/;
 const DEFAULT_DIRECTORY = 'test';
@@ -8,22 +8,19 @@ function findFiles(opt_expressionStr, opt_directory) {
   const dir = opt_directory || DEFAULT_DIRECTORY;
 
   return new Promise((resolve, reject) => {
-    function completeHandler(err, files, stats, contents) {
-      if (err) {
-        reject(err);
-      } else {
-        resolve({
-          files,
-          stats,
-          contents,
-        });
-      }
+    function completeHandler(err, files, stats) {
+      console.log('COMPLETE HANDER!!!!!!!!!!!!!!');
+      if (err) return reject(err);
+
+      resolve({
+        files,
+        stats,
+      });
     }
 
-    readEachFileMatching(expr, dir, function(err, file, stat, content) {
-      console.log('>>>>>>>>>>> >YOOOOOOOO:', content);
-      console.log(content);
-      console.log('complete handler!', contents);
+    eachFileMatching(expr, dir, function(err, file, stat) {
+      console.log('>>>>>>>>>>> >YOOOOOOOO:', stat);
+      /*
       if (err) {
         reject(err);
       } else {
@@ -33,6 +30,7 @@ function findFiles(opt_expressionStr, opt_directory) {
           contents,
         });
       }
+      */
     }, completeHandler);
   });
 }

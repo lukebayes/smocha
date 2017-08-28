@@ -3,9 +3,10 @@ const findFiles = require('../').findFiles;
 
 describe('findFiles', () => {
 
-  it('is callable', () => {
-    return findFiles('fixtures/*.js')
+  it.only('is callable', () => {
+    return findFiles('.*\.js', 'test/fixtures')
       .then((files) => {
+        console.log('files.length:', files.files.length);
         console.log('files:', files);
       });
   });
