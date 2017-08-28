@@ -7,11 +7,14 @@ class TestRunner {
     this._loaders = loaders;
   }
 
-  run() {
-    // TODO(lbayes): This method needs to be asynchronous
-    return this._loaders.map((loader) => {
-      return loader.execute();
-    });
+  /**
+   * Load all loaders in parallel and wait for all files to be loaded and
+   * evaluated.
+   */
+  load() {
+    return Promise.all(this._loaders.map((loader) => {
+      return loader.load();
+    }));
   }
 }
 
