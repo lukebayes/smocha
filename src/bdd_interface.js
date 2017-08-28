@@ -75,6 +75,8 @@ class BddInterface {
       body();
     }
 
+    // Notify the suite that we are done adding concrete hooks, now it can
+    // transform those into the appropriate tree structure.
     child.onEvaluationComplete();
 
     if (parent) {

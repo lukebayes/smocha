@@ -70,29 +70,35 @@ class Suite extends Hook {
   }
 
   onEvaluationComplete() {
-    // Clear befores and afters if there are no tests or children.
     if (this.tests.length === 0 && this.children.length === 0) {
+      // Clear befores and afters if there are no tests or children.
       this.befores.length = 0;
       this.afters.length = 0;
     } else {
+      // Attach before hooks.
       this.befores.forEach((hook) => {
         this.addChild(hook);
       });
 
       this.tests.forEach((test) => {
+        // Attach beforeEach hooks for each test.
         this.beforeEaches.forEach((hook) => {
           this.addChild(hook);
         });
+        // Attach each test.
         this.addChild(test);
+        // Attach afterEach hooks for each test.
         this.afterEaches.forEach((hook) => {
           this.addChild(hook);
         });
       });
 
+      // Attach child suites.
       this.suites.forEach((suite) => {
         this.addChild(suite);
       });
 
+      // Attach after hooks.
       this.afters.forEach((hook) => {
         this.addChild(hook);
       });

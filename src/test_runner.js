@@ -13,10 +13,10 @@ const DEFAULT_OPTIONS = {
  * Load and run the tests that are associated with the provided test loaders.
  */
 class TestRunner {
-  constructor(opt_options) {
+  constructor(opt_options, opt_reporter, opt_interface) {
     this._options = Object.assign(DEFAULT_OPTIONS, opt_options || {});
-    this._reporter = new BaseReporter();
-    this._interface = new BddInterface();
+    this._reporter = opt_reporter || new BaseReporter();
+    this._interface = opt_interface || new BddInterface();
   }
 
   /**
