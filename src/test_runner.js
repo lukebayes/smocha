@@ -1,8 +1,7 @@
 const BaseReporter = require('./base_reporter');
 const BddInterface = require('./bdd_interface');
-const CompositeIterator = require('./composite_iterator');
 const evaluateFiles = require('./evaluate_files');
-const executeTests = require('./execute_tests');
+const executeHooks = require('./execute_hooks');
 const findFiles = require('./find_files');
 
 const DEFAULT_OPTIONS = {
@@ -33,7 +32,7 @@ class TestRunner {
         return evaluateFiles(this._interface.toSandbox(), fileAndStats);
       })
       .then(() => {
-        return executeTests(new CompositeIterator(this._interface.getRoot()));
+        return executeHooks(this._interface.getRoot());
       });
   }
 }

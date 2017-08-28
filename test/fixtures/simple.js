@@ -41,10 +41,6 @@ describe('Simple', () => {
     it('sets value in beforeEach', () => {
       assert.equal(value, 'efgh');
     });
-
-    it('fails', () => {
-      assert(false);
-    });
   });
 
   it('is below', () => {
