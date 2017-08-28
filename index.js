@@ -10,9 +10,12 @@ const NodeLoader = require('./src/node_loader');
 const Suite = require('./src/suite');
 const TestFile = require('./src/test_file');
 const TestRunner = require('./src/test_runner');
+const evaluateFile = require('./src/evaluate_file');
+const evaluateFiles = require('./src/evaluate_files');
 const events = require('./src/events');
 const findFiles = require('./src/find_files');
 const generateId = require('./src/generate_id');
+const readFile = require('./src/read_file');
 
 module.exports = {
   BaseReporter,
@@ -27,8 +30,11 @@ module.exports = {
   Suite,
   TestFile,
   TestRunner,
+  evaluateFile,
+  evaluateFiles,
   events,
   findFiles,
   generateId,
+  readFile,
 };
 

@@ -15,11 +15,11 @@ function findFiles(opt_expressionStr, opt_directory) {
   const dir = opt_directory || DEFAULT_DIRECTORY;
 
   return new Promise((resolve, reject) => {
-    eachFileMatching(expr, dir, null, function completeHandler(err, files, stats) {
+    eachFileMatching(expr, dir, null, function completeHandler(err, fileAndStats, stats) {
       if (err) return reject(err);
-      const results = files.map((file, index) => {
+      const results = fileAndStats.map((file, index) => {
         return {
-          file: path.resolve(file),
+          filename: path.resolve(file),
           stat: stats[index],
         };
       }).sort((a, b) => {
