@@ -40,33 +40,22 @@ describe('CompositeIterator', () => {
     }, /is empty/);
   });
 
-  it.skip('preorder tree traversal', () => {
+  it('preorder tree traversal', () => {
     instance = new CompositeIterator(one);
     assert(instance);
     assert(instance.hasNext());
-    console.log('one');
     assert.equal(instance.next(), one);
     assert(instance.hasNext());
-    console.log('two');
     assert.equal(instance.next(), two);
     assert(instance.hasNext());
-    console.log('four');
     assert.equal(instance.next(), four);
     assert(instance.hasNext());
-    console.log('five');
     assert.equal(instance.next().id, five.id);
     assert(instance.hasNext());
-    console.log('six');
     assert.equal(instance.next(), six);
     assert(instance.hasNext());
-    console.log('three');
     assert.equal(instance.next(), three);
-    console.log('ENDING');
 
-    if (instance.hasNext()) {
-      console.log('stack:', instance._stack.length);
-      console.log('FALSE!:', instance.hasNext());
-    }
     assert.isFalse(instance.hasNext());
   });
 });

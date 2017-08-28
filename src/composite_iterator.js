@@ -26,13 +26,16 @@ class CompositeIterator {
       const result = current.next();
       if (result.hasChildren()) {
         this._stack.push(new Iterator(result.children));
+      } else if (!current.hasNext()) {
+        while (this._current() && !this._current().hasNext()) {
+          this._stack.pop();
+        }
       }
       return result;
-    } else {
-      console.log('popping!', this._stack.length);
-      this._stack.pop();
-      return this.next();
     }
+
+    this._stack.pop();
+    return this.next();
   }
 
   peek() {
