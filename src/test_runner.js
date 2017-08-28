@@ -1,6 +1,8 @@
 const BaseReporter = require('./base_reporter');
 const BddInterface = require('./bdd_interface');
+const CompositeIterator = require('./composite_iterator');
 const evaluateFiles = require('./evaluate_files');
+const executeTests = require('./execute_tests');
 const findFiles = require('./find_files');
 
 const DEFAULT_OPTIONS = {
@@ -25,9 +27,13 @@ class TestRunner {
   run() {
     const opts = this._options;
 
+    // TODO(lbayes): Spread execution across multiple child processes.
     return findFiles(opts.testExpression, opts.testDirectory)
       .then((fileAndStats) => {
         return evaluateFiles(this._interface.toSandbox(), fileAndStats);
+      })
+      .then(() => {
+        return executeTests(new CompositeIterator(this._interface.getRoot()));
       });
   }
 }

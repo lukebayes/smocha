@@ -75,6 +75,8 @@ class BddInterface {
       body();
     }
 
+    child.onEvaluationComplete();
+
     if (parent) {
       this._currentSuite = parent;
     }

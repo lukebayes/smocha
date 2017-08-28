@@ -2,6 +2,7 @@
 class BaseReporter {
   constructor(writer) {
     this.writer = writer;
+    this._results = [];
   }
 
   onStart(test) {
@@ -32,6 +33,10 @@ class BaseReporter {
   }
 
   onEnd(test) {
+  }
+
+  getResults() {
+    return this._results;
   }
 }
 

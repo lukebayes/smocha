@@ -15,14 +15,20 @@ class Suite extends Hook {
     this.tests = [];
   }
 
+  /**
+   * Override the underlying execute implementation so that we can be iterated
+   * over without causing any delays.
+   */
+  execute() {
+    // noop
+  }
+
   addTest(hook) {
-    this.addChild(hook);
     this.tests.push(hook);
     return hook;
   }
 
   addSuite(hook) {
-    this.addChild(hook);
     this.suites.push(hook);
     return hook;
   }
@@ -61,6 +67,36 @@ class Suite extends Hook {
 
   getAfterEaches() {
     return this.afterEaches;
+  }
+
+  onEvaluationComplete() {
+    // Clear befores and afters if there are no tests or children.
+    if (this.tests.length === 0 && this.children.length === 0) {
+      this.befores.length = 0;
+      this.afters.length = 0;
+    } else {
+      this.befores.forEach((hook) => {
+        this.addChild(hook);
+      });
+
+      this.tests.forEach((test) => {
+        this.beforeEaches.forEach((hook) => {
+          this.addChild(hook);
+        });
+        this.addChild(test);
+        this.afterEaches.forEach((hook) => {
+          this.addChild(hook);
+        });
+      });
+
+      this.suites.forEach((suite) => {
+        this.addChild(suite);
+      });
+
+      this.afters.forEach((hook) => {
+        this.addChild(hook);
+      });
+    }
   }
 }
 
