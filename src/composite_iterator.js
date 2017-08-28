@@ -21,21 +21,20 @@ class CompositeIterator {
       throw new Error('Cannot get next item, collection is empty.');
     }
 
-    const current = this._current();
-    if (current.hasNext()) {
-      const result = current.next();
-      if (result.hasChildren()) {
-        this._stack.push(new Iterator(result.children));
-      } else if (!current.hasNext()) {
-        while (this._current() && !this._current().hasNext()) {
-          this._stack.pop();
-        }
+    const node = this._current().next();
+
+    if (node.hasChildren()) {
+      // Push onto the iterator stack.
+      this._stack.push(new Iterator(node.children));
+    } else {
+      // Pop off of the iterator stack until we reach root or find a node
+      // that has children.
+      while (this._current() && !this._current().hasNext()) {
+        this._stack.pop();
       }
-      return result;
     }
 
-    this._stack.pop();
-    return this.next();
+    return node;
   }
 
   peek() {
