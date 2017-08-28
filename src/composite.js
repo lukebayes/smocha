@@ -19,6 +19,10 @@ class Composite extends Emitter {
     }
   }
 
+  hasChildren() {
+    return this.children.length > 0;
+  }
+
   /**
    * Add a child to this entity and set that child's parent property.
    */
