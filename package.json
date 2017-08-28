@@ -24,6 +24,7 @@
   "author": "Luke Bayes",
   "license": "MIT",
   "dependencies": {
+    "fileutils": "^0.1.1",
     "vm2": "^3.4.6"
   },
   "devDependencies": {
