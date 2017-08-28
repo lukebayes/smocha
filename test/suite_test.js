@@ -18,11 +18,11 @@ describe('Suite', () => {
 
     beforeEach(() => {
       after = new Hook('after');
-      afterEachOne = new Hook('afterEach');
-      afterEachTwo = new Hook('afterEach');
+      afterEachOne = new Hook('afterEach1');
+      afterEachTwo = new Hook('afterEach2');
       before = new Hook('before');
-      beforeEachOne = new Hook('beforeEach');
-      beforeEachTwo = new Hook('beforeEach');
+      beforeEachOne = new Hook('beforeEach1');
+      beforeEachTwo = new Hook('beforeEach2');
       testOne = new Hook('test one');
       testTwo = new Hook('test two');
 
@@ -43,6 +43,10 @@ describe('Suite', () => {
       // for each test, and of course, the tests themselves, total of twelve
       // hooks to execute.
       assert.equal(hooks.length, 12);
+
+      hooks.forEach((hook) => {
+        console.log('hook:', hook.getLabel());
+      });
     });
   });
 });

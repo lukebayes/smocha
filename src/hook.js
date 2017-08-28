@@ -104,6 +104,48 @@ class Hook extends Composite {
   getLabel() {
     return this._label;
   }
+
+  /**
+   * Get a list of beforeEach hooks that has the deepest declaration first and
+   * the nearest one last.
+   */
+  getBeforeEaches() {
+    let current = this;
+    let hooks = [];
+
+    // This loop starts with the first parent..
+    while (current && current.parent) {
+      current = current.parent;
+      hooks = hooks.concat(current.getBeforeEaches());
+    }
+
+    return hooks;
+  }
+
+  /**
+   * Get a list of afterEach hooks that has the nearest declaration first and
+   * the deepest one last.
+   */
+  getAfterEaches() {
+    let current = this;
+    // We begin with the parent's afterEaches.
+    let hooks = [];
+
+    // This loop starts with the first grandparent.
+    while (current && current.parent) {
+      current = current.parent;
+      hooks = current.getAfterEaches().concat(hooks);
+    }
+
+    return hooks;
+  }
+
+  toHooks() {
+    let result = this.getBeforeEaches();
+    result.push(this);
+    result = result.concat(this.getAfterEaches());
+    return result;
+  }
 }
 
 Hook.DEFAULT_TIMEOUT = DEFAULT_TIMEOUT;

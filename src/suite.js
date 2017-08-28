@@ -35,6 +35,7 @@ class Suite extends Hook {
   }
 
   addTest(hook) {
+    this.addChild(hook);
     this.tests.push(hook);
   }
 
@@ -50,38 +51,12 @@ class Suite extends Hook {
     return this.afters;
   }
 
-  /**
-   * Get a list of beforeEach hooks that has the deepest declaration first and
-   * the nearest one last.
-   */
   getBeforeEaches() {
-    let hooks = [];
-    let current = this;
-
-    while (current.parent) {
-      current = current.parent;
-      hooks = hooks.concat(current.beforeEaches);
-    }
-
-    hooks = hooks.concat(this.beforeEaches);
-
-    return hooks;
+    return this.beforeEaches;
   }
 
-  /**
-   * Get a list of afterEach hooks that has the nearest declaration first and
-   * the deepest one last.
-   */
   getAfterEaches() {
-    let hooks = this.afterEaches;
-    let current = this;
-
-    while (current.parent) {
-      current = current.parent;
-      hooks = current.afterEaches.concat(hooks);
-    }
-
-    return hooks;
+    return this.afterEaches;
   }
 
   /**
@@ -96,22 +71,21 @@ class Suite extends Hook {
     result = result.concat(this.befores.slice());
 
     // Create a hook set for beforeEaches, its and afterEaches
-    this.tests.forEach((test) => {
+    // this.tests.forEach((test) => {
       // NOTE(lbayes): All add all parent beforeEaches here
-      result = result.concat(this.getBeforeEaches());
-      result.push(test);
-      result = result.concat(this.getAfterEaches());
+      // result = result.concat(test.getBeforeEaches());
+      // result.push(test);
+      // result = result.concat(test.getAfterEaches());
       // NOTE(lbayes): All add all parent afterEaches here
-    });
+    // });
 
     // Nest the children as result
     this.forEach((child) => {
-      result.concat(child.toHooks());
+      result = result.concat(child.toHooks());
     });
 
     // Get the suite-level afters.
     return result.concat(this.afters);
-    return result;
   }
 }
 
