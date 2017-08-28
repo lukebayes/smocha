@@ -9,9 +9,12 @@ class Composite extends Emitter {
     this.parent = null;
   }
 
+  /**
+   * Emit an event that bubbles up the tree to root, unless it is cancelled.
+   */
   bubble(eventName, payload) {
-    this.emit(eventName, payload);
-    if (this.parent) {
+    const isCancelled = this.emit(eventName, payload);
+    if (!isCancelled && this.parent) {
       this.parent.bubble(eventName, payload);
     }
   }

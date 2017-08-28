@@ -6,7 +6,7 @@
 class Iterator {
 
   constructor(iterable) {
-    this._index = -1
+    this._index = -1;
     this._iterable = iterable;
   }
 

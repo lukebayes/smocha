@@ -17,9 +17,7 @@ class HookVisitor extends Emitter {
   }
 
   visitSuite(hook) {
-    const result = this.emit(events.SUITE, hook);
-
-    return result;
+    return this.emit(events.SUITE, hook);
   }
 
   visitTest(hook) {
