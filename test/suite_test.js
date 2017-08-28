@@ -44,9 +44,9 @@ describe('Suite', () => {
       // hooks to execute.
       assert.equal(hooks.length, 12);
 
-      hooks.forEach((hook) => {
-        console.log('hook:', hook.getLabel());
-      });
+      // hooks.forEach((hook) => {
+        // console.log('hook:', hook.getLabel());
+      // });
     });
   });
 });
