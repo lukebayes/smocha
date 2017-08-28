@@ -51,6 +51,8 @@ Some considerations to mitigate this problem are as follows:
 
 4. Sort file processing by last edit timestamp: This would allow us to usually capture files that have been edited with the addition of a .only annotation and we could easily filter those tests that are declared in the same file and in subsequent files. One additional benefit here, is that test execution would become somewhat randomized and interacting tests could surface more readily. We might need to do some work to expose test ordering in order to make failures visible and reproducible. We will still need to provide messaging across processes in order to prevent sibling processes from continuing into execution. There is also a likely risk that sibling processes might execute some of their tests before the one with a .only is evaluated. Perhaps this could be mitigated by also adding a flag for core count, or that disables parallel execution?
 
+This solution is also especially nice for larger test harnesses, because it means that more recently edited tests will run first and we will no longer have to wait for the entire test harness to run when we're primarily interested in those recently edited files. 
+
 ### Execution Planning: Failures
 
 When running in "watch" mode, anytime there are one or more test failures, the runner should automatically filter subsequent test runs to only include those failed tests, until they pass. Once all failures have passed, a second run should automatically trigger without the auto-filter applied.
