@@ -11,11 +11,20 @@ class Suite extends Hook {
     this.afters = [];
     this.beforeEaches = [];
     this.afterEaches = [];
+    this.suites = [];
     this.tests = [];
   }
 
-  execute() {
-    // noop
+  addTest(hook) {
+    this.addChild(hook);
+    this.tests.push(hook);
+    return hook;
+  }
+
+  addSuite(hook) {
+    this.addChild(hook);
+    this.suites.push(hook);
+    return hook;
   }
 
   addBefore(hook) {
@@ -32,11 +41,6 @@ class Suite extends Hook {
 
   addAfterEach(hook) {
     this.afterEaches.push(hook);
-  }
-
-  addTest(hook) {
-    this.addChild(hook);
-    this.tests.push(hook);
   }
 
   getTests() {
@@ -57,35 +61,6 @@ class Suite extends Hook {
 
   getAfterEaches() {
     return this.afterEaches;
-  }
-
-  /**
-   * Flatten the entire tree of tests and suites and insert all before/after
-   * hooks around each test or suite as the case may be.
-   *
-   * Return the array of hooks to be called serially.
-   */
-  toHooks() {
-    let result = [];
-    // Capture the suite-level before blocks
-    result = result.concat(this.befores.slice());
-
-    // Create a hook set for beforeEaches, its and afterEaches
-    // this.tests.forEach((test) => {
-      // NOTE(lbayes): All add all parent beforeEaches here
-      // result = result.concat(test.getBeforeEaches());
-      // result.push(test);
-      // result = result.concat(test.getAfterEaches());
-      // NOTE(lbayes): All add all parent afterEaches here
-    // });
-
-    // Nest the children as result
-    this.forEach((child) => {
-      result = result.concat(child.toHooks());
-    });
-
-    // Get the suite-level afters.
-    return result.concat(this.afters);
   }
 }
 

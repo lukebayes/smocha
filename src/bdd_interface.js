@@ -31,8 +31,8 @@ class BddInterface {
     };
 
     this.it.only = (label, body) => {
-      this.it(label, body, IS_ONLY);
-      this._onOnly(label, body);
+      const hook = this.it(label, body, IS_ONLY);
+      this._onOnly(hook);
     };
 
     this.it.skip = (label, body) => {
@@ -52,9 +52,9 @@ class BddInterface {
     });
   }
 
-  _onOnly(label, body) {
-    this._onlys.push({label: label, body: body});
-
+  _onOnly(hook) {
+    console.log('yo:', hook.id);
+    this._onlys.push(hook);
   }
 
   describe(label, body, isOnly, isPending) {
@@ -65,7 +65,7 @@ class BddInterface {
       // NOTE(lbayes): The current child MUST be attached to the tree before
       // the describe block is evaluated so that .only statements can message
       // the entire tree.
-      parent.addChild(child);
+      parent.addSuite(child);
     }
 
     this._currentSuite = child;
@@ -81,7 +81,7 @@ class BddInterface {
   }
 
   it(label, body, isOnly, isPending) {
-    this._currentSuite.addTest(new Hook(label, body, isOnly, isPending));
+    return this._currentSuite.addTest(new Hook(label, body, isOnly, isPending));
   }
 
   beforeEach(body) {

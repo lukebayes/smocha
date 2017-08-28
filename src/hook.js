@@ -1,4 +1,5 @@
 const Composite = require('./composite');
+const generateId = require('./generate_id');
 
 /**
  * Default async hook timeout in milliseconds.
@@ -20,6 +21,7 @@ function nullFunction() {};
 class Hook extends Composite {
   constructor(label, handler, opt_isOnly, opt_isPending) {
     super();
+    this.id = generateId();
     this.isPending = opt_isPending || false;
     this.isOnly = opt_isOnly || false;
     this.isDisabled = false;

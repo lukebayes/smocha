@@ -6,6 +6,13 @@ const sinon = require('sinon');
 describe('Suite', () => {
   let instance;
 
+  it('returns added tests', () => {
+    const test = new Hook();
+    instance = new Suite();
+    const result = instance.addTest(test);
+    assert.equal(test, result);
+  });
+
   describe('simple', () => {
     let after;
     let afterEachOne;
@@ -35,18 +42,6 @@ describe('Suite', () => {
       instance.addAfter(after);
       instance.addTest(testOne);
       instance.addTest(testTwo);
-    });
-
-    it('creates hooks', () => {
-      const hooks = instance.toHooks();
-      // Expect one before, one after, and two beforeEaches and two afterEaches
-      // for each test, and of course, the tests themselves, total of twelve
-      // hooks to execute.
-      assert.equal(hooks.length, 12);
-
-      // hooks.forEach((hook) => {
-        // console.log('hook:', hook.getLabel());
-      // });
     });
   });
 });

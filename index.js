@@ -11,6 +11,7 @@ const Suite = require('./src/suite');
 const TestFile = require('./src/test_file');
 const TestRunner = require('./src/test_runner');
 const events = require('./src/events');
+const generateId = require('./src/generate_id');
 
 module.exports = {
   BaseReporter,
@@ -26,5 +27,6 @@ module.exports = {
   TestFile,
   TestRunner,
   events,
+  generateId,
 };
 

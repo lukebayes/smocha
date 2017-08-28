@@ -25,6 +25,20 @@ class Composite extends Emitter {
   addChild(child) {
     child.parent = this;
     this.children.push(child);
+    return child;
+  }
+
+  /**
+   * Remove the child by reference.
+   */
+  removeChild(child) {
+    const index = this.children.indexOf(child);
+    if (index > -1 && child.parent === this) {
+      child.parent = null;
+      this.children.splice(index, 1);
+      return child;
+    }
+    return null;
   }
 
   /**

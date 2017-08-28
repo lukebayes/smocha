@@ -80,4 +80,25 @@ describe('Composite', () => {
     one.bubble('abcd');
     assert.equal(handler.callCount, 0);
   });
+
+  it('returns child when added', () => {
+    const root = new Composite();
+    const child = new Composite();
+    const result = root.addChild(child);
+    assert.equal(result, child);
+  });
+
+  it('removes added child', () => {
+    const result = one.removeChild(two);
+    assert.equal(one.children.length, 2);
+    assert.equal(result, two);
+  });
+
+  it('does not remove non-child entities', () => {
+    // three is a child of two, not one.
+    const result = one.removeChild(three);
+    assert.isNull(result);
+    assert.equal(one.children.length, 3);
+    assert.equal(three.parent, two, 'Parent property is left in tact');
+  });
 });
