@@ -13,7 +13,7 @@ class BaseReporter {
 
   onStart(suite) {
     this._startTimeMs = new Date().getTime();
-
+    this._stdout.write('BEGIN\n');
   }
 
   onBefore(suite) {

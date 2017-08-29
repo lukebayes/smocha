@@ -1,0 +1,7 @@
+#!/usr/bin/env node
+
+const TestRunner = require('../').TestRunner;
+
+const runner = new TestRunner();
+runner.run();
+

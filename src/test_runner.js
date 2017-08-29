@@ -15,7 +15,7 @@ const DEFAULT_OPTIONS = {
 class TestRunner {
   constructor(opt_options, opt_reporter, opt_interface) {
     this._options = Object.assign(DEFAULT_OPTIONS, opt_options || {});
-    this._reporter = opt_reporter || new BaseReporter();
+    this._reporter = opt_reporter || new BaseReporter(process.stdout, process.stderr);
     this._interface = opt_interface || new BddInterface();
   }
 
