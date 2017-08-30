@@ -24,6 +24,16 @@ class Suite extends Hook {
     // noop
   }
 
+  start() {
+    console.log('SUITE START');
+    this.emit(events.START, this);
+  }
+
+  end() {
+    console.log('SUITE END');
+    this.emit(events.END, this);
+  }
+
   addTest(hook) {
     this.tests.push(hook);
     return hook;

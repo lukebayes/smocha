@@ -29,15 +29,16 @@ class BddInterface extends Emitter {
    * Delegate all known events from the root Suite so that listeners
    * can subscribe to the interface object to receive those events.
    */
-  _delegateEventsOn(root) {
+  _delegateEvents(root) {
     Object.keys(events).forEach((key) => {
-      this._delegateEvent(root, key);
+      this._delegateEvent(root, events[key]);
     });
   }
 
   _delegateEvent(delegate, eventName) {
     delegate.on(eventName, (payload) => {
-      this.emit(eventName, payload);
+      console.log('ON:', eventName);
+      return this.emit(eventName, payload);
     });
   }
 
@@ -88,7 +89,7 @@ class BddInterface extends Emitter {
       parent.addSuite(child);
     } else {
       this._root = child;
-      this._delegateEventsOn(child);
+      this._delegateEvents(child);
     }
 
     this._currentSuite = child;

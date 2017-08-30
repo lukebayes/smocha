@@ -9,10 +9,12 @@ const CompositeIterator = require('./composite_iterator');
  */
 function executeHooks(root) {
   const iterator = new CompositeIterator(root);
+  root.start();
 
   return new Promise((resolve, reject) => {
     nextHook(iterator, (err) => {
       if (err) return reject(err);
+      root.end();
       resolve();
     });
   });
@@ -27,7 +29,6 @@ function executeHooks(root) {
 function nextHook(iterator, completeHandler) {
   if (iterator.hasNext()) {
     const hook = iterator.next();
-
 
     try {
       const maybePromise = hook.execute();
@@ -45,9 +46,10 @@ function nextHook(iterator, completeHandler) {
     } finally {
       // NOTE(lbayes): Ensure we continue iteration, even if a single hook
       // throws.
-      nextHook(iterator, completeHandler);
+      // nextHook(iterator, completeHandler);
     }
   } else {
+    console.log('COMPLETE');
     completeHandler();
   }
 }

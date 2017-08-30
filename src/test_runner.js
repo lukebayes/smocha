@@ -1,7 +1,7 @@
 const BaseReporter = require('./base_reporter');
 const BddInterface = require('./bdd_interface');
 const evaluateFiles = require('./evaluate_files');
-const eventDelegate = require('./event_delegate');
+const delegateEvents = require('./delegate_events');
 const executeHooks = require('./execute_hooks');
 const findFiles = require('./find_files');
 
@@ -18,7 +18,7 @@ class TestRunner {
     this._options = Object.assign(DEFAULT_OPTIONS, opt_options || {});
     this._interface = opt_interface || new BddInterface();
     this._reporter = opt_reporter || new BaseReporter(process.stdout, process.stderr);
-    eventDelegate(this._interface, this._reporter);
+    delegateEvents(this._interface, this._reporter);
   }
 
   /**

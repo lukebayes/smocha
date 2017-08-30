@@ -42,6 +42,8 @@ class BaseReporter {
   }
 
   onFail(test) {
+    this._stderr.write('\n');
+    this._stderr.write('FAILURE: ' + test.getFullLabel());
   }
 
   onPending(test) {
