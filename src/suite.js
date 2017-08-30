@@ -25,12 +25,10 @@ class Suite extends Hook {
   }
 
   start() {
-    console.log('SUITE START');
     this.emit(events.START, this);
   }
 
   end() {
-    console.log('SUITE END');
     this.emit(events.END, this);
   }
 

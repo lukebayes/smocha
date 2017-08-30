@@ -1,16 +1,7 @@
 const BaseReporter = require('../').BaseReporter;
+const FakeStream = require('./fakes/fake_stream');
 const Hook = require('../').Hook;
 const assert = require('chai').assert;
-
-class FakeStream {
-  constructor() {
-    this.content = '';
-  }
-
-  write(str) {
-    this.content += str;
-  }
-}
 
 describe('BaseReporter', () => {
   let instance;

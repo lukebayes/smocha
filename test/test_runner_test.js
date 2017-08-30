@@ -1,3 +1,4 @@
+const FakeStream = require('./fakes/fake_stream');
 const TestRunner = require('../').TestRunner;
 const assert = require('chai').assert;
 const sinon = require('sinon');
@@ -9,6 +10,8 @@ describe('TestRunner', () => {
     instance = new TestRunner({
       testDirectory: './test/fixtures',
       testExpression: '.*.js',
+      stdout: new FakeStream(),
+      stderr: new FakeStream(),
     });
   });
 

@@ -49,7 +49,6 @@ function nextHook(iterator, completeHandler) {
       // nextHook(iterator, completeHandler);
     }
   } else {
-    console.log('COMPLETE');
     completeHandler();
   }
 }

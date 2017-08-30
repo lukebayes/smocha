@@ -90,20 +90,7 @@ class Hook extends Composite {
    * Execute the provided handler.
    */
   execute() {
-    const duration = this._getTimer();
-    const maybePromise = this._preparedHandler.call(this);
-    if (maybePromise) {
-      return maybePromise
-        .then(() => {
-          this.duration = duration();
-        })
-        .catch((err) => {
-          this.duration = duration();
-          throw err;
-        });
-    } else {
-      this.duration = duration();
-    }
+    return this._preparedHandler.call(this);
   }
 
   _getTimer() {

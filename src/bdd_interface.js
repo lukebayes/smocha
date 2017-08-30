@@ -2,7 +2,6 @@ const Emitter = require('./emitter');
 const Hook = require('./hook');
 const Suite = require('./suite');
 const events = require('./events');
-const hooks = require('./hooks');
 
 const IS_ONLY = true;
 const IS_PENDING = true;
@@ -38,7 +37,6 @@ class BddInterface extends Emitter {
 
   _delegateEvent(delegate, eventName) {
     delegate.on(eventName, (payload) => {
-      console.log('ON:', eventName);
       return this.emit(eventName, payload);
     });
   }
@@ -75,7 +73,6 @@ class BddInterface extends Emitter {
   }
 
   _onOnly(hook) {
-    console.log('yo:', hook.id);
     this._onlys.push(hook);
   }
 
@@ -110,7 +107,7 @@ class BddInterface extends Emitter {
   }
 
   it(label, body, isOnly, isPending) {
-    return this._currentSuite.addTest(new hooks.Test(label, body, isOnly, isPending));
+    return this._currentSuite.addTest(new Hook(label, body, isOnly, isPending));
   }
 
   beforeEach(body) {

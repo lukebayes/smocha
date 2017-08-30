@@ -8,6 +8,8 @@ const findFiles = require('./find_files');
 const DEFAULT_OPTIONS = {
   testDirectory: 'test',
   testExpression: /.*_test.js/,
+  stdout: process.stdout,
+  stderr: process.stderr,
 };
 
 /**
@@ -17,7 +19,7 @@ class TestRunner {
   constructor(opt_options, opt_reporter, opt_interface) {
     this._options = Object.assign(DEFAULT_OPTIONS, opt_options || {});
     this._interface = opt_interface || new BddInterface();
-    this._reporter = opt_reporter || new BaseReporter(process.stdout, process.stderr);
+    this._reporter = opt_reporter || new BaseReporter(this._options.stdout, this._options.stderr);
     delegateEvents(this._interface, this._reporter);
   }
 
