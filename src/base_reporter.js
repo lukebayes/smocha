@@ -9,11 +9,14 @@ class BaseReporter {
     this._failures = [];
     this._startTimeMs = 0;
     this._durationMs = 0;
+    this._startTimeMs = new Date().getTime();
+  }
+
+  onLoadFiles() {
   }
 
   onStart(suite) {
-    this._startTimeMs = new Date().getTime();
-    this._stdout.write('BEGIN\n');
+    // this._stdout.write('BEGIN\n');
   }
 
   onBefore(suite) {

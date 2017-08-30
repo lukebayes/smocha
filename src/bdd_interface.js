@@ -1,5 +1,7 @@
+const Emitter = require('./emitter');
 const Hook = require('./hook');
 const Suite = require('./suite');
+const events = require('./events');
 
 const IS_ONLY = true;
 const IS_PENDING = true;
@@ -14,11 +16,29 @@ const IS_PENDING = true;
  * caller will ask for the root suite and can execute or analyze the assembled
  * tests as needed.
  */
-class BddInterface {
+class BddInterface extends Emitter {
   constructor() {
+    super();
     this._currentSuite = null;
     this._configureAnnotations();
     this._onlys = [];
+    this._root = null;
+  }
+
+  /**
+   * Delegate all known events from the root Suite so that listeners
+   * can subscribe to the interface object to receive those events.
+   */
+  _delegateEventsOn(root) {
+    Object.keys(events).forEach((key) => {
+      this._delegateEvent(root, key);
+    });
+  }
+
+  _delegateEvent(delegate, eventName) {
+    delegate.on(eventName, (payload) => {
+      this.emit(eventName, payload);
+    });
   }
 
   _configureAnnotations() {
@@ -66,6 +86,9 @@ class BddInterface {
       // the describe block is evaluated so that .only statements can message
       // the entire tree.
       parent.addSuite(child);
+    } else {
+      this._root = child;
+      this._delegateEventsOn(child);
     }
 
     this._currentSuite = child;
@@ -105,7 +128,7 @@ class BddInterface {
   }
 
   getRoot() {
-    return this._currentSuite.getRoot();
+    return this._root;
   }
 
   toSandbox() {

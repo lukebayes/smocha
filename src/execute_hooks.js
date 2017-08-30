@@ -41,7 +41,7 @@ function nextHook(iterator, completeHandler) {
       }
     } catch (err) {
       // noop
-      console.log('ERROR:', err);
+      console.error('ERROR:', err);
     } finally {
       // NOTE(lbayes): Ensure we continue iteration, even if a single hook
       // throws.

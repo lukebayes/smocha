@@ -1,4 +1,5 @@
 const Hook = require('./hook');
+const events = require('./events');
 
 /**
  * Fundamental container for test hooks.
