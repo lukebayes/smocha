@@ -25,6 +25,7 @@ class Hook extends Composite {
     this.isPending = opt_isPending || false;
     this.isOnly = opt_isOnly || false;
     this.isDisabled = false;
+    this.duration = 0;
 
     this._label = label;
     this._preparedHandler = this._prepareHandler(handler);
@@ -89,7 +90,27 @@ class Hook extends Composite {
    * Execute the provided handler.
    */
   execute() {
-    return this._preparedHandler.call(this);
+    const duration = this._getTimer();
+    const maybePromise = this._preparedHandler.call(this);
+    if (maybePromise) {
+      return maybePromise
+        .then(() => {
+          this.duration = duration();
+        })
+        .catch((err) => {
+          this.duration = duration();
+          throw err;
+        });
+    } else {
+      this.duration = duration();
+    }
+  }
+
+  _getTimer() {
+    const start = new Date().getTime();
+    return () => {
+      return new Date().getTime() - start;
+    };
   }
 
   /**

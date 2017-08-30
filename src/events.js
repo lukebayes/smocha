@@ -24,6 +24,7 @@ const events = {
   TEST: 'Test',
   TEST_BEGIN: 'TestBegin',
   TEST_FAIL: 'TestFail',
+  TEST_ERROR: 'TestError',
   TEST_PASS: 'TestPass',
   TEST_TIMEOUT: 'TestTimeout',
 };

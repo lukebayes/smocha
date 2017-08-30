@@ -13,6 +13,7 @@ const events = require('./src/events');
 const executeHooks = require('./src/execute_hooks');
 const findFiles = require('./src/find_files');
 const generateId = require('./src/generate_id');
+const hooks = require('./src/hooks');
 const readFile = require('./src/read_file');
 
 module.exports = {
@@ -31,6 +32,7 @@ module.exports = {
   executeHooks,
   findFiles,
   generateId,
+  hooks,
   readFile,
 };
 
