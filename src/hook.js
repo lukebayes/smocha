@@ -5,6 +5,7 @@ const generateId = require('./generate_id');
  * Default async hook timeout in milliseconds.
  */
 const DEFAULT_TIMEOUT = 2000;
+const DEFAULT_TYPE = 'hook';
 
 // Shared stub function implementation, for hooks that have no handler.ca.
 function nullFunction() {};
@@ -19,8 +20,9 @@ function nullFunction() {};
  * when the handler is called.
  */
 class Hook extends Composite {
-  constructor(label, handler, opt_isOnly, opt_isPending) {
+  constructor(label, handler, type, opt_isOnly, opt_isPending) {
     super();
+    this.type = type || DEFAULT_TYPE;
     this.id = generateId();
     this.isPending = opt_isPending || false;
     this.isOnly = opt_isOnly || false;

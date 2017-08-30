@@ -149,14 +149,14 @@ describe('Hook', () => {
 
   it('accepts optional isOnly parameter', () => {
     const handler = sinon.spy();
-    const instance = new Hook('abcd', handler, true);
+    const instance = new Hook('abcd', handler, null, true);
     assert.isFalse(instance.isPending);
     assert(instance.isOnly);
   });
 
   it('accepts optional isPending parameter', () => {
     const handler = sinon.spy();
-    const instance = new Hook('abcd', handler, null, true);
+    const instance = new Hook('abcd', handler, null, null, true);
     assert.isFalse(instance.isOnly);
     assert(instance.isPending);
   });
