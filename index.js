@@ -12,6 +12,7 @@ const evaluateFiles = require('./src/evaluate_files');
 const events = require('./src/events');
 const executeHooks = require('./src/execute_hooks');
 const findFiles = require('./src/find_files');
+const hooks = require('./src/hooks');
 const generateId = require('./src/generate_id');
 const readFile = require('./src/read_file');
 
@@ -31,6 +32,7 @@ module.exports = {
   executeHooks,
   findFiles,
   generateId,
+  hooks,
   readFile,
 };
 

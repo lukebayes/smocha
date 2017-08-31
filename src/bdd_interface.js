@@ -2,6 +2,7 @@ const Emitter = require('./emitter');
 const Hook = require('./hook');
 const Suite = require('./suite');
 const events = require('./events');
+const hooks = require('./hooks');
 
 const IS_ONLY = true;
 const IS_PENDING = true;
@@ -107,7 +108,7 @@ class BddInterface extends Emitter {
   }
 
   it(label, body, isOnly, isPending) {
-    return this._currentSuite.addTest(new Hook(label, body, isOnly, isPending));
+    return this._currentSuite.addTest(new hooks.Test(label, body, isOnly, isPending));
   }
 
   beforeEach(body) {

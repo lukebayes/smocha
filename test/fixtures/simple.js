@@ -44,7 +44,7 @@ describe('Simple', () => {
   });
 
   it('is below', () => {
-    assert(value, 'abcd');
+    assert.equal(value, 'abcd');
   });
 });
 
