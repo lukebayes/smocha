@@ -27,6 +27,7 @@ class Hook extends Composite {
     this.isPending = opt_isPending || false;
     this.isOnly = opt_isOnly || false;
     this.isDisabled = false;
+    this.isComplete = false;
     this.duration = 0;
 
     this._label = label;

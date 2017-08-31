@@ -1,3 +1,4 @@
+const assert = require('chai').assert;
 const hooks = require('../../').hooks;
 
 describe('Test Hook', () => {

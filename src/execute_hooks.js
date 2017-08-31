@@ -15,7 +15,7 @@ function executeHooks(root) {
     nextHook(iterator, (err) => {
       if (err) return reject(err);
       root.end();
-      resolve();
+      resolve(root);
     });
   });
 };
