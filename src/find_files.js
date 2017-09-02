@@ -29,7 +29,13 @@ function findFiles(opt_expressionStr, opt_directory) {
           stat: stats[index],
         };
       }).sort((a, b) => {
-        return b.stat.mtimeMs - a.stat.mtimeMs;
+        // If the files were last modified at the same time, use creation
+        // time to run most recently created files first.
+        if (b.stat.mtimeMs === a.stat.mtimeMs) {
+          return b.stat.atimeMs - a.stat.atimeMs;
+        } else {
+          return b.stat.mtimeMs - a.stat.mtimeMs;
+        }
       });
       resolve(results);
     });
