@@ -12,7 +12,6 @@ describe('findFiles', () => {
         const secondStat = fileAndStats[1].stat;
         assert(firstStat.mtimeMs >= secondStat.mtimeMs, 'Expected sort by modified time');
         if (firstStat.mtimeMs === secondStat.mtimeMs) {
-          console.log('yoooooooo', firstState.atimeMs);
           assert(firstStat.atimeMs >= secondStat.atimeMs, 'Expected fallback to creation time');
         }
       });
