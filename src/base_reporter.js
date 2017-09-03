@@ -1,6 +1,9 @@
+const Emitter = require('./emitter');
+const events = require('./events');
 
-class BaseReporter {
+class BaseReporter extends Emitter {
   constructor(stdout, stderr) {
+    super();
     this._stdout = stdout;
     this._stderr = stderr;
     this._results = [];
@@ -10,13 +13,26 @@ class BaseReporter {
     this._startTimeMs = 0;
     this._durationMs = 0;
     this._startTimeMs = new Date().getTime();
+    this._configureListeners();
+  }
+
+  _configureListener(eventName, handler) {
+    this.on(eventName, handler.bind(this));
+  }
+
+  _configureListeners() {
+    this._configureListener(events.START, this.onStart);
+    this._configureListener(events.TEST_BEGIN, this.onTestBegin);
+    this._configureListener(events.TEST_PASS, this.onTestPass);
+    this._configureListener(events.TEST_FAIL, this.onTestFail);
+    this._configureListener(events.END, this.onEnd);
   }
 
   onLoadFiles() {
   }
 
   onStart(suite) {
-    // this._stdout.write('BEGIN\n');
+    // this._stdout.write('onStart\n');
   }
 
   onBefore(suite) {
@@ -31,17 +47,18 @@ class BaseReporter {
   onSuite(suite) {
   }
 
-  onTest(suite) {
+  onTestBegin(suite) {
   }
 
-  onPass(test) {
-    // TODO(lbayes): Get test duration.
-    this._stdout.write('.');
+  onTestPass(test) {
     this._results.push(test);
     this._passingCount++;
+    // TODO(lbayes): Get test duration.
+    this._stdout.write('.');
   }
 
-  onFail(test) {
+  onTestFail(test) {
+    this._failures.push(test);
     this._stderr.write('\n');
     this._stderr.write('FAILURE: ' + test.getFullLabel());
   }

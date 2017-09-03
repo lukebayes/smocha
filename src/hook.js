@@ -97,9 +97,9 @@ class Hook extends Composite {
   }
 
   _getTimer() {
-    const start = new Date().getTime();
+    const startMs = new Date().getTime();
     return () => {
-      return new Date().getTime() - start;
+      return new Date().getTime() - startMs;
     };
   }
 

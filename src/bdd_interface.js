@@ -1,6 +1,7 @@
 const Emitter = require('./emitter');
 const Hook = require('./hook');
 const Suite = require('./suite');
+const delegateEvents = require('./delegate_events');
 const events = require('./events');
 const hooks = require('./hooks');
 
@@ -24,22 +25,6 @@ class BddInterface extends Emitter {
     this._configureAnnotations();
     this._onlys = [];
     this._root = null;
-  }
-
-  /**
-   * Delegate all known events from the root Suite so that listeners
-   * can subscribe to the interface object to receive those events.
-   */
-  _delegateEvents(root) {
-    Object.keys(events).forEach((key) => {
-      this._delegateEvent(root, events[key]);
-    });
-  }
-
-  _delegateEvent(delegate, eventName) {
-    delegate.on(eventName, (payload) => {
-      return this.emit(eventName, payload);
-    });
   }
 
   _configureAnnotations() {
@@ -88,7 +73,7 @@ class BddInterface extends Emitter {
       parent.addSuite(child);
     } else {
       this._root = child;
-      this._delegateEvents(child);
+      delegateEvents(child, this);
     }
 
     this._currentSuite = child;

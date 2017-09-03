@@ -8,8 +8,8 @@ const CompositeIterator = require('./composite_iterator');
  * that use the async (callback) style are already wrapped in a promise.
  */
 function executeHooks(root) {
-  const iterator = new CompositeIterator(root);
   root.start();
+  const iterator = new CompositeIterator(root);
 
   return new Promise((resolve, reject) => {
     nextHook(iterator, (err) => {

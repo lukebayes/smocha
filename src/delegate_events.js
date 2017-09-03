@@ -1,16 +1,16 @@
 const events = require('./events');
 
 
-function delegateEvents(emitter, reporter) {
-
-  function delegateEvent(eventName, callback) {
-    emitter.on(eventName, callback.bind(reporter));
+function delegateEvents(emitter, receiver) {
+  function delegateEvent(eventName) {
+    emitter.on(eventName, function(payload) {
+      receiver.emit(eventName, payload);
+    });
   };
 
-  delegateEvent(events.START, reporter.onStart);
-  delegateEvent(events.END, reporter.onEnd);
-  delegateEvent(events.TEST_PASS, reporter.onPass);
-  delegateEvent(events.TEST_FAIL, reporter.onFail);
+  Object.keys(events).forEach((key) => {
+    delegateEvent(events[key]);
+  });
 };
 
 module.exports = delegateEvents;

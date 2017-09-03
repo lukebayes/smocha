@@ -22,18 +22,18 @@ describe('BaseReporter', () => {
   });
 
   it('emits dots on stable pass', () => {
-    instance.onPass(test);
-    instance.onPass(test);
-    instance.onPass(test);
+    instance.onTestPass(test);
+    instance.onTestPass(test);
+    instance.onTestPass(test);
     assert.equal(stdout.content, '...');
   });
 
   it('emits counts on end', () => {
     instance.onStart();
-    instance.onPass(test);
-    instance.onPass(test);
-    instance.onPass(test);
-    instance.onPass(test);
+    instance.onTestPass(test);
+    instance.onTestPass(test);
+    instance.onTestPass(test);
+    instance.onTestPass(test);
     instance.onEnd();
 
     const lines = stdout.content.split('\n');
