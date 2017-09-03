@@ -2,6 +2,23 @@
 
 # Notes
 
+## OO vs Functional, mutable vs immutable
+The current incremental incarnation (9/3/2017) is built with a mostly OO-style implementation and is bumping up against many of the problems with this approach. The class hiearchies are getting deep and complex, control flow is obtuse, magic is gathering and events are starting to fly around unexpectedly.
+
+What would it look like if we moved to more of an immutable data and pure function approach?
+
+What are the steps that need to be taken?
+
+We have relatively static data to begin with. These are files with test declarations that need to be processed, what are some challenges we'll face if we attempt to make this an immutable data structure?
+
+It's relatively easy to imagine evaluating files and constructing a relatively large, immutable data structure, but this would mean that test execution would generate a new data structure, rather than mutating the existing one with new values (e.g., test duration, success/failure, errors, etc.). This seems reasonable, but what would it mean to have the UI react to this data structure incrementally?
+
+The reporter could hold onto the static tree of test declarations and respond to a stream of messages that are emitted by test execution.
+
+How does this complexity differ from what is built now?
+
+It seems to me that some of the complexity arises from bubbling events and mysterious delegation tactics. Perhaps it would be good to start with that message stream from test execution? I think I can decouple execution from the objects that represent tests.
+
 ## Hooks, Rules and Messaging
 
 We have a composite tree structure that is being created in the form of Suites and Hooks.
