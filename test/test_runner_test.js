@@ -21,8 +21,8 @@ describe('TestRunner', () => {
 
   it('is runnable', () => {
     return instance.run()
-      .then((root) => {
-        assert.isAbove(root.children.length, 8);
+      .then((results) => {
+        assert.equal(results.length, 29);
       });
   });
 });

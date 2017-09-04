@@ -4,6 +4,7 @@ const evaluateFiles = require('./evaluate_files');
 const delegateEvents = require('./delegate_events');
 const executeHooks = require('./execute_hooks');
 const findFiles = require('./find_files');
+const hooks = require('./hooks');
 
 const DEFAULT_OPTIONS = {
   testDirectory: 'test',
@@ -31,13 +32,26 @@ class TestRunner {
   run() {
     const opts = this._options;
 
+    function onProgress(result) {
+      const hook = result;
+      if (hook instanceof hooks.Test) {
+        if (result.failure) {
+          reporter.onTestFail(hook);
+        } else if (result.error) {
+          reporter.onTestError(hook);
+        } else {
+          reporter.onTestPass(hook);
+        }
+      }
+    };
+
     // TODO(lbayes): Spread execution across multiple child processes.
     return findFiles(opts.testExpression, opts.testDirectory)
       .then((fileAndStats) => {
         return evaluateFiles(this._interface.toSandbox(), fileAndStats);
       })
       .then(() => {
-        return executeHooks(this._interface.getRoot());
+        return executeHooks(this._interface.getRoot(), onProgress);
       });
   }
 }

@@ -1,3 +1,4 @@
+const AssertionError = require('chai').AssertionError;
 const CompositeIterator = require('./composite_iterator');
 
 /**
@@ -7,15 +8,16 @@ const CompositeIterator = require('./composite_iterator');
  * hooks will cause execution to wait until resolved or rejected. Declarations
  * that use the async (callback) style are already wrapped in a promise.
  */
-function executeHooks(root) {
+function executeHooks(root, onProgress) {
   root.start();
+  const results = [];
   const iterator = new CompositeIterator(root);
 
   return new Promise((resolve, reject) => {
-    nextHook(iterator, (err) => {
+    nextHook(iterator, onProgress, results, (err) => {
       if (err) return reject(err);
       root.end();
-      resolve(root);
+      resolve(results);
     });
   });
 };
@@ -26,32 +28,107 @@ function executeHooks(root) {
  * If there are no more hooks in the iterator, call the provided complete
  * handler.
  */
-function nextHook(iterator, completeHandler) {
+function nextHook(iterator, onProgress, results, completeHandler) {
   if (iterator.hasNext()) {
-    const hook = iterator.next();
+    function onNext() {
+      nextHook(iterator, onProgress, results, completeHandler);
+    };
 
-    try {
-      const maybePromise = hook.execute();
-
-      if (maybePromise) {
-        maybePromise.then(() => {
-          nextHook(iterator, completeHandler);
-        });
-      } else {
-        nextHook(iterator, completeHandler);
-      }
-    } catch (err) {
-      // noop
-      console.error('ERROR:', err);
-    } finally {
-      // NOTE(lbayes): Ensure we continue iteration, even if a single hook
-      // throws.
-      // nextHook(iterator, completeHandler);
-    }
+    executeHook(iterator.next(), onProgress, results, onNext);
   } else {
     completeHandler();
   }
 }
 
+/**
+ * Execute the provided hook, whether it's synchronous, async or returns a
+ * promise.
+ *
+ * If the call causes a test failure, call onFailure.
+ *
+ * If the call causes an unexpected Error, call onError.
+ *
+ * When complete, call next().
+ */
+function executeHook(hook, onProgress, results, onNext) {
+  let result;
+  let handler = hook.handler;
+  let failureResponse = null;
+  let errorResponse = null;
+
+  function onFailure(failure) {
+    // console.log('on failure:', failure);
+    failureResponse = failure;
+  };
+
+  function onError(err) {
+    // console.log('on error:', err);
+    errorResponse = err;
+  };
+
+  function onComplete() {
+    const result = {
+      error: errorResponse,
+      failure: failureResponse,
+      hook: hook,
+    };
+    results.push(result);
+    onProgress(result);
+    onNext();
+  }
+
+  try {
+    result = promisifyAsyncHook(handler).call(hook);
+    if (result && typeof result.then === 'function') {
+      return result
+        .catch((err) => {
+          handleFailureOrError(err, onFailure, onError);
+        })
+        .then(() => {
+          onComplete();
+        });
+    } else {
+      onComplete();
+    }
+  } catch (err) {
+    handleFailureOrError(err, onFailure, onError);
+    onComplete();
+  }
+}
+
+/**
+ * Wrap an async-style hook in a promise, or simply return the hook if it's
+ * synchronous.
+ */
+function promisifyAsyncHook(handler) {
+  if (handler.length > 0) {
+    return function asyncHandler() {
+      return new Promise((resolve, reject) => {
+        function callbackToPromise(err) {
+          if (err) {
+            reject(err);
+          }
+          resolve();
+        }
+        // NOTE(lbayes): This outer function will be called with a context so
+        // that 'this' refers to the HOOK instance.
+        handler.call(this, callbackToPromise);
+      });
+    };
+  }
+
+  return handler;
+}
+
+/**
+ * Handle hook failure as either an error or a test failure.
+ */
+function handleFailureOrError(err, onFailure, onError) {
+  if (err instanceof AssertionError) {
+    onFailure(err);
+  } else {
+    onError(err);
+  }
+}
 
 module.exports = executeHooks;

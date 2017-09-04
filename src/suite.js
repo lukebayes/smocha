@@ -1,5 +1,6 @@
 const Hook = require('./hook');
 const events = require('./events');
+const nullFunction = require('./null_function');
 
 /**
  * Fundamental container for test hooks.
@@ -14,6 +15,7 @@ class Suite extends Hook {
     this.afterEaches = [];
     this.suites = [];
     this.tests = [];
+    this.handler = nullFunction;
   }
 
   /**
@@ -25,6 +27,7 @@ class Suite extends Hook {
   }
 
   start() {
+    this.onEvaluationComplete();
     this.emit(events.START, this);
   }
 
