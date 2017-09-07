@@ -10,7 +10,7 @@ describe('BaseReporter', () => {
   let stderr;
 
   beforeEach(() => {
-    test = new Hook('abcd');
+    test = new Hook('abcd', null, Hook.Types.Test);
 
     stdout = new FakeStream();
     stderr = new FakeStream();
@@ -22,22 +22,22 @@ describe('BaseReporter', () => {
   });
 
   it('emits dots on stable pass', () => {
-    instance.onTestPass(test);
-    instance.onTestPass(test);
-    instance.onTestPass(test);
+    instance.onHookComplete({hook: test});
+    instance.onHookComplete({hook: test});
+    instance.onHookComplete({hook: test});
     assert.equal(stdout.content, '...');
   });
 
   it('emits counts on end', () => {
     instance.onStart();
-    instance.onTestPass(test);
-    instance.onTestPass(test);
-    instance.onTestPass(test);
-    instance.onTestPass(test);
+    instance.onHookComplete({hook: test});
+    instance.onHookComplete({hook: test});
+    instance.onHookComplete({hook: test});
+    instance.onHookComplete({hook: test});
     instance.onEnd();
 
     const lines = stdout.content.split('\n');
     assert.equal(lines[0], '....');
-    assert.match(lines[1], /4 passing \(\dms\)/);
+    assert.match(lines[2], /4 passing \(\dms\)/);
   });
 });

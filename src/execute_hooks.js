@@ -1,5 +1,6 @@
 const AssertionError = require('chai').AssertionError;
 const CompositeIterator = require('./composite_iterator');
+const events = require('./events');
 const nullFunction = require('./null_function');
 
 /**
@@ -42,6 +43,14 @@ function nextHook(iterator, onProgress, results, completeHandler) {
   }
 }
 
+function createTimer() {
+  const start = new Date().getTime();
+  // Call this returned function to get duraction since createTimer() was called.
+  return function() {
+    return new Date().getTime() - start;
+  };
+}
+
 /**
  * Execute the provided hook, whether it's synchronous, async or returns a
  * promise.
@@ -57,6 +66,8 @@ function executeHook(hook, onProgress, results, onNext) {
   let handler = hook.handler;
   let failureResponse = null;
   let errorResponse = null;
+  const duration = createTimer();
+  hook.bubble(events.HOOK_BEGIN, hook);
 
   function onFailure(failure) {
     // console.log('on failure:', failure);
@@ -73,9 +84,11 @@ function executeHook(hook, onProgress, results, onNext) {
       error: errorResponse,
       failure: failureResponse,
       hook: hook,
+      duration: duration(),
     };
     results.push(result);
     onProgress(result);
+    hook.bubble(events.HOOK_COMPLETE, result);
     onNext();
   }
 

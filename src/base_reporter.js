@@ -1,4 +1,5 @@
 const Emitter = require('./emitter');
+const Hook = require('./hook');
 const events = require('./events');
 
 class BaseReporter extends Emitter {
@@ -10,6 +11,7 @@ class BaseReporter extends Emitter {
 
     this._passingCount = 0;
     this._failures = [];
+    this._errors = [];
     this._startTimeMs = 0;
     this._durationMs = 0;
     this._startTimeMs = new Date().getTime();
@@ -22,9 +24,8 @@ class BaseReporter extends Emitter {
 
   _configureListeners() {
     this._configureListener(events.START, this.onStart);
-    this._configureListener(events.TEST_BEGIN, this.onTestBegin);
-    this._configureListener(events.TEST_PASS, this.onTestPass);
-    this._configureListener(events.TEST_FAIL, this.onTestFail);
+    this._configureListener(events.HOOK_BEGIN, this.onHookBegin);
+    this._configureListener(events.HOOK_COMPLETE, this.onHookComplete);
     this._configureListener(events.END, this.onEnd);
   }
 
@@ -47,20 +48,39 @@ class BaseReporter extends Emitter {
   onSuite(suite) {
   }
 
-  onTestBegin(suite) {
+  onHookBegin(hook) {
   }
 
-  onTestPass(test) {
-    this._results.push(test);
-    this._passingCount++;
-    // TODO(lbayes): Get test duration.
-    this._stdout.write('.');
+  onHookComplete(result) {
+    this._duration += result.duration;
+
+    if (result.hook.error) {
+      this.onHookError(result);
+    } else if (result.hook.failure) {
+      this.onHookFailure(result);
+    } else if (result.hook.type === Hook.Types.Test) {
+      this.onTestPass(result);
+    }
   }
 
-  onTestFail(test) {
-    this._failures.push(test);
+  onHookFailure(result) {
+    this._failures.push(result.hook);
     this._stderr.write('\n');
-    this._stderr.write('FAILURE: ' + test.getFullLabel());
+    this._stderr.write('FAILURE: ' + result.hook.getFullLabel() + '\n');
+    this._stderr.write(result.failure + '\n');
+  }
+
+  onHookError(result) {
+    this._errors.push(result.hook);
+    this._stderr.write('\n');
+    this._stderr.write('ERROR: ' + result.hook.getFullLabel() + '\n');
+    this._stderr.write(result.error + '\n');
+  }
+
+  onTestPass(result) {
+    this._results.push(result.hook);
+    this._passingCount++;
+    this._stdout.write('.');
   }
 
   onPending(test) {
@@ -74,7 +94,7 @@ class BaseReporter extends Emitter {
 
   onEnd() {
     this._durationMs = (new Date().getTime()) - this._startTimeMs;
-    this._stdout.write('\n');
+    this._stdout.write('\n\n');
     this._stdout.write(`${this._passingCount} passing (${this._durationMs}ms)\n`);
   }
 

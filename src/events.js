@@ -1,5 +1,9 @@
 
 const events = {
+  HOOK_BEGIN: 'HookBegin',
+  HOOK_COMPLETE: 'HookComplete',
+
+
   AFTER: 'After',
   AFTER_BEGIN: 'AfterBegin',
   AFTER_EACH: 'AfterEach',

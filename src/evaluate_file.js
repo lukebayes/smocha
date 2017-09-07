@@ -12,7 +12,11 @@ function evaluateFile(sandbox, content, filename) {
     sandbox: sandbox,
   });
 
-  vm.run(content, filename);
+  try {
+    vm.run(content, filename);
+  } catch (err) {
+    console.error('EvaluationError:', err);
+  }
 };
 
 module.exports = evaluateFile;

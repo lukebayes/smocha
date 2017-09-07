@@ -2,13 +2,6 @@ const Composite = require('../').Composite;
 const CompositeIterator = require('../').CompositeIterator;
 const assert = require('chai').assert;
 
-class Node extends Composite {
-  constructor(label) {
-    super();
-    this.label = label;
-  }
-}
-
 describe('CompositeIterator', () => {
   let instance;
   let one;
@@ -19,12 +12,12 @@ describe('CompositeIterator', () => {
   let six;
 
   beforeEach(() => {
-    one = new Node('one');
-    two = new Node('two');
-    three = new Node('three');
-    four = new Node('four');
-    five = new Node('five');
-    six = new Node('six');
+    one = new Composite('one');
+    two = new Composite('two');
+    three = new Composite('three');
+    four = new Composite('four');
+    five = new Composite('five');
+    six = new Composite('six');
 
     one.addChild(two);
     one.addChild(three);
