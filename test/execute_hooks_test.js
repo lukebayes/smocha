@@ -26,6 +26,28 @@ describe('executeHooks', () => {
     return onProgress.getCall(index).args[0];
   }
 
+  it('receives the hook as this', () => {
+    let receivedLabel;
+    function handler() {
+      receivedLabel = this.getFullLabel();
+    };
+    const test = new hooks.Test('abcd', handler);
+    suite.addTest(test);
+    return executeHooks(suite)
+      .then(() => {
+        assert.equal(receivedLabel, 'root suite abcd');
+      });
+  });
+
+  it('uses a nullFunction if no handler is present', () => {
+    const test = new hooks.Test('abcd');
+    suite.addTest(test);
+    return executeHooks(suite)
+      .then(() => {
+        // NOTE(lbayes): The test should be 'pending'
+      });
+  });
+
   describe('synchronous', () => {
     it('executes passing tests', () => {
       createTest('one', () => {

@@ -93,23 +93,23 @@ class BddInterface extends Emitter {
   }
 
   it(label, body, isOnly, isPending) {
-    return this._currentSuite.addTest(new hooks.Test(label, body, isOnly, isPending));
+    return this._currentSuite.addTest(new Hook(label, body, Hook.Types.Test, isOnly, isPending));
   }
 
   beforeEach(body) {
-    this._currentSuite.addBeforeEach(new Hook('beforeEach', body));
+    this._currentSuite.addBeforeEach(new Hook('beforeEach', body, Hook.Types.BeforeEach));
   }
 
   afterEach(body) {
-    this._currentSuite.addAfterEach(new Hook('afterEach', body));
+    this._currentSuite.addAfterEach(new Hook('afterEach', body, Hook.Types.AfterEach));
   }
 
   before(body) {
-    this._currentSuite.addBefore(new Hook('before', body));
+    this._currentSuite.addBefore(new Hook('before', body, Hook.Types.Before));
   }
 
   after(body) {
-    this._currentSuite.addAfter(new Hook('after', body));
+    this._currentSuite.addAfter(new Hook('after', body, Hook.Types.After));
   }
 
   getRoot() {

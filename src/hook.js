@@ -1,14 +1,11 @@
 const Composite = require('./composite');
 const generateId = require('./generate_id');
+const nullFunction = require('./null_function');
 
 /**
  * Default async hook timeout in milliseconds.
  */
 const DEFAULT_TIMEOUT = 2000;
-const DEFAULT_TYPE = 'hook';
-
-// Shared stub function implementation, for hooks that have no handler.ca.
-function nullFunction() {};
 
 /**
  * Hooks are the base wrapper around all test declarations including describe,
@@ -20,53 +17,19 @@ function nullFunction() {};
  * when the handler is called.
  */
 class Hook extends Composite {
-  constructor(label, handler, type, opt_isOnly, opt_isPending) {
+  constructor(label, opt_handler, opt_type, opt_isOnly, opt_isPending) {
     super();
-    this.type = type || DEFAULT_TYPE;
+    this.type = opt_type || Hook.Types.Default;
     this.id = generateId();
-    this.isPending = opt_isPending || false;
+    this.isPending = typeof opt_isPending !== 'undefined' ? opt_isPending : !opt_handler || false;
     this.isOnly = opt_isOnly || false;
     this.isDisabled = false;
     this.isComplete = false;
-    this.handler = handler;
+    this.handler = opt_handler || nullFunction;
     this.duration = 0;
 
     this._label = label;
-    this._preparedHandler = this._prepareHandler(handler);
     this._timeout = null;
-  }
-
-  /**
-   * Ensure we at least have a null function to call if the handler is
-   * undefined and otherwise prepare the provided handler by checking to see if
-   * it expects a callback argument, so that we can wrap it in a promise, or
-   * finally, ensure that we return whatever the implementation returns, which
-   * should either be a promise or undefined.
-   */
-  _prepareHandler(handler) {
-    // TODO(lbayes): Timeouts
-    // This looks like a declaration that expects an async callback.
-    if (handler && handler.length > 0) {
-      function asyncHandler() {
-        return new Promise((resolve, reject) => {
-          function callbackToPromise(err) {
-            if (err) {
-              reject(err);
-            }
-            resolve();
-          }
-          // TODO(lbayes): Call the handler with a context, so that
-          // implementations can call this.timeout(2000), and possibly other
-          // methods.
-          handler.call(this, callbackToPromise);
-        });
-      }
-      return asyncHandler;
-    }
-
-    // This handler is either undefined or has zero arguments, therefore it is
-    // either synchronous or it will return a promise when called.
-    return handler || nullFunction;
   }
 
   /**
@@ -91,20 +54,6 @@ class Hook extends Composite {
   }
 
   /**
-   * Execute the provided handler.
-   */
-  execute() {
-    return this._preparedHandler.call(this);
-  }
-
-  _getTimer() {
-    const startMs = new Date().getTime();
-    return () => {
-      return new Date().getTime() - startMs;
-    };
-  }
-
-  /**
    * Get the full label (including parent labels) for this Hook.
    */
   getFullLabel() {
@@ -121,6 +70,16 @@ class Hook extends Composite {
 }
 
 Hook.DEFAULT_TIMEOUT = DEFAULT_TIMEOUT;
+
+Hook.Types = {
+  After: 'After',
+  AfterEach: 'AfterEach',
+  Before: 'Before',
+  BeforeEach: 'BeforeEach',
+  Default: 'Default', // Used for tests
+  Suite: 'Suite',
+  Test: 'Test',
+};
 
 module.exports = Hook;
 

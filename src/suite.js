@@ -7,7 +7,7 @@ const nullFunction = require('./null_function');
  */
 class Suite extends Hook {
   constructor(label, handler, opt_isOnly, opt_isPending) {
-    super(label, handler, opt_isOnly, opt_isPending);
+    super(label, handler, Hook.Types.Suite, opt_isOnly, opt_isPending);
 
     this.befores = [];
     this.afters = [];

@@ -19,39 +19,6 @@ describe('Hook', () => {
     assert.equal(instance.getFullLabel(), 'abcd');
   });
 
-  it('uses a null function if no handler is provided', () => {
-    const instance = new Hook();
-    assert.isUndefined(instance.execute());
-  });
-
-  it('executes provided handler', () => {
-    const handler = sinon.spy();
-    const instance = new Hook('abcd', handler);
-    instance.execute();
-    assert.equal(handler.callCount, 1);
-  });
-
-  it('receives the hook as this', () => {
-    let receivedLabel;
-    function handler() {
-      receivedLabel = this.getFullLabel();
-    }
-    const instance = new Hook('abcd', handler);
-    instance.execute();
-    assert.equal(receivedLabel, 'abcd');
-  });
-
-  it('receives the hook as this when using callback', () => {
-    let receivedLabel;
-    function handler(callback) {
-      receivedLabel = this.getFullLabel();
-      callback();
-    }
-    const instance = new Hook('abcd', handler);
-    instance.execute();
-    assert.equal(receivedLabel, 'abcd');
-  });
-
   it('label includes parent if composed', () => {
     const root = new Hook('abcd');
     const one = new Hook('efgh');
@@ -110,43 +77,6 @@ describe('Hook', () => {
     });
   });
 
-  describe('promise', () => {
-    it('returns handler promise, if provided', () => {
-      function handler() {
-        return new Promise((resolve, reject) => {
-          resolve();
-        });
-      }
-      const result = new Hook('abcd', handler).execute();
-      assert(result);
-      assert(result.then);
-      return result;
-    });
-  });
-
-  describe('async', () => {
-    it('handles async handler', () => {
-      function handler(callback) {
-        callback();
-      }
-      const result = new Hook('abcd', handler).execute();
-      assert(result);
-      // Wraps callback handler in a returned promise
-      assert(result.then);
-      return result;
-    });
-
-    it('forwards async failure to promise rejection', () => {
-      function handler(callback) {
-        callback('fake error');
-      }
-      return new Hook('abcd', handler).execute()
-        .catch((err) => {
-          assert.equal(err, 'fake error');
-        });
-    });
-  });
-
   it('accepts optional isOnly parameter', () => {
     const handler = sinon.spy();
     const instance = new Hook('abcd', handler, null, true);
@@ -159,5 +89,34 @@ describe('Hook', () => {
     const instance = new Hook('abcd', handler, null, null, true);
     assert.isFalse(instance.isOnly);
     assert(instance.isPending);
+  });
+
+  describe('isPending', () => {
+    it('is not pending by default (if we have a handler)', () => {
+      const instance = new Hook('abcd', () => {});
+      assert.isFalse(instance.isPending);
+    });
+
+    it('isPending if no handler provided', () => {
+      const instance = new Hook('abcd');
+      assert(instance.isPending);
+    });
+
+    it('overrides default isPending if no handler, but isPending is true', () => {
+      const instance = new Hook('abcd', null, null, null, false);
+      assert.isFalse(instance.isPending);
+    });
+  });
+
+  describe('type', () => {
+    it('has a default', () => {
+      const instance = new Hook();
+      assert.equal(instance.type, Hook.Types.Default);
+    });
+
+    it('accepts a value', () => {
+      const instance = new Hook('abcd', null, 'efgh');
+      assert.equal(instance.type, 'efgh');
+    });
   });
 });

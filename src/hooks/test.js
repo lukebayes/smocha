@@ -13,6 +13,7 @@ class Test extends Hook {
         })
         .catch((err) => {
           this.emit(evnts.TEST_FAIL, this);
+          throw err;
         });
     }
   }

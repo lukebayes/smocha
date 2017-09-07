@@ -1,5 +1,6 @@
 const AssertionError = require('chai').AssertionError;
 const CompositeIterator = require('./composite_iterator');
+const nullFunction = require('./null_function');
 
 /**
  * Execute all hooks present on the tree that is provided.
@@ -8,8 +9,9 @@ const CompositeIterator = require('./composite_iterator');
  * hooks will cause execution to wait until resolved or rejected. Declarations
  * that use the async (callback) style are already wrapped in a promise.
  */
-function executeHooks(root, onProgress) {
+function executeHooks(root, opt_onProgress) {
   root.start();
+  const onProgress = opt_onProgress || nullFunction;
   const results = [];
   const iterator = new CompositeIterator(root);
 
