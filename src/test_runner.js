@@ -1,10 +1,10 @@
 const BaseReporter = require('./base_reporter');
 const BddInterface = require('./bdd_interface');
-const evaluateFiles = require('./evaluate_files');
+const Hook = require('./hook');
 const delegateEvents = require('./delegate_events');
+const evaluateFiles = require('./evaluate_files');
 const executeHooks = require('./execute_hooks');
 const findFiles = require('./find_files');
-const hooks = require('./hooks');
 
 const DEFAULT_OPTIONS = {
   testDirectory: 'test',
@@ -34,7 +34,7 @@ class TestRunner {
 
     function onProgress(result) {
       const hook = result;
-      if (hook instanceof hooks.Test) {
+      if (hook.type === Hook.Types.Test) {
         if (result.failure) {
           reporter.onTestFail(hook);
         } else if (result.error) {

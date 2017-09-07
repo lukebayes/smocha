@@ -3,7 +3,6 @@ const Hook = require('./hook');
 const Suite = require('./suite');
 const delegateEvents = require('./delegate_events');
 const events = require('./events');
-const hooks = require('./hooks');
 
 const IS_ONLY = true;
 const IS_PENDING = true;

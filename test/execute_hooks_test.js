@@ -1,8 +1,8 @@
+const Hook = require('../').Hook;
 const Suite = require('../').Suite;
 const assert = require('chai').assert;
 const sinon = require('sinon');
 const executeHooks = require('../').executeHooks;
-const hooks = require('../').hooks;
 
 describe('executeHooks', () => {
   let onProgress;
@@ -17,7 +17,7 @@ describe('executeHooks', () => {
   });
 
   function createTest(label, handler) {
-    const test = new hooks.Test(label, handler);
+    const test = new Hook(label, handler);
     suite.addTest(test);
     return test;
   };
@@ -31,7 +31,7 @@ describe('executeHooks', () => {
     function handler() {
       receivedLabel = this.getFullLabel();
     };
-    const test = new hooks.Test('abcd', handler);
+    const test = new Hook('abcd', handler);
     suite.addTest(test);
     return executeHooks(suite)
       .then(() => {
@@ -40,7 +40,7 @@ describe('executeHooks', () => {
   });
 
   it('uses a nullFunction if no handler is present', () => {
-    const test = new hooks.Test('abcd');
+    const test = new Hook('abcd');
     suite.addTest(test);
     return executeHooks(suite)
       .then(() => {
