@@ -28,16 +28,8 @@ class Hook extends Composite {
     this.isComplete = false;
     this.handler = opt_handler || nullFunction;
 
-    this._label = label;
+    this._label = label || '';
     this._timeout = null;
-  }
-
-  start() {
-    this.emit(events.START, this);
-  }
-
-  end() {
-    this.emit(events.END, this);
   }
 
   /**
@@ -66,7 +58,7 @@ class Hook extends Composite {
    */
   getFullLabel() {
     const base = this.parent ? this.parent.getFullLabel() + ' ' : '';
-    return `${base}${this._label}`;
+    return `${base}${this.getLabel()}`;
   }
 
   /**
@@ -77,7 +69,8 @@ class Hook extends Composite {
   }
 
   clone() {
-    const copy = new Hook(this.getLabel(), this.handler, this.type, this.isOnly, this.isPending);
+    const copy = new Hook(this._label, this.handler, this.type, this.isOnly, this.isPending);
+    copy.id = this.id;
     copy.isDisabled = this.isDisabled;
     copy.isComplete = this.isComplete;
     if (this._timeout !== null) {

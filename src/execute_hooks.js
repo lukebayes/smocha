@@ -1,5 +1,6 @@
 const AssertionError = require('chai').AssertionError;
 const CompositeIterator = require('./composite_iterator');
+const Hook = require('./hook');
 const events = require('./events');
 const nullFunction = require('./null_function');
 const suiteToHooks = require('./suite_to_hooks');
@@ -11,18 +12,13 @@ const suiteToHooks = require('./suite_to_hooks');
  * hooks will cause execution to wait until resolved or rejected. Declarations
  * that use the async (callback) style are already wrapped in a promise.
  */
-function executeHooks(rootDefinition, opt_onProgress) {
-  const root = suiteToHooks(rootDefinition);
-  root.start();
-
-  const onProgress = opt_onProgress || nullFunction;
+function executeHooks(root) {
   const results = [];
   const iterator = new CompositeIterator(root);
 
   return new Promise((resolve, reject) => {
-    nextHook(iterator, onProgress, results, (err) => {
+    nextHook(iterator, results, (err) => {
       if (err) return reject(err);
-      root.end();
       resolve(results);
     });
   });
@@ -34,21 +30,21 @@ function executeHooks(rootDefinition, opt_onProgress) {
  * If there are no more hooks in the iterator, call the provided complete
  * handler.
  */
-function nextHook(iterator, onProgress, results, completeHandler) {
+function nextHook(iterator, results, completeHandler) {
   if (iterator.hasNext()) {
     function onNext() {
-      nextHook(iterator, onProgress, results, completeHandler);
+      nextHook(iterator, results, completeHandler);
     };
 
-    executeHook(iterator.next(), onProgress, results, onNext);
+    executeHook(iterator.next(), results, onNext);
   } else {
     completeHandler();
   }
 }
 
-function createTimer() {
+function initializeTimer() {
   const start = new Date().getTime();
-  // Call this returned function to get duraction since createTimer() was called.
+  // Call this returned function to get duration since initializeTimer() was called.
   return function() {
     return new Date().getTime() - start;
   };
@@ -64,13 +60,13 @@ function createTimer() {
  *
  * When complete, call next().
  */
-function executeHook(hook, onProgress, results, onNext) {
+function executeHook(hook, results, onNext) {
   let result;
   let handler = hook.handler;
   let failureResponse = null;
   let errorResponse = null;
-  const duration = createTimer();
-  hook.bubble(events.HOOK_BEGIN, hook);
+  const getDuration = initializeTimer();
+  // hook.bubble(events.HOOK_BEGIN, hook);
 
   function onFailure(failure) {
     // console.log('on failure:', failure);
@@ -83,15 +79,18 @@ function executeHook(hook, onProgress, results, onNext) {
   };
 
   function onComplete() {
-    const result = {
-      error: errorResponse,
-      failure: failureResponse,
-      hook: hook,
-      duration: duration(),
-    };
-    results.push(result);
-    onProgress(result);
-    hook.bubble(events.HOOK_COMPLETE, result);
+    if (hook.type === Hook.Types.Test) {
+      const result = {
+        error: errorResponse,
+        failure: failureResponse,
+        hook: hook,
+        duration: getDuration(),
+      };
+
+      results.push(result);
+      // Bubble the HOOK_COMPLETE event from the current hook.
+      hook.bubble(events.HOOK_COMPLETE, result);
+    }
     onNext();
   }
 

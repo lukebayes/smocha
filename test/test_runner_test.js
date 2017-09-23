@@ -22,7 +22,7 @@ describe('TestRunner', () => {
   it('is runnable', () => {
     return instance.run()
       .then((results) => {
-        assert.equal(results.length, 24);
+        assert.equal(results.length, 6);
       });
   });
 });

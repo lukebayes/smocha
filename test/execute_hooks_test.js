@@ -1,11 +1,12 @@
+const FakeStream = require('./fakes/fake_stream');
 const Hook = require('../').Hook;
 const Suite = require('../').Suite;
 const assert = require('chai').assert;
-const sinon = require('sinon');
 const executeHooks = require('../').executeHooks;
+const sinon = require('sinon');
+const suiteToHooks = require('../').suiteToHooks;
 
 describe('executeHooks', () => {
-  let onProgress;
   let one;
   let suite;
   let three;
@@ -13,18 +14,13 @@ describe('executeHooks', () => {
 
   beforeEach(() => {
     suite = new Suite('root suite');
-    onProgress = sinon.spy();
   });
 
   function createTest(label, handler) {
-    const test = new Hook(label, handler);
+    const test = new Hook(label, handler, Hook.Types.Test);
     suite.addTest(test);
     return test;
   };
-
-  function getProgressArg(index) {
-    return onProgress.getCall(index).args[0];
-  }
 
   it('receives the hook as this', () => {
     let receivedLabel;
@@ -33,7 +29,7 @@ describe('executeHooks', () => {
     };
     const test = new Hook('abcd', handler);
     suite.addTest(test);
-    return executeHooks(suite)
+    return executeHooks(suiteToHooks(suite))
       .then(() => {
         assert.equal(receivedLabel, 'root suite abcd');
       });
@@ -42,7 +38,7 @@ describe('executeHooks', () => {
   it('uses a nullFunction if no handler is present', () => {
     const test = new Hook('abcd');
     suite.addTest(test);
-    return executeHooks(suite)
+    return executeHooks(suiteToHooks(suite))
       .then(() => {
         // NOTE(lbayes): The test should be 'pending'
       });
@@ -62,9 +58,9 @@ describe('executeHooks', () => {
         assert.isTrue(true);
       });
 
-      return executeHooks(suite, onProgress)
-          .then(() => {
-            assert.equal(onProgress.callCount, 4);
+      return executeHooks(suiteToHooks(suite))
+          .then((results) => {
+            assert.equal(results.length, 3);
           });
     });
 
@@ -81,17 +77,11 @@ describe('executeHooks', () => {
         throw new Error('fake error');
       });
 
-      return executeHooks(suite, onProgress)
+      return executeHooks(suiteToHooks(suite))
         .then((results) => {
-          // Check progress results.
-          assert.match(getProgressArg(1).failure.message, /one failed/);
-          assert.match(getProgressArg(2).failure.message, /1 to equal 2/);
-          assert.match(getProgressArg(3).error.message, /fake error/);
-
-          // Check aggregate results.
-          assert.match(results[1].failure.message, /one failed/);
-          assert.match(results[2].failure.message, /1 to equal 2/);
-          assert.match(results[3].error.message, /fake error/);
+          assert.match(results[0].failure.message, /one failed/);
+          assert.match(results[1].failure.message, /1 to equal 2/);
+          assert.match(results[2].error.message, /fake error/);
         });
     });
   });
@@ -104,11 +94,11 @@ describe('executeHooks', () => {
         });
       });
 
-      return executeHooks(suite, onProgress)
+      return executeHooks(suiteToHooks(suite))
         .then((results) => {
-          assert.equal(onProgress.callCount, 2);
-          assert.isNull(getProgressArg(1).failure);
-          assert.isNull(getProgressArg(1).error);
+          assert.equal(results.length, 1);
+          assert.isNull(results[0].failure);
+          assert.isNull(results[0].error);
         });
     });
 
@@ -129,13 +119,12 @@ describe('executeHooks', () => {
         });
       });
 
-      return executeHooks(suite, onProgress)
+      return executeHooks(suiteToHooks(suite))
         .then((results) => {
-          assert.equal(onProgress.callCount, 4);
-          assert.match(getProgressArg(1).error.message, /fake error/);
-          assert.match(getProgressArg(2).error.message, /fake error two/);
-          assert.isNull(getProgressArg(3).error);
-          assert.isNull(getProgressArg(3).failure);
+          assert.match(results[0].error.message, /fake error/);
+          assert.match(results[1].error.message, /fake error two/);
+          assert.isNull(results[2].error);
+          assert.isNull(results[2].failure);
         });
     });
 
@@ -146,10 +135,9 @@ describe('executeHooks', () => {
         });
       });
 
-      return executeHooks(suite, onProgress)
+      return executeHooks(suiteToHooks(suite))
         .then((results) => {
-          assert.equal(onProgress.callCount, 2);
-          assert.match(getProgressArg(1).failure.message, /fake failure/);
+          assert.match(results[0].failure.message, /fake failure/);
         });
     });
 
@@ -160,10 +148,9 @@ describe('executeHooks', () => {
         });
       });
 
-      return executeHooks(suite, onProgress)
+      return executeHooks(suiteToHooks(suite))
         .then((results) => {
-          assert.equal(onProgress.callCount, 2);
-          assert.match(getProgressArg(1).error.message, /fake error/);
+          assert.match(results[0].error.message, /fake error/);
         });
     });
   });

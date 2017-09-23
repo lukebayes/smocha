@@ -3,8 +3,10 @@ const BddInterface = require('./bdd_interface');
 const Hook = require('./hook');
 const delegateEvents = require('./delegate_events');
 const evaluateFiles = require('./evaluate_files');
+const events = require('./events');
 const executeHooks = require('./execute_hooks');
 const findFiles = require('./find_files');
+const suiteToHooks = require('./suite_to_hooks');
 
 const DEFAULT_OPTIONS = {
   testDirectory: 'test',
@@ -19,10 +21,7 @@ const DEFAULT_OPTIONS = {
 class TestRunner {
   constructor(opt_options, opt_reporter, opt_interface) {
     this._options = Object.assign(DEFAULT_OPTIONS, opt_options || {});
-
     this._interface = opt_interface || new BddInterface();
-    this._reporter = opt_reporter || new BaseReporter(this._options.stdout, this._options.stderr);
-    delegateEvents(this._interface, this._reporter);
   }
 
   /**
@@ -31,27 +30,23 @@ class TestRunner {
    */
   run() {
     const opts = this._options;
-
-    function onProgress(result) {
-      const hook = result;
-      if (hook.type === Hook.Types.Test) {
-        if (result.failure) {
-          reporter.onTestFail(hook);
-        } else if (result.error) {
-          reporter.onTestError(hook);
-        } else {
-          reporter.onTestPass(hook);
-        }
-      }
-    };
+    const currentInterface = this._interface;
+    const reporter = opts.reporter || new BaseReporter(opts.stdout, opts.stderr);
+    reporter.onStart();
 
     // TODO(lbayes): Spread execution across multiple child processes.
     return findFiles(opts.testExpression, opts.testDirectory)
       .then((fileAndStats) => {
-        return evaluateFiles(this._interface.toSandbox(), fileAndStats);
+        return evaluateFiles(currentInterface.toSandbox(), fileAndStats);
       })
       .then(() => {
-        return executeHooks(this._interface.getRoot(), onProgress);
+        const rootSuite = suiteToHooks(currentInterface.getRoot());
+        rootSuite.on(events.HOOK_COMPLETE, reporter.onHookComplete.bind(reporter));
+        return executeHooks(rootSuite, reporter);
+      })
+      .then((results) => {
+        reporter.onEnd();
+        return results;
       });
   }
 }

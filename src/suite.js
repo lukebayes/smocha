@@ -19,15 +19,6 @@ class Suite extends Hook {
     this.handler = nullFunction;
   }
 
-  /**
-   * Override the underlying execute implementation so that we can be iterated
-   * over without causing any delays.
-   */
-  execute() {
-    // noop
-    return this;
-  }
-
   addTest(hook) {
     this.tests.push(hook);
     return hook;

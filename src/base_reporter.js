@@ -15,78 +15,42 @@ class BaseReporter extends Emitter {
     this._errors = [];
     this._startTimeMs = 0;
     this._startTimeMs = new Date().getTime();
-    this._configureListeners();
-  }
-
-  _configureListener(eventName, handler) {
-    this.on(eventName, handler.bind(this));
-  }
-
-  _configureListeners() {
-    this._configureListener(events.START, this.onStart);
-    this._configureListener(events.HOOK_BEGIN, this.onHookBegin);
-    this._configureListener(events.HOOK_COMPLETE, this.onHookComplete);
-    this._configureListener(events.END, this.onEnd);
-  }
-
-  onLoadFiles() {
-  }
-
-  onStart(suite) {
-    // this._stdout.write('onStart\n');
-  }
-
-  onBefore(suite) {
-  }
-
-  onAfter(suite) {
-  }
-
-  onBeforeEach(test) {
-  }
-
-  onSuite(suite) {
-  }
-
-  onHookBegin(hook) {
   }
 
   onHookComplete(result) {
     if (result.error) {
-      this.onHookError(result);
-    } else if (result.hook.isPending) {
-      this.onHookSkipped(result);
+      this._onHookError(result);
     } else if (result.failure) {
-      this.onHookFailure(result);
+      this._onHookFailure(result);
+    } else if (result.hook.isPending) {
+      this._onHookSkipped(result);
     } else if (result.hook.type === Hook.Types.Test) {
-      this.onTestPass(result);
+      this._onTestPass(result);
     }
   }
 
-  onTestPass(result) {
+  _onTestPass(result) {
     this._passed.push(result);
     this._stdout.write('.');
   }
 
-  onHookSkipped(result) {
+  _onHookSkipped(result) {
     this._skipped.push(result);
-    this._stout.write(',');
+    this._stdout.write(',');
   }
 
-  onHookFailure(result) {
+  _onHookFailure(result) {
     this._failed.push(result);
     this._stdout.write('x');
   }
 
-  onHookError(result) {
+  _onHookError(result) {
     this._errors.push(result);
     this._stdout.write('X');
   }
 
-  onAfterEach(test) {
-  }
-
-  onAfterSuite(suite) {
+  onStart() {
+    this._stdout.write('\n');
   }
 
   onEnd() {
@@ -96,7 +60,7 @@ class BaseReporter extends Emitter {
     const count = passedCount + failedCount + skippedCount;
     const duration = (new Date().getTime()) - this._startTimeMs;
 
-    this._stdout.write('\n\n');
+    this._stdout.write('\n');
     this._stdout.write(`${passedCount} passing (${duration}ms)\n`);
 
     if (failedCount > 0) {
@@ -118,7 +82,8 @@ class BaseReporter extends Emitter {
     this._errors.forEach((result) => {
       this._stderr.write('\n');
       this._stderr.write('ERROR: ' + result.hook.getFullLabel() + '\n');
-      this._stderr.write(result.error + '\n');
+      this._stderr.write(result.error.stack);
+      this._stderr.write('\n');
     });
   }
 
@@ -126,7 +91,8 @@ class BaseReporter extends Emitter {
     this._failed.forEach((result) => {
       this._stderr.write('\n');
       this._stderr.write('FAILURE: ' + result.hook.getFullLabel() + '\n');
-      this._stderr.write(result.failure + '\n');
+      this._stderr.write(result.failure.stack);
+      this._stderr.write('\n');
     });
   }
 }
