@@ -26,7 +26,7 @@ describe('executeHooks', () => {
     return onProgress.getCall(index).args[0];
   }
 
-  it.only('receives the hook as this', () => {
+  it('receives the hook as this', () => {
     let receivedLabel;
     function handler() {
       receivedLabel = this.getFullLabel();

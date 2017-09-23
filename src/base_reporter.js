@@ -14,7 +14,6 @@ class BaseReporter extends Emitter {
     this._skipped = [];
     this._errors = [];
     this._startTimeMs = 0;
-    this._durationMs = 0;
     this._startTimeMs = new Date().getTime();
     this._configureListeners();
   }
@@ -91,14 +90,14 @@ class BaseReporter extends Emitter {
   }
 
   onEnd() {
-    this._durationMs = (new Date().getTime()) - this._startTimeMs;
-    this._stdout.write('\n\n');
-    this._stdout.write(`${this._passingCount} passing (${this._durationMs}ms)\n`);
-
     const passedCount = this._passed.length;
     const failedCount = this._failed.length;
     const skippedCount = this._skipped.length;
     const count = passedCount + failedCount + skippedCount;
+    const duration = (new Date().getTime()) - this._startTimeMs;
+
+    this._stdout.write('\n\n');
+    this._stdout.write(`${passedCount} passing (${duration}ms)\n`);
 
     if (failedCount > 0) {
       this._stdout.write(`${failedCount} failing\n`);

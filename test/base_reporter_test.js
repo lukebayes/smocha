@@ -18,10 +18,6 @@ describe('BaseReporter', () => {
     instance = new BaseReporter(stdout, stderr);
   });
 
-  it('is instantiable', () => {
-    assert(instance);
-  });
-
   it('emits dots on stable pass', () => {
     instance.onHookComplete({hook: test});
     instance.onHookComplete({hook: test});
@@ -38,7 +34,6 @@ describe('BaseReporter', () => {
     instance.onEnd();
 
     const lines = stdout.content.split('\n');
-    console.log('lines:', lines);
     assert.equal(lines[0], '....');
     assert.match(lines[2], /4 passing \(\dms\)/);
   });
