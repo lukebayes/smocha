@@ -1,28 +1,54 @@
 const BddInterface = require('../').BddInterface;
 const assert = require('chai').assert;
+const nullFunction = require('../').nullFunction;
 const sinon = require('sinon');
 
 describe('BddInterface', () => {
   let instance;
+  let sandbox;
 
   beforeEach(() => {
     instance = new BddInterface();
+    sandbox = instance.toSandbox();
   });
 
-  describe('it.only', () => {
-    it.skip('provides it.only', () => {
-      const handler = sinon.spy();
-      instance.describe('abcd');
+  it('has empty root suite by default', () => {
+    assert(instance.getRoot());
+  });
 
-      const sandbox = instance.toSandbox();
+  it('parents sibling suites appropriately', () => {
+    sandbox.describe('abcd');
+    sandbox.describe('efgh');
+
+    const root = instance.getRoot();
+    root.start();
+    assert.equal(root.suites.length, 2);
+  });
+
+  it('parents child tests properly', () => {
+    sandbox.describe('abcd', () => {
+      sandbox.it('one', nullFunction);
+      sandbox.it('two', nullFunction);
+      sandbox.it('three', nullFunction);
+    });
+
+    const root = instance.getRoot();
+    root.start();
+    console.log(root.tests);
+    assert.equal(root.children.length, 3);
+  });
+
+  describe.skip('it.only', () => {
+    it('provides it.only', () => {
+      const handler = sinon.spy();
+      sandbox.describe('abcd');
 
       sandbox.it('mnop', handler);
       sandbox.it.only('efgh', handler);
       sandbox.it('ijkl', handler);
 
-      const rootSuite = instance.getRoot();
-
-      assert.equal(rootSuite.tests.length, 1);
+      const root = instance.getRoot();
+      assert.equal(root.tests.length, 1);
     });
   });
 });

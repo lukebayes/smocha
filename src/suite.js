@@ -9,6 +9,7 @@ class Suite extends Hook {
   constructor(label, handler, opt_isOnly, opt_isPending) {
     super(label, handler, Hook.Types.Suite, opt_isOnly, opt_isPending);
 
+    this._isEvaluationComplete = false;
     this.befores = [];
     this.afters = [];
     this.beforeEaches = [];
@@ -24,15 +25,20 @@ class Suite extends Hook {
    */
   execute() {
     // noop
+    return this;
   }
 
   start() {
-    this.onEvaluationComplete();
-    this.emit(events.START, this);
+    if (!this._isEvaluationComplete) {
+      this.onEvaluationComplete();
+      this.emit(events.START, this);
+    }
+    return this;
   }
 
   end() {
     this.emit(events.END, this);
+    return this;
   }
 
   addTest(hook) {
@@ -41,6 +47,9 @@ class Suite extends Hook {
   }
 
   addSuite(hook) {
+    // NOTE(lbayes): REMOVE THIS!!!
+    hook.parent = this;
+
     this.suites.push(hook);
     return hook;
   }
@@ -117,38 +126,42 @@ class Suite extends Hook {
   }
 
   onEvaluationComplete() {
-    if (this.tests.length === 0 && this.children.length === 0) {
-      // Clear befores and afters if there are no tests or children.
-      this.befores.length = 0;
-      this.afters.length = 0;
-    } else {
-      // Attach before hooks.
-      this.befores.forEach((hook) => {
-        this.addChild(hook);
-      });
-
-      this.tests.forEach((test) => {
-        // Attach beforeEach hooks for each test.
-        this.getAllBeforeEaches().forEach((hook) => {
+    if (!this._isEvaluationComplete) {
+      this._isEvaluationComplete = true;
+      if (this.tests.length === 0 && this.children.length === 0) {
+        // Clear befores and afters if there are no tests or children.
+        this.befores.length = 0;
+        this.afters.length = 0;
+      } else {
+        // Attach before hooks.
+        this.befores.forEach((hook) => {
           this.addChild(hook);
         });
-        // Attach each test.
-        this.addChild(test);
-        // Attach afterEach hooks for each test.
-        this.getAllAfterEaches().forEach((hook) => {
+
+        this.tests.forEach((test) => {
+          // Attach beforeEach hooks for each test.
+          this.getAllBeforeEaches().forEach((hook) => {
+            this.addChild(hook);
+          });
+          // Attach each test.
+          this.addChild(test);
+          // Attach afterEach hooks for each test.
+          this.getAllAfterEaches().forEach((hook) => {
+            this.addChild(hook);
+          });
+        });
+
+        // Attach child suites.
+        this.suites.forEach((suite) => {
+          this.addChild(suite);
+          suite.onEvaluationComplete();
+        });
+
+        // Attach after hooks.
+        this.afters.forEach((hook) => {
           this.addChild(hook);
         });
-      });
-
-      // Attach child suites.
-      this.suites.forEach((suite) => {
-        this.addChild(suite);
-      });
-
-      // Attach after hooks.
-      this.afters.forEach((hook) => {
-        this.addChild(hook);
-      });
+      }
     }
   }
 }

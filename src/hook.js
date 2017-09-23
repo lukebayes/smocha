@@ -26,7 +26,6 @@ class Hook extends Composite {
     this.isDisabled = false;
     this.isComplete = false;
     this.handler = opt_handler || nullFunction;
-    this.duration = 0;
 
     this._label = label;
     this._timeout = null;
@@ -67,6 +66,17 @@ class Hook extends Composite {
   getLabel() {
     return this._label;
   }
+
+  clone() {
+    const copy = new Hook(this.getLabel(), this.handler, this.type, this.isOnly, this.isPending);
+    copy.isDisabled = this.isDisabled;
+    copy.isComplete = this.isComplete;
+    if (this._timeout !== null) {
+      copy.timeout(this._timeout);
+    }
+    return copy;
+  }
+
 }
 
 Hook.DEFAULT_TIMEOUT = DEFAULT_TIMEOUT;

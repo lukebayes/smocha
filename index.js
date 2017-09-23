@@ -15,6 +15,7 @@ const findFiles = require('./src/find_files');
 const generateId = require('./src/generate_id');
 const nullFunction = require('./src/null_function');
 const readFile = require('./src/read_file');
+const suiteToHooks = require('./src/suite_to_hooks');
 
 module.exports = {
   BaseReporter,
@@ -34,5 +35,6 @@ module.exports = {
   generateId,
   nullFunction,
   readFile,
+  suiteToHooks,
 };
 

@@ -20,10 +20,10 @@ const IS_PENDING = true;
 class BddInterface extends Emitter {
   constructor() {
     super();
-    this._currentSuite = null;
     this._configureAnnotations();
     this._onlys = [];
-    this._root = null;
+    this._currentSuite = new Suite();
+    delegateEvents(this._currentSuite, this);
   }
 
   _configureAnnotations() {
@@ -65,15 +65,7 @@ class BddInterface extends Emitter {
     const parent = this._currentSuite;
     const child = new Suite(label, body, isOnly, isPending);
 
-    if (parent) {
-      // NOTE(lbayes): The current child MUST be attached to the tree before
-      // the describe block is evaluated so that .only statements can message
-      // the entire tree.
-      parent.addSuite(child);
-    } else {
-      this._root = child;
-      delegateEvents(child, this);
-    }
+    parent.addSuite(child);
 
     this._currentSuite = child;
 
@@ -81,10 +73,6 @@ class BddInterface extends Emitter {
     if (body) {
       body();
     }
-
-    // Notify the suite that we are done adding concrete hooks, now it can
-    // transform those into the appropriate tree structure.
-    child.onEvaluationComplete();
 
     if (parent) {
       this._currentSuite = parent;
@@ -112,7 +100,7 @@ class BddInterface extends Emitter {
   }
 
   getRoot() {
-    return this._root;
+    return this._currentSuite;
   }
 
   toSandbox() {

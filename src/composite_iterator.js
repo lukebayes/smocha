@@ -42,6 +42,14 @@ class CompositeIterator {
       return this._current().peek();
     }
   }
+
+  toArray() {
+    const result = [];
+    while(this.hasNext()) {
+      result.push(this.next());
+    }
+    return result;
+  }
 }
 
 module.exports = CompositeIterator;

@@ -1,6 +1,7 @@
 const Hook = require('../').Hook;
 const Suite = require('../').Suite;
 const assert = require('chai').assert;
+const nullFunction = require('../').nullFunction;
 const sinon = require('sinon');
 
 describe('Suite', () => {
@@ -42,6 +43,35 @@ describe('Suite', () => {
       instance.addAfter(after);
       instance.addTest(testOne);
       instance.addTest(testTwo);
+    });
+  });
+
+  describe('start', () => {
+    let root;
+    let child1;
+    let test1;
+    let test2;
+
+    beforeEach(() => {
+      root = new Suite('root');
+      child1 = new Suite('child1');
+      test1 = new Hook('test1', nullFunction, Hook.Types.Test);
+      test2 = new Hook('test2', nullFunction, Hook.Types.Test);
+
+      root.addSuite(child1);
+      child1.addTest(test1);
+      child1.addTest(test2);
+    });
+
+    it('accepts suite and test declarations', () => {
+      assert.equal(root.tests.length, 0);
+      assert.equal(root.suites.length, 1);
+      assert.equal(child1.tests.length, 2);
+
+      // NOTE(lbayes): The real hook tree has not yet been constructed!
+      assert.isNull(child1.parent);
+      assert.isNull(test1.parent);
+      assert.isNull(test2.parent);
     });
   });
 });
