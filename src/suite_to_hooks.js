@@ -41,7 +41,7 @@ function suiteToHooks(suite) {
   const result = suite.clone();
   if (suite.tests.length > 0 || suite.suites.length > 0) {
 
-    suite.befores.forEach((hook) => {
+    suite.getBefores().forEach((hook) => {
       result.addChild(hook.clone());
     });
 
@@ -59,6 +59,10 @@ function suiteToHooks(suite) {
 
     suite.suites.forEach((childSuite) => {
       result.addChild(suiteToHooks(childSuite));
+    });
+
+    suite.getAfters().forEach((hook) => {
+      result.addChild(hook.clone());
     });
   }
 

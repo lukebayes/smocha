@@ -60,7 +60,7 @@ describe('suiteToHooks', () => {
       child1.addAfterEach(new Hook('afterEach1', nullFunction, Hook.Types.AfterEach));
       child1.addAfterEach(new Hook('afterEach2', nullFunction, Hook.Types.AfterEach));
       child1.addAfterEach(new Hook('afterEach3', nullFunction, Hook.Types.AfterEach));
-      child1.addAfter(new Hook('before2', nullFunction, Hook.Types.After));
+      child1.addAfter(new Hook('after', nullFunction, Hook.Types.After));
 
       child2.addBeforeEach(new Hook('beforeEach4', nullFunction, Hook.Types.BeforeEach));
       child2.addBeforeEach(new Hook('beforeEach5', nullFunction, Hook.Types.BeforeEach));
@@ -118,6 +118,7 @@ describe('suiteToHooks', () => {
       assert.equal(iterator.next().getFullLabel(), 'root child1 child2 afterEach2');
       assert.equal(iterator.next().getFullLabel(), 'root child1 child2 afterEach3');
 
+      assert.equal(iterator.next().getFullLabel(), 'root child1 after');
       assert.isFalse(iterator.hasNext());
     });
   });
