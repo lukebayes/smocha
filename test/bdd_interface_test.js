@@ -35,7 +35,9 @@ describe('BddInterface', () => {
     assert.equal(abcd.tests.length, 3);
   });
 
-  describe.skip('it.only', () => {
+  // TODO(lbayes): Finish support for .only blocks
+  /*
+  describe('it.only', () => {
     it('provides it.only', () => {
       sandbox.describe('abcd');
 
@@ -47,5 +49,6 @@ describe('BddInterface', () => {
       assert.equal(abcd.tests.length, 1);
     });
   });
+  */
 });
 
