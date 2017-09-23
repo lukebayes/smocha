@@ -35,6 +35,6 @@ describe('BaseReporter', () => {
 
     const lines = stdout.content.split('\n');
     assert.equal(lines[1], '....');
-    assert.match(lines[2], /4 passing \(\dms\)/);
+    assert.match(lines[3], /4 passing \(\dms\)/);
   });
 });

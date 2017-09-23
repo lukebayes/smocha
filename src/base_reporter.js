@@ -53,27 +53,6 @@ class BaseReporter extends Emitter {
     this._stdout.write('\n');
   }
 
-  onEnd() {
-    const passedCount = this._passed.length;
-    const failedCount = this._failed.length;
-    const skippedCount = this._skipped.length;
-    const count = passedCount + failedCount + skippedCount;
-    const duration = (new Date().getTime()) - this._startTimeMs;
-
-    this._stdout.write('\n');
-    this._stdout.write(`${passedCount} passing (${duration}ms)\n`);
-
-    if (failedCount > 0) {
-      this._stdout.write(`${failedCount} failing\n`);
-    }
-    if (skippedCount > 0) {
-      this._stdout.write(`${skippedCount} skipped\n`);
-    }
-
-    this._printErrors();
-    this._printFailures();
-  }
-
   getResults() {
     return this._results;
   }
@@ -94,6 +73,29 @@ class BaseReporter extends Emitter {
       this._stderr.write(result.failure.stack);
       this._stderr.write('\n');
     });
+  }
+
+  onEnd() {
+    const passedCount = this._passed.length;
+    const failedCount = this._failed.length;
+    const skippedCount = this._skipped.length;
+    const count = passedCount + failedCount + skippedCount;
+    const duration = (new Date().getTime()) - this._startTimeMs;
+
+    this._stdout.write('\n\n');
+    this._stdout.write(`${passedCount} passing (${duration}ms)\n`);
+
+    if (failedCount > 0) {
+      this._stdout.write(`${failedCount} failing\n`);
+    }
+    if (skippedCount > 0) {
+      this._stdout.write(`${skippedCount} skipped\n`);
+    }
+
+    this._printErrors();
+    this._printFailures();
+
+    this._stdout.write('\n');
   }
 }
 
