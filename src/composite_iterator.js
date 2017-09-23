@@ -5,6 +5,7 @@ const Iterator = require('./iterator');
  */
 class CompositeIterator {
   constructor(root) {
+    this._root = root;
     this._stack = root ? [new Iterator([root])] : [];
   }
 
@@ -45,8 +46,10 @@ class CompositeIterator {
 
   toArray() {
     const result = [];
-    while(this.hasNext()) {
-      result.push(this.next());
+    // Ensure this call does not mutate the state of the current Iterator.
+    const child = new CompositeIterator(this._root);
+    while(child.hasNext()) {
+      result.push(child.next());
     }
     return result;
   }

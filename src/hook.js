@@ -1,4 +1,5 @@
 const Composite = require('./composite');
+const events = require('./events');
 const generateId = require('./generate_id');
 const nullFunction = require('./null_function');
 
@@ -29,6 +30,14 @@ class Hook extends Composite {
 
     this._label = label;
     this._timeout = null;
+  }
+
+  start() {
+    this.emit(events.START, this);
+  }
+
+  end() {
+    this.emit(events.END, this);
   }
 
   /**

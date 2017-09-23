@@ -68,8 +68,11 @@ describe('Suite', () => {
       assert.equal(root.suites.length, 1);
       assert.equal(child1.tests.length, 2);
 
+      // TODO(lbayes): THIS SHOULD NOT HAPPEN, ONLY TEMPORARY WHILE MOVING AWAY
+      // FROM COMPLEX MODELS.
+      assert.equal(child1.parent, root);
+
       // NOTE(lbayes): The real hook tree has not yet been constructed!
-      assert.isNull(child1.parent);
       assert.isNull(test1.parent);
       assert.isNull(test2.parent);
     });

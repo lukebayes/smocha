@@ -21,7 +21,6 @@ describe('BddInterface', () => {
     sandbox.describe('efgh');
 
     const root = instance.getRoot();
-    root.start();
     assert.equal(root.suites.length, 2);
   });
 
@@ -32,23 +31,20 @@ describe('BddInterface', () => {
       sandbox.it('three', nullFunction);
     });
 
-    const root = instance.getRoot();
-    root.start();
-    console.log(root.tests);
-    assert.equal(root.children.length, 3);
+    const abcd = instance.getRoot().suites[0];
+    assert.equal(abcd.tests.length, 3);
   });
 
   describe.skip('it.only', () => {
     it('provides it.only', () => {
-      const handler = sinon.spy();
       sandbox.describe('abcd');
 
-      sandbox.it('mnop', handler);
-      sandbox.it.only('efgh', handler);
-      sandbox.it('ijkl', handler);
+      sandbox.it('mnop', nullFunction);
+      sandbox.it.only('efgh', nullFunction);
+      sandbox.it('ijkl', nullFunction);
 
-      const root = instance.getRoot();
-      assert.equal(root.tests.length, 1);
+      const abcd = instance.getRoot().suites[0];
+      assert.equal(abcd.tests.length, 1);
     });
   });
 });

@@ -28,19 +28,6 @@ class Suite extends Hook {
     return this;
   }
 
-  start() {
-    if (!this._isEvaluationComplete) {
-      this.onEvaluationComplete();
-      this.emit(events.START, this);
-    }
-    return this;
-  }
-
-  end() {
-    this.emit(events.END, this);
-    return this;
-  }
-
   addTest(hook) {
     this.tests.push(hook);
     return hook;
