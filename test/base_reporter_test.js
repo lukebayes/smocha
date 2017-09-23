@@ -2,6 +2,7 @@ const BaseReporter = require('../').BaseReporter;
 const FakeStream = require('./fakes/fake_stream');
 const Hook = require('../').Hook;
 const assert = require('chai').assert;
+const nullFunction = require('../').nullFunction;
 
 describe('BaseReporter', () => {
   let instance;
@@ -10,7 +11,7 @@ describe('BaseReporter', () => {
   let stderr;
 
   beforeEach(() => {
-    test = new Hook('abcd', null, Hook.Types.Test);
+    test = new Hook('abcd', nullFunction, Hook.Types.Test);
 
     stdout = new FakeStream();
     stderr = new FakeStream();
@@ -37,6 +38,7 @@ describe('BaseReporter', () => {
     instance.onEnd();
 
     const lines = stdout.content.split('\n');
+    console.log('lines:', lines);
     assert.equal(lines[0], '....');
     assert.match(lines[2], /4 passing \(\dms\)/);
   });

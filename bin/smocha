@@ -4,7 +4,7 @@ const TestRunner = require('../').TestRunner;
 
 const runner = new TestRunner({
   testDirectory: 'test',
-  testExpression: '_test.js',
+  testExpression: 'execute_hooks_test.js',
 });
 runner.run();
 
