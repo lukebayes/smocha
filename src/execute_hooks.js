@@ -2,16 +2,21 @@ const AssertionError = require('chai').AssertionError;
 const Hook = require('./hook');
 const Iterator = require('./iterator');
 const events = require('./events');
+const initializeTimer = require('./initialize_timer');
 const nullFunction = require('./null_function');
 const suiteToHooks = require('./suite_to_hooks');
 
 
 /**
- * Execute all hooks present on the tree that is provided.
+ * Execute all hooks in the provided Array serially.
  *
  * Any synchronous hook blocks will be executed synchronously, any asynchronous
  * hooks will cause execution to wait until resolved or rejected. Declarations
- * that use the async (callback) style are already wrapped in a promise.
+ * that use the async (callback) style will be wrapped in a promise.
+ *
+ * Call the provided onHookComplete handler after each hook is executed. This
+ * handler will be provided with a results object that will include a reference
+ * to the hook along with execution status fields.
  */
 function executeHooks(root, onHookComplete) {
   const results = [];
@@ -38,14 +43,6 @@ function executeHooks(root, onHookComplete) {
 
     nextHook();
   });
-}
-
-function initializeTimer() {
-  const start = new Date().getTime();
-  // Call this returned function to get duration since initializeTimer() was called.
-  return function() {
-    return new Date().getTime() - start;
-  };
 }
 
 /**

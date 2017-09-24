@@ -13,6 +13,7 @@ const events = require('./src/events');
 const executeHooks = require('./src/execute_hooks');
 const findFiles = require('./src/find_files');
 const generateId = require('./src/generate_id');
+const initializeTimer = require('./src/initialize_timer');
 const nullFunction = require('./src/null_function');
 const readFile = require('./src/read_file');
 const suiteToHooks = require('./src/suite_to_hooks');
@@ -33,6 +34,7 @@ module.exports = {
   executeHooks,
   findFiles,
   generateId,
+  initializeTimer,
   nullFunction,
   readFile,
   suiteToHooks,

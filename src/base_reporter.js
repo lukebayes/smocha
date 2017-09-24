@@ -1,6 +1,7 @@
 const Emitter = require('./emitter');
 const Hook = require('./hook');
 const events = require('./events');
+const initializeTimer = require('./initialize_timer');
 
 class BaseReporter extends Emitter {
   constructor(stdout, stderr) {
@@ -13,8 +14,7 @@ class BaseReporter extends Emitter {
     this._failed = [];
     this._skipped = [];
     this._errors = [];
-    this._startTimeMs = 0;
-    this._startTimeMs = new Date().getTime();
+    this._getDuration = initializeTimer();
   }
 
   onHookComplete(result) {
@@ -85,7 +85,7 @@ class BaseReporter extends Emitter {
     const failedCount = this._failed.length;
     const skippedCount = this._skipped.length;
     const count = passedCount + failedCount + skippedCount;
-    const duration = (new Date().getTime()) - this._startTimeMs;
+    const duration = this._getDuration();
 
     this._stdout.write('\n\n');
     this._stdout.write(`${passedCount} passing (${duration}ms)\n`);
