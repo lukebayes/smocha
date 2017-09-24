@@ -50,7 +50,6 @@ describe('Hook', () => {
       assert.equal(copy.type, Hook.Types.Test);
       assert.isFalse(copy.isOnly);
       assert.isFalse(copy.isPending);
-      assert.isFalse(copy.isDisabled);
     });
   });
 

@@ -108,15 +108,20 @@ function executeHook(hook, onHookComplete) {
 
   function onComplete() {
     const result = {
+      duration: getDuration(),
       error: errorResponse,
       failure: failureResponse,
-      hook: hook,
-      duration: getDuration(),
+      isOnly: hook.isOnly,
+      isPending: hook.isPending,
+      label: hook.label,
+      type: hook.type,
     };
     onHookComplete(result);
   }
 
   try {
+    // TODO(lbayes): Call the handler with some other context that allows for calls
+    // to a timeout() function that mimics how mocha handles this.
     result = promisifyAsyncHook(handler).call(hook);
     if (result && typeof result.then === 'function') {
       return result

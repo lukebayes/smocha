@@ -24,7 +24,7 @@ describe('TestRunner', () => {
     return instance.run()
       .then((results) => {
         const tests = results.filter((result) => {
-          return result.hook.type === Hook.Types.Test;
+          return result.type === Hook.Types.Test;
         });
         assert.equal(tests.length, 6);
       });

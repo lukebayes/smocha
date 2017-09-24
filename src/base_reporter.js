@@ -24,9 +24,9 @@ class BaseReporter extends Emitter {
     } else if (result.failure) {
       // Can be any kind of hook
       this._onHookFailure(result);
-    } else if (result.hook.type === Hook.Types.Test) {
+    } else if (result.type === Hook.Types.Test) {
       // Only report skipped test hooks
-      if (result.hook.isPending) {
+      if (result.isPending) {
         this._onHookSkipped(result);
       } else {
         this._onTestPass(result);
@@ -65,7 +65,7 @@ class BaseReporter extends Emitter {
   _printErrors() {
     this._errors.forEach((result) => {
       this._stderr.write('\n');
-      this._stderr.write('ERROR: ' + result.hook.label + '\n');
+      this._stderr.write('ERROR: ' + result.label + '\n');
       this._stderr.write(result.error.stack);
       this._stderr.write('\n');
     });
@@ -74,7 +74,7 @@ class BaseReporter extends Emitter {
   _printFailures() {
     this._failed.forEach((result) => {
       this._stderr.write('\n');
-      this._stderr.write('FAILURE: ' + result.hook.label + '\n');
+      this._stderr.write('FAILURE: ' + result.label + '\n');
       this._stderr.write(result.failure.stack);
       this._stderr.write('\n');
     });

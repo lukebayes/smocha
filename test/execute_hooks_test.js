@@ -29,7 +29,7 @@ describe('executeHooks', () => {
     return executeHooks(suiteToHooks(suite), nullFunction)
       .then((results) => {
         // No handler is the same as skipped
-        assert(results[0].hook.isPending);
+        assert(results[0].isPending);
       });
   });
 

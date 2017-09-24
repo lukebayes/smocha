@@ -18,13 +18,12 @@ const DEFAULT_TIMEOUT = 2000;
  * when the handler is called.
  */
 class Hook extends Composite {
-  constructor(label, opt_handler, opt_type, opt_isOnly, opt_isPending, opt_isDisabled) {
+  constructor(label, opt_handler, opt_type, opt_isOnly, opt_isPending) {
     super();
     this.type = opt_type || Hook.Types.Default;
     this.id = generateId();
     this.isPending = typeof opt_isPending !== 'undefined' ? opt_isPending : !opt_handler || false;
     this.isOnly = opt_isOnly || false;
-    this.isDisabled = opt_isDisabled || false;
     this.handler = opt_handler || nullFunction;
     this.label = label || '';
 
@@ -75,7 +74,6 @@ class Hook extends Composite {
     return {
       handler: this.handler,
       id: this.id,
-      isDisabled: this.isDisabled,
       isOnly: this.isOnly,
       isPending: this.isPending,
       label: this.getFullLabel(),
@@ -87,7 +85,6 @@ class Hook extends Composite {
   clone() {
     const copy = new Hook(this.label, this.handler, this.type, this.isOnly, this.isPending);
     copy.id = this.id;
-    copy.isDisabled = this.isDisabled;
     if (this._timeout !== null) {
       copy.timeout(this._timeout);
     }
