@@ -1,4 +1,5 @@
-const Emitter = require('../').Emitter;
+// NOTE(lbayes): This class is likely to be removed, but holding off for now.
+const Emitter = require('../src/emitter');
 const assert = require('chai').assert;
 const sinon = require('sinon');
 
