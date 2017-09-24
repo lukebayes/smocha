@@ -39,20 +39,17 @@ class TestRunner {
     reporter.onStart();
 
     return findFiles(opts.testExpression, opts.testDirectory)
-      .then((fileAndStats) => {
-        // NOTE(lbayes): Keep execution order changing, this will surface interacting
-        // tests and make it much more difficult for them hide behind deterministic
-        // test order.
-        const sortedFilenames = fileAndStats.sort(mtimeSort).map((fileAndStat) => {
-          return fileAndStat.filename;
-        });
+      .then((filenames) => {
         // TODO(lbayes): Spread execution across multiple child processes.
-        return evaluateFiles(currentInterface.toSandbox(), sortedFilenames);
+        return evaluateFiles(currentInterface.toSandbox(), filenames);
       })
       .then(() => {
         return executeHooks(suiteToHooks(currentInterface.getRoot()), (result) => {
           reporter.onHookComplete(result);
         });
+      })
+      .catch((err) => {
+        reporter.onError(err);
       })
       .then((results) => {
         reporter.onEnd();

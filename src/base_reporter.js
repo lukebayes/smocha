@@ -51,6 +51,13 @@ class BaseReporter {
     this._stdout.write('X');
   }
 
+  /**
+   * Can be called when evaluating source files.
+   */
+  onError(err) {
+    this._errors.push({error: err, label: ''});
+  }
+
   onStart() {
     this._stdout.write('\n');
   }

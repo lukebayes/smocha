@@ -36,6 +36,8 @@ function findFiles(opt_expressionStr, opt_directory) {
         } else {
           return b.stat.mtimeMs - a.stat.mtimeMs;
         }
+      }).map((fileAndStat) => {
+        return fileAndStat.filename;
       });
       resolve(results);
     });
