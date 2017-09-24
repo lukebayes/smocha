@@ -1,4 +1,5 @@
 const FakeStream = require('./fakes/fake_stream');
+const Hook = require('../').Hook;
 const TestRunner = require('../').TestRunner;
 const assert = require('chai').assert;
 const sinon = require('sinon');
@@ -22,7 +23,10 @@ describe('TestRunner', () => {
   it('is runnable', () => {
     return instance.run()
       .then((results) => {
-        assert.equal(results.length, 6);
+        const tests = results.filter((result) => {
+          return result.hook.type === Hook.Types.Test;
+        });
+        assert.equal(tests.length, 6);
       });
   });
 });

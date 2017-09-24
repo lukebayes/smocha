@@ -1,4 +1,4 @@
-const CompositeIterator = require('../').CompositeIterator;
+const Iterator = require('../').Iterator;
 const Hook = require('../').Hook;
 const Suite = require('../').Suite;
 const assert = require('chai').assert;
@@ -37,15 +37,12 @@ describe('suiteToHooks', () => {
   describe('tests and suites', () => {
     it('assembles tests and suites', () => {
       const result = suiteToHooks(root);
-      const iterator = new CompositeIterator(result);
+      const iterator = new Iterator(result);
 
-      assert.equal(iterator.next().getFullLabel(), 'root');
-      assert.equal(iterator.next().getFullLabel(), 'root child1');
-      assert.equal(iterator.next().getFullLabel(), 'root child1 test1');
-      assert.equal(iterator.next().getFullLabel(), 'root child1 test2');
-      assert.equal(iterator.next().getFullLabel(), 'root child1 child2');
-      assert.equal(iterator.next().getFullLabel(), 'root child1 child2 test3');
-      assert.equal(iterator.next().getFullLabel(), 'root child1 child2 test4');
+      assert.equal(iterator.next().label, 'root child1 test1');
+      assert.equal(iterator.next().label, 'root child1 test2');
+      assert.equal(iterator.next().label, 'root child1 child2 test3');
+      assert.equal(iterator.next().label, 'root child1 child2 test4');
       assert.isFalse(iterator.hasNext());
     });
   });
@@ -70,55 +67,54 @@ describe('suiteToHooks', () => {
     it('assembles all hooks', () => {
       const result = suiteToHooks(root);
 
-      const iterator = new CompositeIterator(result);
-      assert.equal(iterator.next().getFullLabel(), 'root');
-      assert.equal(iterator.next().getFullLabel(), 'root child1');
-      assert.equal(iterator.next().getFullLabel(), 'root child1 before1');
-      assert.equal(iterator.next().getFullLabel(), 'root child1 before2');
+      const iterator = new Iterator(result);
+      // assert.equal(iterator.next().label, 'root');
+      // assert.equal(iterator.next().label, 'root child1');
+      assert.equal(iterator.next().label, 'root child1 before1');
+      assert.equal(iterator.next().label, 'root child1 before2');
 
 
       // Ensure beforeEaches and afterEaches wrap each of child1's tests
-      assert.equal(iterator.next().getFullLabel(), 'root child1 beforeEach1');
-      assert.equal(iterator.next().getFullLabel(), 'root child1 beforeEach2');
-      assert.equal(iterator.next().getFullLabel(), 'root child1 beforeEach3');
-      assert.equal(iterator.next().getFullLabel(), 'root child1 test1');
-      assert.equal(iterator.next().getFullLabel(), 'root child1 afterEach1');
-      assert.equal(iterator.next().getFullLabel(), 'root child1 afterEach2');
-      assert.equal(iterator.next().getFullLabel(), 'root child1 afterEach3');
+      assert.equal(iterator.next().label, 'root child1 beforeEach1');
+      assert.equal(iterator.next().label, 'root child1 beforeEach2');
+      assert.equal(iterator.next().label, 'root child1 beforeEach3');
+      assert.equal(iterator.next().label, 'root child1 test1');
+      assert.equal(iterator.next().label, 'root child1 afterEach1');
+      assert.equal(iterator.next().label, 'root child1 afterEach2');
+      assert.equal(iterator.next().label, 'root child1 afterEach3');
 
-      assert.equal(iterator.next().getFullLabel(), 'root child1 beforeEach1');
-      assert.equal(iterator.next().getFullLabel(), 'root child1 beforeEach2');
-      assert.equal(iterator.next().getFullLabel(), 'root child1 beforeEach3');
-      assert.equal(iterator.next().getFullLabel(), 'root child1 test2');
-      assert.equal(iterator.next().getFullLabel(), 'root child1 afterEach1');
-      assert.equal(iterator.next().getFullLabel(), 'root child1 afterEach2');
-      assert.equal(iterator.next().getFullLabel(), 'root child1 afterEach3');
+      assert.equal(iterator.next().label, 'root child1 beforeEach1');
+      assert.equal(iterator.next().label, 'root child1 beforeEach2');
+      assert.equal(iterator.next().label, 'root child1 beforeEach3');
+      assert.equal(iterator.next().label, 'root child1 test2');
+      assert.equal(iterator.next().label, 'root child1 afterEach1');
+      assert.equal(iterator.next().label, 'root child1 afterEach2');
+      assert.equal(iterator.next().label, 'root child1 afterEach3');
 
       // Ensure child1 AND child2 beforeEaches and afterEaches wrap child2's tests
-      assert.equal(iterator.next().getFullLabel(), 'root child1 child2');
-      assert.equal(iterator.next().getFullLabel(), 'root child1 child2 beforeEach1');
-      assert.equal(iterator.next().getFullLabel(), 'root child1 child2 beforeEach2');
-      assert.equal(iterator.next().getFullLabel(), 'root child1 child2 beforeEach3');
-      assert.equal(iterator.next().getFullLabel(), 'root child1 child2 beforeEach4');
-      assert.equal(iterator.next().getFullLabel(), 'root child1 child2 beforeEach5');
-      assert.equal(iterator.next().getFullLabel(), 'root child1 child2 test3');
-      assert.equal(iterator.next().getFullLabel(), 'root child1 child2 afterEach4');
-      assert.equal(iterator.next().getFullLabel(), 'root child1 child2 afterEach1');
-      assert.equal(iterator.next().getFullLabel(), 'root child1 child2 afterEach2');
-      assert.equal(iterator.next().getFullLabel(), 'root child1 child2 afterEach3');
+      assert.equal(iterator.next().label, 'root child1 beforeEach1');
+      assert.equal(iterator.next().label, 'root child1 beforeEach2');
+      assert.equal(iterator.next().label, 'root child1 beforeEach3');
+      assert.equal(iterator.next().label, 'root child1 child2 beforeEach4');
+      assert.equal(iterator.next().label, 'root child1 child2 beforeEach5');
+      assert.equal(iterator.next().label, 'root child1 child2 test3');
+      assert.equal(iterator.next().label, 'root child1 child2 afterEach4');
+      assert.equal(iterator.next().label, 'root child1 afterEach1');
+      assert.equal(iterator.next().label, 'root child1 afterEach2');
+      assert.equal(iterator.next().label, 'root child1 afterEach3');
 
-      assert.equal(iterator.next().getFullLabel(), 'root child1 child2 beforeEach1');
-      assert.equal(iterator.next().getFullLabel(), 'root child1 child2 beforeEach2');
-      assert.equal(iterator.next().getFullLabel(), 'root child1 child2 beforeEach3');
-      assert.equal(iterator.next().getFullLabel(), 'root child1 child2 beforeEach4');
-      assert.equal(iterator.next().getFullLabel(), 'root child1 child2 beforeEach5');
-      assert.equal(iterator.next().getFullLabel(), 'root child1 child2 test4');
-      assert.equal(iterator.next().getFullLabel(), 'root child1 child2 afterEach4');
-      assert.equal(iterator.next().getFullLabel(), 'root child1 child2 afterEach1');
-      assert.equal(iterator.next().getFullLabel(), 'root child1 child2 afterEach2');
-      assert.equal(iterator.next().getFullLabel(), 'root child1 child2 afterEach3');
+      assert.equal(iterator.next().label, 'root child1 beforeEach1');
+      assert.equal(iterator.next().label, 'root child1 beforeEach2');
+      assert.equal(iterator.next().label, 'root child1 beforeEach3');
+      assert.equal(iterator.next().label, 'root child1 child2 beforeEach4');
+      assert.equal(iterator.next().label, 'root child1 child2 beforeEach5');
+      assert.equal(iterator.next().label, 'root child1 child2 test4');
+      assert.equal(iterator.next().label, 'root child1 child2 afterEach4');
+      assert.equal(iterator.next().label, 'root child1 afterEach1');
+      assert.equal(iterator.next().label, 'root child1 afterEach2');
+      assert.equal(iterator.next().label, 'root child1 afterEach3');
 
-      assert.equal(iterator.next().getFullLabel(), 'root child1 after');
+      assert.equal(iterator.next().label, 'root child1 after');
       assert.isFalse(iterator.hasNext());
     });
   });

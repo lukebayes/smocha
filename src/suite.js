@@ -20,31 +20,34 @@ class Suite extends Hook {
   }
 
   addTest(hook) {
+    hook.parent = this;
     this.tests.push(hook);
     return hook;
   }
 
   addSuite(hook) {
-    // NOTE(lbayes): REMOVE THIS!!!
     hook.parent = this;
-
     this.suites.push(hook);
     return hook;
   }
 
   addBefore(hook) {
+    hook.parent = this;
     this.befores.push(hook);
   }
 
   addBeforeEach(hook) {
+    hook.parent = this;
     this.beforeEaches.push(hook);
   }
 
   addAfter(hook) {
+    hook.parent = this;
     this.afters.push(hook);
   }
 
   addAfterEach(hook) {
+    hook.parent = this;
     this.afterEaches.push(hook);
   }
 

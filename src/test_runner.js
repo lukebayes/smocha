@@ -40,9 +40,9 @@ class TestRunner {
         return evaluateFiles(currentInterface.toSandbox(), fileAndStats);
       })
       .then(() => {
-        const rootSuite = suiteToHooks(currentInterface.getRoot());
-        rootSuite.on(events.HOOK_COMPLETE, reporter.onHookComplete.bind(reporter));
-        return executeHooks(rootSuite, reporter);
+        return executeHooks(suiteToHooks(currentInterface.getRoot()), (result) => {
+          reporter.onHookComplete(result);
+        });
       })
       .then((results) => {
         reporter.onEnd();

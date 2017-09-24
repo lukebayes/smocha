@@ -34,39 +34,39 @@ function getAfterEachesFor(suiteDeclaration) {
 }
 
 /**
- * Recursively transform the provided Suite (and it's children) into a tree of
+ * Recursively transform the provided Suite (and it's children) into a list of
  * executable Hooks.
  */
 function suiteToHooks(suiteDeclaration) {
-  const result = suiteDeclaration.clone();
+  let results = [];
   if (suiteDeclaration.tests.length > 0 || suiteDeclaration.suites.length > 0) {
 
     suiteDeclaration.getBefores().forEach((hook) => {
-      result.addChild(hook.clone());
+      results.push(hook.toExecutable());
     });
 
     suiteDeclaration.tests.forEach((test) => {
       getBeforeEachesFor(suiteDeclaration).forEach((hook) => {
-        result.addChild(hook.clone());
+        results.push(hook.toExecutable());
       });
 
-      result.addChild(test.clone());
+      results.push(test.toExecutable());
 
       getAfterEachesFor(suiteDeclaration).forEach((hook) => {
-        result.addChild(hook.clone());
+        results.push(hook.toExecutable());
       });
     });
 
     suiteDeclaration.suites.forEach((childSuite) => {
-      result.addChild(suiteToHooks(childSuite));
+      results = results.concat(suiteToHooks(childSuite));
     });
 
     suiteDeclaration.getAfters().forEach((hook) => {
-      result.addChild(hook.clone());
+      results.push(hook.toExecutable());
     });
   }
 
-  return result;
+  return results;
 }
 
 module.exports = suiteToHooks;

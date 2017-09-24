@@ -1,5 +1,4 @@
 const BddInterface = require('../').BddInterface;
-const CompositeIterator = require('../').CompositeIterator;
 const assert = require('chai').assert;
 const evaluateFiles = require('../').evaluateFiles;
 const suiteToHooks = require('../').suiteToHooks;
@@ -22,8 +21,8 @@ describe('evaluateFiles', () => {
     return evaluateFiles(sandbox, fileAndStats)
       .then(() => {
         const root = bddInterface.getRoot();
-        const hooks = new CompositeIterator(suiteToHooks(root)).toArray();
-        assert(hooks.length >= 23);
+        const hooks = suiteToHooks(root);
+        assert(hooks.length >= 20);
       });
   });
 });

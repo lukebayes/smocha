@@ -3,6 +3,7 @@ const Hook = require('../').Hook;
 const Suite = require('../').Suite;
 const assert = require('chai').assert;
 const executeHooks = require('../').executeHooks;
+const nullFunction = require('../').nullFunction;
 const sinon = require('sinon');
 const suiteToHooks = require('../').suiteToHooks;
 
@@ -22,25 +23,13 @@ describe('executeHooks', () => {
     return test;
   };
 
-  it('receives the hook as this', () => {
-    let receivedLabel;
-    function handler() {
-      receivedLabel = this.getFullLabel();
-    };
-    const test = new Hook('abcd', handler);
-    suite.addTest(test);
-    return executeHooks(suiteToHooks(suite))
-      .then(() => {
-        assert.equal(receivedLabel, 'root suite abcd');
-      });
-  });
-
   it('uses a nullFunction if no handler is present', () => {
     const test = new Hook('abcd');
     suite.addTest(test);
-    return executeHooks(suiteToHooks(suite))
-      .then(() => {
-        // NOTE(lbayes): The test should be 'pending'
+    return executeHooks(suiteToHooks(suite), nullFunction)
+      .then((results) => {
+        // No handler is the same as skipped
+        assert(results[0].hook.isPending);
       });
   });
 
@@ -58,7 +47,7 @@ describe('executeHooks', () => {
         assert.isTrue(true);
       });
 
-      return executeHooks(suiteToHooks(suite))
+      return executeHooks(suiteToHooks(suite), nullFunction)
           .then((results) => {
             assert.equal(results.length, 3);
           });
@@ -77,7 +66,7 @@ describe('executeHooks', () => {
         throw new Error('fake error');
       });
 
-      return executeHooks(suiteToHooks(suite))
+      return executeHooks(suiteToHooks(suite), nullFunction)
         .then((results) => {
           assert.match(results[0].failure.message, /one failed/);
           assert.match(results[1].failure.message, /1 to equal 2/);
@@ -94,7 +83,7 @@ describe('executeHooks', () => {
         });
       });
 
-      return executeHooks(suiteToHooks(suite))
+      return executeHooks(suiteToHooks(suite), nullFunction)
         .then((results) => {
           assert.equal(results.length, 1);
           assert.isNull(results[0].failure);
@@ -119,7 +108,7 @@ describe('executeHooks', () => {
         });
       });
 
-      return executeHooks(suiteToHooks(suite))
+      return executeHooks(suiteToHooks(suite), nullFunction)
         .then((results) => {
           assert.match(results[0].error.message, /fake error/);
           assert.match(results[1].error.message, /fake error two/);
@@ -135,7 +124,7 @@ describe('executeHooks', () => {
         });
       });
 
-      return executeHooks(suiteToHooks(suite))
+      return executeHooks(suiteToHooks(suite), nullFunction)
         .then((results) => {
           assert.match(results[0].failure.message, /fake failure/);
         });
@@ -148,7 +137,7 @@ describe('executeHooks', () => {
         });
       });
 
-      return executeHooks(suiteToHooks(suite))
+      return executeHooks(suiteToHooks(suite), nullFunction)
         .then((results) => {
           assert.match(results[0].error.message, /fake error/);
         });

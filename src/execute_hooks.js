@@ -1,9 +1,10 @@
 const AssertionError = require('chai').AssertionError;
-const CompositeIterator = require('./composite_iterator');
 const Hook = require('./hook');
+const Iterator = require('./iterator');
 const events = require('./events');
 const nullFunction = require('./null_function');
 const suiteToHooks = require('./suite_to_hooks');
+
 
 /**
  * Execute all hooks present on the tree that is provided.
@@ -12,35 +13,32 @@ const suiteToHooks = require('./suite_to_hooks');
  * hooks will cause execution to wait until resolved or rejected. Declarations
  * that use the async (callback) style are already wrapped in a promise.
  */
-function executeHooks(root) {
+function executeHooks(root, onHookComplete) {
   const results = [];
-  const iterator = new CompositeIterator(root);
+  const iterator = new Iterator(root);
 
   return new Promise((resolve, reject) => {
-    nextHook(iterator, results, (err) => {
-      if (err) return reject(err);
-      resolve(results);
-    });
+    /**
+     * Get the next hook and execute it.
+     *
+     * If there are no more hooks in the iterator, call the provided complete
+     * handler.
+     */
+    function nextHook() {
+      if (iterator.hasNext()) {
+        executeHook(iterator.next(), (result) => {
+          results.push(result);
+          onHookComplete(result);
+          nextHook();
+        });
+      } else {
+        resolve(results);
+      }
+    }
+
+    nextHook();
   });
 };
-
-/**
- * Get the next hook and execute it.
- *
- * If there are no more hooks in the iterator, call the provided complete
- * handler.
- */
-function nextHook(iterator, results, completeHandler) {
-  if (iterator.hasNext()) {
-    function onNext() {
-      nextHook(iterator, results, completeHandler);
-    };
-
-    executeHook(iterator.next(), results, onNext);
-  } else {
-    completeHandler();
-  }
-}
 
 function initializeTimer() {
   const start = new Date().getTime();
@@ -48,69 +46,6 @@ function initializeTimer() {
   return function() {
     return new Date().getTime() - start;
   };
-}
-
-/**
- * Execute the provided hook, whether it's synchronous, async or returns a
- * promise.
- *
- * If the call causes a test failure, call onFailure.
- *
- * If the call causes an unexpected Error, call onError.
- *
- * When complete, call next().
- */
-function executeHook(hook, results, onNext) {
-  let result;
-  let handler = hook.handler;
-  let failureResponse = null;
-  let errorResponse = null;
-  const getDuration = initializeTimer();
-  // hook.bubble(events.HOOK_BEGIN, hook);
-
-  function onFailure(failure) {
-    // console.log('on failure:', failure);
-    failureResponse = failure;
-  };
-
-  function onError(err) {
-    // console.log('on error:', err);
-    errorResponse = err;
-  };
-
-  function onComplete() {
-    if (hook.type === Hook.Types.Test) {
-      const result = {
-        error: errorResponse,
-        failure: failureResponse,
-        hook: hook,
-        duration: getDuration(),
-      };
-
-      results.push(result);
-      // Bubble the HOOK_COMPLETE event from the current hook.
-      hook.bubble(events.HOOK_COMPLETE, result);
-    }
-    onNext();
-  }
-
-  try {
-    result = promisifyAsyncHook(handler).call(hook);
-    if (result && typeof result.then === 'function') {
-      return result
-        .catch((err) => {
-          handleFailureOrError(err, onFailure, onError);
-        })
-        .then(() => {
-          onComplete();
-        });
-    } else {
-      onComplete();
-    }
-  } catch (err) {
-    handleFailureOrError(err, onFailure, onError);
-    onComplete();
-  }
 }
 
 /**
@@ -145,6 +80,59 @@ function handleFailureOrError(err, onFailure, onError) {
     onFailure(err);
   } else {
     onError(err);
+  }
+}
+
+/**
+ * Execute the provided hook, whether it's synchronous, async or returns a
+ * promise.
+ *
+ * If the call causes a test failure, call onFailure.
+ *
+ * If the call causes an unexpected Error, call onError.
+ *
+ * When complete, call next().
+ */
+function executeHook(hook, onHookComplete) {
+  let result;
+  let handler = hook.handler;
+  let failureResponse = null;
+  let errorResponse = null;
+  const getDuration = initializeTimer();
+  // hook.bubble(events.HOOK_BEGIN, hook);
+
+  function onFailure(failure) {
+    failureResponse = failure;
+  };
+
+  function onError(err) {
+    errorResponse = err;
+  };
+
+  function onComplete() {
+    const result = {
+      error: errorResponse,
+      failure: failureResponse,
+      hook: hook,
+      duration: getDuration(),
+    };
+    onHookComplete(result);
+  }
+
+  try {
+    result = promisifyAsyncHook(handler).call(hook);
+    if (result && typeof result.then === 'function') {
+      return result
+        .catch((err) => {
+          handleFailureOrError(err, onFailure, onError);
+        })
+        .then(onComplete);
+    } else {
+      onComplete();
+    }
+  } catch (err) {
+    handleFailureOrError(err, onFailure, onError);
+    onComplete();
   }
 }
 

@@ -18,17 +18,16 @@ const DEFAULT_TIMEOUT = 2000;
  * when the handler is called.
  */
 class Hook extends Composite {
-  constructor(label, opt_handler, opt_type, opt_isOnly, opt_isPending) {
+  constructor(label, opt_handler, opt_type, opt_isOnly, opt_isPending, opt_isDisabled) {
     super();
     this.type = opt_type || Hook.Types.Default;
     this.id = generateId();
     this.isPending = typeof opt_isPending !== 'undefined' ? opt_isPending : !opt_handler || false;
     this.isOnly = opt_isOnly || false;
-    this.isDisabled = false;
-    this.isComplete = false;
+    this.isDisabled = opt_isDisabled || false;
     this.handler = opt_handler || nullFunction;
+    this.label = label || '';
 
-    this._label = label || '';
     this._timeout = null;
   }
 
@@ -65,14 +64,30 @@ class Hook extends Composite {
    * Get the local label only.
    */
   getLabel() {
-    return this._label;
+    return this.label;
+  }
+
+  getTimeout() {
+    return this.timeout !== null ? this.timeout : this.parent && this.parent.timeout() || DEFAULT_TIMEOUT;
+  }
+
+  toExecutable() {
+    return {
+      handler: this.handler,
+      id: this.id,
+      isDisabled: this.isDisabled,
+      isOnly: this.isOnly,
+      isPending: this.isPending,
+      label: this.getFullLabel(),
+      timeout: this.timeout,
+      type: this.type,
+    };
   }
 
   clone() {
-    const copy = new Hook(this._label, this.handler, this.type, this.isOnly, this.isPending);
+    const copy = new Hook(this.label, this.handler, this.type, this.isOnly, this.isPending);
     copy.id = this.id;
     copy.isDisabled = this.isDisabled;
-    copy.isComplete = this.isComplete;
     if (this._timeout !== null) {
       copy.timeout(this._timeout);
     }

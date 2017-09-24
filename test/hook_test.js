@@ -35,6 +35,25 @@ describe('Hook', () => {
     assert.equal(three.getFullLabel(), 'abcd efgh ijkl mnop');
   });
 
+  describe('toExecutable', () => {
+    it('copies all keys', () => {
+      const handler = sinon.spy();
+      const root = new Hook('root');
+      const parent = new Hook('abcd');
+      const child = new Hook('efgh', handler, Hook.Types.Test);
+      root.addChild(parent);
+      parent.addChild(child);
+
+      const copy = child.toExecutable();
+      assert.equal(copy.label, 'root abcd efgh');
+      assert.equal(copy.handler, handler);
+      assert.equal(copy.type, Hook.Types.Test);
+      assert.isFalse(copy.isOnly);
+      assert.isFalse(copy.isPending);
+      assert.isFalse(copy.isDisabled);
+    });
+  });
+
   describe('timeout', () => {
     let instance;
 
