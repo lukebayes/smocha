@@ -8,12 +8,6 @@ describe('Hook', () => {
     assert(instance);
   });
 
-  it('gets unique id when created', () => {
-    const one = new Hook();
-    const two = new Hook();
-    assert.notEqual(one.id, two.id);
-  });
-
   it('accepts label and handler', () => {
     const instance = new Hook('abcd');
     assert.equal(instance.getFullLabel(), 'abcd');

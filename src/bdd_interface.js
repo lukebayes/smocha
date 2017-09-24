@@ -46,7 +46,7 @@ class BddInterface {
     });
 
     this._currentSuite.getTests().forEach((testHook) => {
-      if (onlyLabels.indexOf(testHook.getLabel()) === -1) {
+      if (onlyLabels.indexOf(testHook.label) === -1) {
         testHook.isDisabled = true;
       }
     });

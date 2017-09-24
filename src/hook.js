@@ -1,5 +1,4 @@
 const Composite = require('./composite');
-const generateId = require('./generate_id');
 const nullFunction = require('./null_function');
 
 /**
@@ -20,7 +19,6 @@ class Hook extends Composite {
   constructor(label, opt_handler, opt_type, opt_isOnly, opt_isPending) {
     super();
     this.type = opt_type || Hook.Types.Default;
-    this.id = generateId();
     this.isPending = typeof opt_isPending !== 'undefined' ? opt_isPending : !opt_handler || false;
     this.isOnly = opt_isOnly || false;
     this.handler = opt_handler || nullFunction;
@@ -55,14 +53,7 @@ class Hook extends Composite {
    */
   getFullLabel() {
     const base = this.parent ? this.parent.getFullLabel() + ' ' : '';
-    return `${base}${this.getLabel()}`;
-  }
-
-  /**
-   * Get the local label only.
-   */
-  getLabel() {
-    return this.label;
+    return `${base}${this.label}`;
   }
 
   getTimeout() {
@@ -72,22 +63,12 @@ class Hook extends Composite {
   toExecutable() {
     return {
       handler: this.handler,
-      id: this.id,
       isOnly: this.isOnly,
       isPending: this.isPending,
       label: this.getFullLabel(),
       timeout: this.timeout,
       type: this.type,
     };
-  }
-
-  clone() {
-    const copy = new Hook(this.label, this.handler, this.type, this.isOnly, this.isPending);
-    copy.id = this.id;
-    if (this._timeout !== null) {
-      copy.timeout(this._timeout);
-    }
-    return copy;
   }
 }
 
