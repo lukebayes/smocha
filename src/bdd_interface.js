@@ -1,5 +1,6 @@
 const Hook = require('./hook');
 const Suite = require('./suite');
+const getTimeoutFunctionFor = require('./get_timeout_function_for');
 
 const IS_ONLY = true;
 const IS_PENDING = true;
@@ -66,7 +67,7 @@ class BddInterface {
 
     // Evaluate the current describe block to construct a tree of Hooks and Suites
     if (body) {
-      body();
+      body.call(this);
     }
 
     if (parent) {
@@ -95,7 +96,7 @@ class BddInterface {
   }
 
   timeout(opt_duration) {
-    this._currentSuite.timeout(opt_duration);
+    return getTimeoutFunctionFor(this._currentSuite)(opt_duration);
   }
 
   getRoot() {
@@ -110,6 +111,7 @@ class BddInterface {
       beforeEach: this.beforeEach.bind(this),
       describe: this.describe.bind(this),
       it: this.it.bind(this),
+      timeout: this.timeout.bind(this),
     };
     sandbox.it.only = this.it.only.bind(this);
     sandbox.describe.only = this.describe.only.bind(this);

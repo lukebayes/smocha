@@ -1,7 +1,11 @@
 const BddInterface = require('../').BddInterface;
+const Hook = require('../').Hook;
+const Suite = require('../').Suite;
 const assert = require('chai').assert;
+const executeHooks = require('../').executeHooks;
 const nullFunction = require('../').nullFunction;
 const sinon = require('sinon');
+const suiteToHooks = require('../').suiteToHooks;
 
 describe('BddInterface', () => {
   let instance;
@@ -33,6 +37,21 @@ describe('BddInterface', () => {
 
     const abcd = instance.getRoot().suites[0];
     assert.equal(abcd.tests.length, 3);
+  });
+
+  it('applies suite changes to timeout', () => {
+    sandbox.describe('root', function() {
+      this.timeout(20);
+
+      sandbox.it('test1', function() {
+        assert.equal(this.timeout(), 20);
+      });
+    });
+
+    return executeHooks(suiteToHooks(instance.getRoot()), nullFunction)
+      .then((results) => {
+        assert.equal(results[0].timeout, 20);
+      });
   });
 
   // TODO(lbayes): Finish support for .only blocks

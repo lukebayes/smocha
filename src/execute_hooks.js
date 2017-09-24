@@ -2,6 +2,7 @@ const AssertionError = require('chai').AssertionError;
 const Hook = require('./hook');
 const Iterator = require('./iterator');
 const initializeTimer = require('./initialize_timer');
+const getTimeoutFunctionFor = require('./get_timeout_function_for');
 const nullFunction = require('./null_function');
 const suiteToHooks = require('./suite_to_hooks');
 
@@ -80,15 +81,7 @@ function handleFailureOrError(err, onFailure, onError) {
 
 function getHookExecutionContext(hook) {
   return {
-    /**
-     * This is here for backwards compatibility.
-     */
-    timeout: function(opt_duration) {
-      if (!isNaN(opt_duration)) {
-        hook.timeout = opt_duration;
-      }
-      return hook.timeout;
-    }
+    timeout: getTimeoutFunctionFor(hook),
   };
 }
 
