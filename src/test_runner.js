@@ -3,7 +3,7 @@ const BddInterface = require('./bdd_interface');
 const Hook = require('./hook');
 const evaluateFiles = require('./evaluate_files');
 const executeHooks = require('./execute_hooks');
-const filesToBatches = require('./files_to_batches');
+const chunk = require('./chunk');
 const findFiles = require('./find_files');
 const suiteToHooks = require('./suite_to_hooks');
 
@@ -19,6 +19,9 @@ const DEFAULT_OPTIONS = {
  */
 function mtimeSort(stat) {
   return stat.mtimeMs;
+}
+
+function execChildWith(files) {
 }
 
 /**
@@ -42,7 +45,10 @@ class TestRunner {
 
     return findFiles(opts.testExpression, opts.testDirectory)
       .then((filenames) => {
-        const batches = filesToBatches(filenames);
+        // TODO(lbayes): Heading somewhere like this...
+        // chunk(filenames).forEach((chunk) => {
+          // execChildWith(chunk);
+        // });
 
         const currentInterface = new BddInterface();
         // TODO(lbayes): Spread execution across multiple child processes.

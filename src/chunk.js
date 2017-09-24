@@ -1,6 +1,12 @@
 const os = require('os');
 
-function filesToBatches(list, opt_coreCount) {
+/**
+ * Given the provided Array, return a new Array that has separated it into
+ * chunks, ensuring that the elements that are nearest the beginning of
+ * the initial collection will also be at the beginning of each chunk of the
+ * returned Array.
+ */
+function chunk(list, opt_coreCount) {
   const batchCount = Math.min(list.length, opt_coreCount || os.cpus().length);
   const fileCount = list == null ? 0 : list.length;
   const batchSize = Math.ceil(fileCount / batchCount);
@@ -26,5 +32,5 @@ function filesToBatches(list, opt_coreCount) {
   return result;
 }
 
-module.exports = filesToBatches;
+module.exports = chunk;
 
