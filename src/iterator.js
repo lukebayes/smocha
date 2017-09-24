@@ -25,6 +25,10 @@ class Iterator {
   reset() {
     this._index = -1;
   }
+
+  length() {
+    return this._iterable.length - this._index - 1;
+  }
 }
 
 module.exports = Iterator;
