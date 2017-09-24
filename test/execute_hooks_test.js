@@ -33,6 +33,35 @@ describe('executeHooks', () => {
       });
   });
 
+  it('respects parent timeout', () => {
+    function handler() {
+      assert.equal(this.timeout(), 30);
+    };
+    suite.timeout = 30;
+    const test = new Hook('abcd', handler, Hook.Types.Test);
+    suite.addTest(test);
+
+    return executeHooks(suiteToHooks(suite), nullFunction)
+      .then((results) => {
+        assert.equal(results[0].timeout, 30);
+      });
+  });
+
+  it('can configure timeout', () => {
+    function handler() {
+      assert.equal(this.timeout(), Hook.DEFAULT_TIMEOUT);
+      this.timeout(20);
+      assert.equal(this.timeout(), 20);
+    };
+
+    const test = new Hook('abcd', handler, Hook.Types.Test);
+    suite.addTest(test);
+    return executeHooks(suiteToHooks(suite), nullFunction)
+      .then((results) => {
+        assert.equal(results[0].timeout, 20);
+      });
+  });
+
   describe('synchronous', () => {
     it('executes passing tests', () => {
       createTest('one', () => {

@@ -79,19 +79,23 @@ class BddInterface {
   }
 
   beforeEach(body) {
-    this._currentSuite.addBeforeEach(new Hook('beforeEach', body, Hook.Types.BeforeEach));
+    return this._currentSuite.addBeforeEach(new Hook('beforeEach', body, Hook.Types.BeforeEach));
   }
 
   afterEach(body) {
-    this._currentSuite.addAfterEach(new Hook('afterEach', body, Hook.Types.AfterEach));
+    return this._currentSuite.addAfterEach(new Hook('afterEach', body, Hook.Types.AfterEach));
   }
 
   before(body) {
-    this._currentSuite.addBefore(new Hook('before', body, Hook.Types.Before));
+    return this._currentSuite.addBefore(new Hook('before', body, Hook.Types.Before));
   }
 
   after(body) {
-    this._currentSuite.addAfter(new Hook('after', body, Hook.Types.After));
+    return this._currentSuite.addAfter(new Hook('after', body, Hook.Types.After));
+  }
+
+  timeout(opt_duration) {
+    this._currentSuite.timeout(opt_duration);
   }
 
   getRoot() {

@@ -5,7 +5,6 @@ const initializeTimer = require('./initialize_timer');
 const nullFunction = require('./null_function');
 const suiteToHooks = require('./suite_to_hooks');
 
-
 /**
  * Execute all hooks in the provided Array serially.
  *
@@ -79,6 +78,20 @@ function handleFailureOrError(err, onFailure, onError) {
   }
 }
 
+function getHookExecutionContext(hook) {
+  return {
+    /**
+     * This is here for backwards compatibility.
+     */
+    timeout: function(opt_duration) {
+      if (!isNaN(opt_duration)) {
+        hook.timeout = opt_duration;
+      }
+      return hook.timeout;
+    }
+  };
+}
+
 /**
  * Execute the provided hook, whether it's synchronous, async or returns a
  * promise.
@@ -110,8 +123,10 @@ function executeHook(hook, onHookComplete) {
       error: errorResponse,
       failure: failureResponse,
       isOnly: hook.isOnly,
+      isPassing: !!errorResponse && !!failureResponse,
       isPending: hook.isPending,
       label: hook.label,
+      timeout: hook.timeout,
       type: hook.type,
     };
     onHookComplete(result);
@@ -120,7 +135,7 @@ function executeHook(hook, onHookComplete) {
   try {
     // TODO(lbayes): Call the handler with some other context that allows for calls
     // to a timeout() function that mimics how mocha handles this.
-    result = promisifyAsyncHook(handler).call(hook);
+    result = promisifyAsyncHook(handler).call(getHookExecutionContext(hook));
     if (result && typeof result.then === 'function') {
       return result
         .catch((err) => {

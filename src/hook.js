@@ -23,29 +23,11 @@ class Hook extends Composite {
     this.isOnly = opt_isOnly || false;
     this.handler = opt_handler || nullFunction;
     this.label = label || '';
-
-    this._timeout = null;
+    this.timeout = null;
   }
 
-  /**
-   * Set or get the timeout value for the current hook.
-   *
-   * This method will delegate to the nearest parent configuration if a local
-   * value is not found.
-   *
-   * NOTE(lbayes): This method signature is only this way in order to support
-   * legacy mocha tests.
-   */
-  timeout(opt_value) {
-    if (opt_value) {
-      this._timeout = opt_value;
-    }
-
-    if (this._timeout !== null) {
-      return this._timeout;
-    }
-
-    return this.parent && this.parent.timeout() || DEFAULT_TIMEOUT;
+  getTimeout() {
+    return this.timeout ? this.timeout : this.parent && this.parent.getTimeout() || DEFAULT_TIMEOUT;
   }
 
   /**
@@ -56,17 +38,13 @@ class Hook extends Composite {
     return `${base}${this.label}`;
   }
 
-  getTimeout() {
-    return this.timeout !== null ? this.timeout : this.parent && this.parent.timeout() || DEFAULT_TIMEOUT;
-  }
-
   toExecutable() {
     return {
       handler: this.handler,
       isOnly: this.isOnly,
       isPending: this.isPending,
       label: this.getFullLabel(),
-      timeout: this.timeout,
+      timeout: this.getTimeout(),
       type: this.type,
     };
   }

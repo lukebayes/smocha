@@ -35,19 +35,22 @@ describe('Hook', () => {
       const root = new Hook('root');
       const parent = new Hook('abcd');
       const child = new Hook('efgh', handler, Hook.Types.Test);
+      parent.timeout = 20;
       root.addChild(parent);
       parent.addChild(child);
 
       const copy = child.toExecutable();
+
       assert.equal(copy.label, 'root abcd efgh');
       assert.equal(copy.handler, handler);
       assert.equal(copy.type, Hook.Types.Test);
+      assert.equal(copy.timeout, 20, 'Inherits parent timeout');
       assert.isFalse(copy.isOnly);
       assert.isFalse(copy.isPending);
     });
   });
 
-  describe('timeout', () => {
+  describe('getTimeout()', () => {
     let instance;
 
     beforeEach(() => {
@@ -55,17 +58,17 @@ describe('Hook', () => {
     });
 
     it('gets default timeout', () => {
-      assert.equal(instance.timeout(), 2000);
+      assert.equal(instance.getTimeout(), Hook.DEFAULT_TIMEOUT);
     });
 
     it('sets timeout', () => {
-      instance.timeout(3000);
-      assert.equal(instance.timeout(), 3000);
+      instance.timeout = 3000;
+      assert.equal(instance.getTimeout(), 3000);
     });
 
     it('does not accept 0 timeout', () => {
-      instance.timeout(0);
-      assert.equal(instance.timeout(), 2000);
+      instance.timeout = 0;
+      assert.equal(instance.getTimeout(), Hook.DEFAULT_TIMEOUT);
     });
 
     it('gets timeout from parent', () => {
@@ -73,9 +76,9 @@ describe('Hook', () => {
       const child = new Hook('efgh');
       root.addChild(child);
 
-      root.timeout(50);
-      assert.equal(child.timeout(), 50);
-      assert.equal(root.timeout(), 50);
+      root.timeout = 50;
+      assert.equal(child.getTimeout(), 50);
+      assert.equal(root.getTimeout(), 50);
     });
 
     it('overrides timeout in child', () => {
@@ -83,9 +86,9 @@ describe('Hook', () => {
       const child = new Hook('efgh');
       root.addChild(child);
 
-      child.timeout(100);
-      assert.equal(child.timeout(), 100);
-      assert.equal(root.timeout(), 2000);
+      child.timeout = 100;
+      assert.equal(child.getTimeout(), 100);
+      assert.equal(root.getTimeout(), Hook.DEFAULT_TIMEOUT);
     });
   });
 

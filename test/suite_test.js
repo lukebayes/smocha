@@ -7,11 +7,11 @@ const sinon = require('sinon');
 describe('Suite', () => {
   let instance;
 
-  it('returns added tests', () => {
+  it('returns suite when adding tests', () => {
     const test = new Hook();
     instance = new Suite();
     const result = instance.addTest(test);
-    assert.equal(test, result);
+    assert.equal(instance, result);
   });
 
   describe('simple', () => {
