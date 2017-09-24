@@ -38,7 +38,7 @@ function executeHooks(root, onHookComplete) {
 
     nextHook();
   });
-};
+}
 
 function initializeTimer() {
   const start = new Date().getTime();

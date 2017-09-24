@@ -34,9 +34,9 @@ class TestRunner {
     const reporter = opts.reporter || new BaseReporter(opts.stdout, opts.stderr);
     reporter.onStart();
 
-    // TODO(lbayes): Spread execution across multiple child processes.
     return findFiles(opts.testExpression, opts.testDirectory)
       .then((fileAndStats) => {
+        // TODO(lbayes): Spread execution across multiple child processes.
         return evaluateFiles(currentInterface.toSandbox(), fileAndStats);
       })
       .then(() => {

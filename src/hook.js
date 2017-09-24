@@ -93,7 +93,6 @@ class Hook extends Composite {
     }
     return copy;
   }
-
 }
 
 Hook.DEFAULT_TIMEOUT = DEFAULT_TIMEOUT;
