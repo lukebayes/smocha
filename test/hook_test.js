@@ -1,5 +1,7 @@
 const Hook = require('../').Hook;
+const Suite = require('../').Suite;
 const assert = require('chai').assert;
+const nullFunction = require('../').nullFunction;
 const sinon = require('sinon');
 
 describe('Hook', () => {
@@ -50,11 +52,11 @@ describe('Hook', () => {
     });
   });
 
-  describe('getTimeout()', () => {
+  describe('timeout', () => {
     let instance;
 
     beforeEach(() => {
-      instance = new Hook('abcd');
+      instance = new Hook('abcd', nullFunction, Hook.Types.Test);
     });
 
     it('gets default timeout', () => {
@@ -63,6 +65,7 @@ describe('Hook', () => {
 
     it('sets timeout', () => {
       instance.timeout = 3000;
+      instance.SHIT = true;
       assert.equal(instance.getTimeout(), 3000);
     });
 
@@ -72,8 +75,8 @@ describe('Hook', () => {
     });
 
     it('gets timeout from parent', () => {
-      const root = new Hook('abcd');
-      const child = new Hook('efgh');
+      const root = new Suite('abcd');
+      const child = new Hook('efgh', nullFunction, Hook.Types.Test);
       root.addChild(child);
 
       root.timeout = 50;
@@ -82,9 +85,9 @@ describe('Hook', () => {
     });
 
     it('overrides timeout in child', () => {
-      const root = new Hook('abcd');
-      const child = new Hook('efgh');
-      root.addChild(child);
+      const root = new Suite('abcd');
+      const child = new Hook('efgh', nullFunction, Hook.Types.Test);
+      root.addTest(child);
 
       child.timeout = 100;
       assert.equal(child.getTimeout(), 100);

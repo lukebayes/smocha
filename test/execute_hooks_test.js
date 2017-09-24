@@ -34,14 +34,13 @@ describe('executeHooks', () => {
   });
 
   it('respects parent timeout', () => {
-    function handler() {
-      assert.equal(this.timeout(), 30);
-    };
     suite.timeout = 30;
-    const test = new Hook('abcd', handler, Hook.Types.Test);
+    const test = new Hook('abcd', function() {
+      assert.equal(this.timeout(), 30);
+    }, Hook.Types.Test);
     suite.addTest(test);
 
-    return executeHooks(suiteToHooks(suite), nullFunction)
+    return executeHooks(suiteToHooks(suite))
       .then((results) => {
         assert.equal(results[0].timeout, 30);
       });

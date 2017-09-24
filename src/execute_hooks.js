@@ -17,9 +17,10 @@ const suiteToHooks = require('./suite_to_hooks');
  * handler will be provided with a results object that will include a reference
  * to the hook along with execution status fields.
  */
-function executeHooks(root, onHookComplete) {
+function executeHooks(root, opt_onHookComplete) {
   const results = [];
   const iterator = new Iterator(root);
+  const onHookComplete = opt_onHookComplete || nullFunction;
 
   return new Promise((resolve, reject) => {
     /**
