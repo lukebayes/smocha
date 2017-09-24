@@ -45,7 +45,7 @@ class BddInterface {
       return only.label;
     });
 
-    this._currentSuite.getTests().forEach((testHook) => {
+    this._currentSuite.tests.forEach((testHook) => {
       if (onlyLabels.indexOf(testHook.label) === -1) {
         testHook.isDisabled = true;
       }

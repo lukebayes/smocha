@@ -15,6 +15,8 @@ class Suite extends Hook {
     this.afterEaches = [];
     this.suites = [];
     this.tests = [];
+    // There is no runtime execution for suites, their handlers are executed
+    // during file evaluation.
     this.handler = nullFunction;
   }
 
@@ -52,26 +54,6 @@ class Suite extends Hook {
     hook.parent = this;
     this.afterEaches.push(hook);
     return this;
-  }
-
-  getTests() {
-    return this.tests;
-  }
-
-  getBefores() {
-    return this.befores;
-  }
-
-  getAfters() {
-    return this.afters;
-  }
-
-  getBeforeEaches() {
-    return this.beforeEaches;
-  }
-
-  getAfterEaches() {
-    return this.afterEaches;
   }
 }
 

@@ -58,12 +58,49 @@ describe('Suite', () => {
       test1 = new Hook('test1', nullFunction, Hook.Types.Test);
       test2 = new Hook('test2', nullFunction, Hook.Types.Test);
 
-      root.addSuite(child1);
-      child1.addTest(test1);
-      child1.addTest(test2);
+    });
+
+    it('addTest returns suite', () => {
+      const result = root.addTest(test1);
+      assert.equal(test1.parent, root);
+      assert.equal(result, root);
+    });
+
+    it('addSuite returns suite', () => {
+      const result = root.addSuite(child1);
+      assert.equal(child1.parent, root);
+      assert.equal(result, root);
+    });
+
+    it('addBefore returns suite', () => {
+      const result = root.addBefore(test1);
+      assert.equal(test1.parent, root);
+      assert.equal(result, root);
+    });
+
+    it('addBeforeEach returns suite', () => {
+      const result = root.addBeforeEach(test1);
+      assert.equal(test1.parent, root);
+      assert.equal(result, root);
+    });
+
+    it('addAfter returns suite', () => {
+      const result = root.addAfter(test1);
+      assert.equal(test1.parent, root);
+      assert.equal(result, root);
+    });
+
+    it('addAfterEach returns suite', () => {
+      const result = root.addAfterEach(test1);
+      assert.equal(test1.parent, root);
+      assert.equal(result, root);
     });
 
     it('accepts suite and test declarations', () => {
+      root.addSuite(child1);
+      child1.addTest(test1);
+      child1.addTest(test2);
+
       assert.equal(root.tests.length, 0);
       assert.equal(root.suites.length, 1);
       assert.equal(child1.tests.length, 2);

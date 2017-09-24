@@ -10,7 +10,7 @@ function getBeforeEachesFor(suiteDeclaration) {
   let hooks = [];
 
   while (current) {
-    hooks = current.getBeforeEaches().concat(hooks);
+    hooks = current.beforeEaches.concat(hooks);
     current = current.parent;
   }
 
@@ -26,7 +26,7 @@ function getAfterEachesFor(suiteDeclaration) {
   let hooks = [];
 
   while (current) {
-    hooks = hooks.concat(current.getAfterEaches());
+    hooks = hooks.concat(current.afterEaches);
     current = current.parent;
   }
 
@@ -41,7 +41,7 @@ function suiteToHooks(suiteDeclaration) {
   let results = [];
   if (suiteDeclaration.tests.length > 0 || suiteDeclaration.suites.length > 0) {
 
-    suiteDeclaration.getBefores().forEach((hook) => {
+    suiteDeclaration.befores.forEach((hook) => {
       results.push(hook.toExecutable());
     });
 
@@ -61,7 +61,7 @@ function suiteToHooks(suiteDeclaration) {
       results = results.concat(suiteToHooks(childSuite));
     });
 
-    suiteDeclaration.getAfters().forEach((hook) => {
+    suiteDeclaration.afters.forEach((hook) => {
       results.push(hook.toExecutable());
     });
   }
