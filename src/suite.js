@@ -1,5 +1,4 @@
 const Hook = require('./hook');
-const events = require('./events');
 const nullFunction = require('./null_function');
 
 /**

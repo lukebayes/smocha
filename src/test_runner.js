@@ -1,9 +1,7 @@
 const BaseReporter = require('./base_reporter');
 const BddInterface = require('./bdd_interface');
 const Hook = require('./hook');
-const delegateEvents = require('./delegate_events');
 const evaluateFiles = require('./evaluate_files');
-const events = require('./events');
 const executeHooks = require('./execute_hooks');
 const findFiles = require('./find_files');
 const suiteToHooks = require('./suite_to_hooks');
@@ -16,12 +14,18 @@ const DEFAULT_OPTIONS = {
 };
 
 /**
+ * Sort function to sort file stat objects on modified time.
+ */
+function mtimeSort(stat) {
+  return stat.mtimeMs;
+}
+
+/**
  * Load and run the tests that are associated with the provided test loaders.
  */
 class TestRunner {
-  constructor(opt_options, opt_reporter, opt_interface) {
+  constructor(opt_options, opt_reporter) {
     this._options = Object.assign(DEFAULT_OPTIONS, opt_options || {});
-    this._interface = opt_interface || new BddInterface();
   }
 
   /**
@@ -30,14 +34,20 @@ class TestRunner {
    */
   run() {
     const opts = this._options;
-    const currentInterface = this._interface;
+    const currentInterface = new BddInterface();
     const reporter = opts.reporter || new BaseReporter(opts.stdout, opts.stderr);
     reporter.onStart();
 
     return findFiles(opts.testExpression, opts.testDirectory)
       .then((fileAndStats) => {
+        // NOTE(lbayes): Keep execution order changing, this will surface interacting
+        // tests and make it much more difficult for them hide behind deterministic
+        // test order.
+        const sortedFilenames = fileAndStats.sort(mtimeSort).map((fileAndStat) => {
+          return fileAndStat.filename;
+        });
         // TODO(lbayes): Spread execution across multiple child processes.
-        return evaluateFiles(currentInterface.toSandbox(), fileAndStats);
+        return evaluateFiles(currentInterface.toSandbox(), sortedFilenames);
       })
       .then(() => {
         return executeHooks(suiteToHooks(currentInterface.getRoot()), (result) => {

@@ -1,5 +1,4 @@
 const Composite = require('./composite');
-const events = require('./events');
 const generateId = require('./generate_id');
 const nullFunction = require('./null_function');
 

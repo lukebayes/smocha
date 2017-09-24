@@ -1,10 +1,8 @@
-const Emitter = require('./emitter');
 /**
  * Provide some basic infrastructure for entity composition.
  */
-class Composite extends Emitter {
+class Composite {
   constructor() {
-    super();
     this.children = [];
     this.parent = null;
   }

@@ -1,8 +1,5 @@
-const Emitter = require('./emitter');
 const Hook = require('./hook');
 const Suite = require('./suite');
-const delegateEvents = require('./delegate_events');
-const events = require('./events');
 
 const IS_ONLY = true;
 const IS_PENDING = true;
@@ -17,13 +14,11 @@ const IS_PENDING = true;
  * caller will ask for the root suite and can execute or analyze the assembled
  * tests as needed.
  */
-class BddInterface extends Emitter {
+class BddInterface {
   constructor() {
-    super();
     this._configureAnnotations();
     this._onlys = [];
     this._currentSuite = new Suite();
-    delegateEvents(this._currentSuite, this);
   }
 
   _configureAnnotations() {

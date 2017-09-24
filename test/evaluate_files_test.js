@@ -12,8 +12,8 @@ describe('evaluateFiles', () => {
     bddInterface = new BddInterface();
     sandbox = bddInterface.toSandbox();
     fileAndStats = [
-      {filename: './test/fixtures/simple.js'},
-      {filename: './test/fixtures/dependency.js'},
+      './test/fixtures/simple.js',
+      './test/fixtures/dependency.js',
     ];
   });
 

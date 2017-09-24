@@ -1,6 +1,5 @@
 const Composite = require('../').Composite;
 const assert = require('chai').assert;
-const Emitter = require('../').Emitter;
 const sinon = require('sinon');
 
 describe('Composite', () => {
@@ -61,24 +60,6 @@ describe('Composite', () => {
       looped = true;
     });
     assert(looped);
-  });
-
-  it('bubbles events', () => {
-    const handler = sinon.spy();
-    root.on('abcd', handler);
-    five.bubble('abcd');
-    assert.equal(handler.callCount, 1);
-  });
-
-  it('cancels bubbling events', () => {
-    function canceller() {
-      return Emitter.CANCEL;
-    };
-    const handler = sinon.spy();
-    root.on('abcd', handler);
-    one.on('abcd', canceller);
-    one.bubble('abcd');
-    assert.equal(handler.callCount, 0);
   });
 
   it('returns child when added', () => {

@@ -1,7 +1,6 @@
 const AssertionError = require('chai').AssertionError;
 const Hook = require('./hook');
 const Iterator = require('./iterator');
-const events = require('./events');
 const initializeTimer = require('./initialize_timer');
 const nullFunction = require('./null_function');
 const suiteToHooks = require('./suite_to_hooks');
@@ -96,7 +95,6 @@ function executeHook(hook, onHookComplete) {
   let failureResponse = null;
   let errorResponse = null;
   const getDuration = initializeTimer();
-  // hook.bubble(events.HOOK_BEGIN, hook);
 
   function onFailure(failure) {
     failureResponse = failure;

@@ -1,11 +1,8 @@
-const Emitter = require('./emitter');
 const Hook = require('./hook');
-const events = require('./events');
 const initializeTimer = require('./initialize_timer');
 
-class BaseReporter extends Emitter {
+class BaseReporter {
   constructor(stdout, stderr) {
-    super();
     this._stdout = stdout;
     this._stderr = stderr;
 
