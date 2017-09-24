@@ -9,6 +9,7 @@ const TestRunner = require('./src/test_runner');
 const evaluateFile = require('./src/evaluate_file');
 const evaluateFiles = require('./src/evaluate_files');
 const executeHooks = require('./src/execute_hooks');
+const filesToBatches = require('./src/files_to_batches');
 const findFiles = require('./src/find_files');
 const generateId = require('./src/generate_id');
 const initializeTimer = require('./src/initialize_timer');
@@ -28,6 +29,7 @@ module.exports = {
   evaluateFile,
   evaluateFiles,
   executeHooks,
+  filesToBatches,
   findFiles,
   generateId,
   initializeTimer,

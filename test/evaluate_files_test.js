@@ -18,9 +18,8 @@ describe('evaluateFiles', () => {
   });
 
   it('loads and evaluates fixture files', () => {
-    return evaluateFiles(sandbox, fileAndStats)
-      .then(() => {
-        const root = bddInterface.getRoot();
+    return evaluateFiles(bddInterface, fileAndStats)
+      .then((root) => {
         const hooks = suiteToHooks(root);
         assert(hooks.length >= 20);
       });

@@ -2,7 +2,6 @@ const assert = require('chai').assert;
 const findFiles = require('../').findFiles;
 
 describe('findFiles', () => {
-
   it('sorts files by most recently edited', () => {
     return findFiles('.*\.js', './test/fixtures')
       .then((filenames) => {

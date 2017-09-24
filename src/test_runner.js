@@ -3,6 +3,7 @@ const BddInterface = require('./bdd_interface');
 const Hook = require('./hook');
 const evaluateFiles = require('./evaluate_files');
 const executeHooks = require('./execute_hooks');
+const filesToBatches = require('./files_to_batches');
 const findFiles = require('./find_files');
 const suiteToHooks = require('./suite_to_hooks');
 
@@ -34,19 +35,21 @@ class TestRunner {
    */
   run() {
     const opts = this._options;
-    const currentInterface = new BddInterface();
     const reporter = opts.reporter || new BaseReporter(opts.stdout, opts.stderr);
     reporter.onStart();
 
+    const onHookComplete = reporter.onHookComplete.bind(reporter);
+
     return findFiles(opts.testExpression, opts.testDirectory)
       .then((filenames) => {
+        const batches = filesToBatches(filenames);
+
+        const currentInterface = new BddInterface();
         // TODO(lbayes): Spread execution across multiple child processes.
-        return evaluateFiles(currentInterface.toSandbox(), filenames);
+        return evaluateFiles(currentInterface, filenames);
       })
-      .then(() => {
-        return executeHooks(suiteToHooks(currentInterface.getRoot()), (result) => {
-          reporter.onHookComplete(result);
-        });
+      .then((rootSuite) => {
+        return executeHooks(suiteToHooks(rootSuite), onHookComplete);
       })
       .catch((err) => {
         reporter.onError(err);
