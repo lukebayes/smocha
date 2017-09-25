@@ -11,7 +11,7 @@ const os = require('os');
 const suiteToHooks = require('./suite_to_hooks');
 
 const DEFAULT_OPTIONS = {
-  coreCount: 1,
+  coreCount: 4,
   testDirectory: 'test',
   testExpression: /.*_test.js/,
   stdout: process.stdout,
@@ -42,9 +42,10 @@ function createWorkersFor(files, opt_coreCount) {
   return workPool;
 }
 
-function executeTests(workPool, iterator, onHookComplete) {
+function spreadExecution(workPool, iterator, onHookComplete) {
   let activeWorkerCount = workPool.length;
   console.log('WORKERS:', activeWorkerCount);
+
   return new Promise((resolve, reject) => {
     workPool.forEach((child) => {
       child.on('error', (err) => {
@@ -112,7 +113,7 @@ class TestRunner {
     return findFiles(opts.testExpression, opts.testDirectory)
       .then((filenames) => {
         const pool = createWorkersFor(filenames, opts.coreCount);
-        return executeTests(pool, new Iterator(filenames), onHookComplete);
+        return spreadExecution(pool, new Iterator(filenames), onHookComplete);
       })
       .catch((err) => {
         reporter.onError(err);
