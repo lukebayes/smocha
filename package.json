@@ -24,7 +24,7 @@
   "license": "MIT",
   "dependencies": {
     "chokidar": "1.4.3",
-    "diff": "^2.2.2"
+    "diff": "~>3.5.0"
   },
   "devDependencies": {
     "@lukebayes/each-file": "^1.0.0",
