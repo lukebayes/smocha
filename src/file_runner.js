@@ -13,7 +13,7 @@ class FileRunner extends Runner {
 
     defaultUi(file, suite, (err, suite) => {
       if (err) {
-        this._completeHandler(err);
+        opt_completeHandler && opt_completeHandler(err);
         return;
       }
 

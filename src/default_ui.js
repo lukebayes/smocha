@@ -26,21 +26,24 @@ var updateGlobalsWithSuiteKeys = function(suite) {
 var resetGlobalKeys = function(globals) {
   if (globals) {
     Object.keys(globals).forEach(function(key) {
+      // TODO(lbayes): Delete if necessary.
       global[key] = globals[key];
     });
   }
 };
 
-module.exports = function(file, suite, completeHandler) {
+module.exports = function(file, suite, opt_completeHandler) {
   var globals = updateGlobalsWithSuiteKeys(suite);
+  var error = null;
 
   try {
     require(file);
-    completeHandler(null, suite);
   } catch (err) {
-    completeHandler(err);
+    error = err;
   } finally {
     resetGlobalKeys(globals);
+    opt_completeHandler && opt_completeHandler(error, suite);
   }
+
 };
 
